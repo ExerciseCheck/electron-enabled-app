@@ -166,7 +166,7 @@ internals.applyRoutes = function (server, next) {
       console.log(request);
 
       RefExercise.create(
-          request,
+          request.payload,
         (err, document) => {
 
         if (err) {
