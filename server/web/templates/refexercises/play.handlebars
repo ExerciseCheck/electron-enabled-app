@@ -78,7 +78,7 @@
     var canvasSKLT = document.getElementById('bodyCanvas');
     var ctx1 = canvasSKLT.getContext('2d');
 
-    var frameData =  JSON.parse(document.getElementById("frames")[0]).innerHTML;
+    var frameData =  JSON.parse(document.getElementById("frames").innerHTML);
 
     IntervalID = animateCanvas1(frameData["bodyFrames"],frameData["bodyFrames"]["tracingId"]);
 
