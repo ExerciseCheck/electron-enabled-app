@@ -17,7 +17,7 @@ const config = {
     production: process.env.PROJECT_NAME,
     test: 'Anchor-Test',
     local: process.env.PROJECT_NAME,
-    $default: 'Anchor'
+    $default: 'ExerciseCheck'
   },
   port: {
     web: {

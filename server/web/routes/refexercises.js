@@ -58,10 +58,35 @@ internals.applyRoutes = function (server, next) {
 
         return reply.view('refexercises/edit', {
           user: request.auth.credentials.user,
-          projectName: Config.get('/projectName'),
-          document
+          projectName: Config.get('/projectName')
         });
       });
+    }
+  });
+
+
+  server.route({
+    method: 'GET',
+    path: '/refexercises/play',
+    config: {
+      // auth: {
+      //   strategy: 'session',
+      //   scope: ['root','admin']
+      // }
+    },
+    handler: function (request, reply) {
+
+      //noinspection JSAnnotator
+      RefExercise.findOne({}, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('refexercises/play', {
+          frameData: document
+        });
+    });
     }
   });
 
