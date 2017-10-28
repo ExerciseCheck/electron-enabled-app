@@ -84,7 +84,7 @@ internals.applyRoutes = function (server, next) {
         }
 
         return reply.view('refexercises/play', {
-          frameData: document
+          frameData: document["bodyFrames"]
         });
     });
     }
