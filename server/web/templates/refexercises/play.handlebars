@@ -9,6 +9,13 @@
                                 height: 600px;
                                 width: 800px;"></canvas>
 <script>
+    var canvasSKLT = document.getElementById('bodyCanvas');
+    var ctx1 = canvasSKLT.getContext('2d');
+    var radius=9;
+    var width = canvasSKLT.width;
+    var height = canvasSKLT.height;
+
+
     function animateCanvas1(bufferBodyFrames,tracingID){
         var i = 0;
         var TimerID = setInterval(function(){
@@ -75,8 +82,6 @@
         ctx1.strokeStyle="black";
     }
 
-    var canvasSKLT = document.getElementById('bodyCanvas');
-    var ctx1 = canvasSKLT.getContext('2d');
 
     var frameData =  JSON.parse(document.getElementById("frames").innerHTML);
 
