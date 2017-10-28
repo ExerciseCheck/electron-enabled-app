@@ -162,9 +162,11 @@ internals.applyRoutes = function (server, next) {
     config: {
     },
     handler: function (request, reply) {
+      console.log("request is....");
+      console.log(request);
 
       RefExercise.create(
-          request.payload.bodyFrames, 
+          request,
         (err, document) => {
 
         if (err) {
