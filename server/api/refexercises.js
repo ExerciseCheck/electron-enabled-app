@@ -160,12 +160,6 @@ internals.applyRoutes = function (server, next) {
     method: 'POST',
     path: '/refexercises',
     config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session']
-      },
-      validate: {
-        payload: RefExercise.payload
-      }
     },
     handler: function (request, reply) {
 
