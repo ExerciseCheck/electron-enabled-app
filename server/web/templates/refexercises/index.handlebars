@@ -43,12 +43,12 @@
       ajax: {
         url: "../api/table/refexercises",
         data: function (d) {
-          d.fields = "bodyFrames";
+          d.fields = "bodyFrames time";
         }
       },
       "columns": [
         {
-          data: "bodyFrames",
+          data: "bodyFrames.bodyFrames",
           defaultContent: ""
         },
         {

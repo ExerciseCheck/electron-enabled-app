@@ -6,8 +6,8 @@
                                 margin-top: 30px;
                                 background: grey;
                                 display: block;
-                                height: 600px;
-                                width: 800px;"></canvas>
+                                height: 500px;
+                                width: 900px;"></canvas>
 <script>
     var canvasSKLT = document.getElementById('bodyCanvas');
     var ctx1 = canvasSKLT.getContext('2d');
@@ -19,6 +19,8 @@
     function animateCanvas1(bufferBodyFrames,tracingID){
         var i = 0;
         var TimerID = setInterval(function(){
+//            console.log("body frame at index " +i + "is");
+//            console.log(bufferBodyFrames[i]);
             liveupdateCanvas1(bufferBodyFrames[i], tracingID);
             i++;
             if (i>=bufferBodyFrames.length){i=0;}
@@ -26,10 +28,21 @@
         return TimerID;
     }
 
+    function drawCircle(x, y, r, color){ // Not used in current code
+        ctx1.beginPath();
+        ctx1.strokeStyle=color;
+        ctx1.arc(x, y,r,0,Math.PI*2);
+        ctx1.stroke();
+    }
+
     function liveupdateCanvas1(bodyFrame, tracingID){
+//        console.log("lalalla");
+//        console.log(tracingID);
+//        console.log(bodyFrame);
         ctx1.clearRect(0, 0, width, height);
-        //drawCircle(ctx1, 50, 50, 10, "red"); removed if following code line works
-        //drawCenterCircle(width/2, height/5, 50, body.joints[2].depthX * width, body.joints[2].depthY * height);
+//        drawCircle(ctx1, 50, 50, 10, "red"); //rsremoved if following code line works
+//        drawCenterCircle(width/2, height/5, 50, body.joints[2].depthX * width, body.joints[2].depthY * height);
+        //bodyFrame should be array of bodies
         if (tracingID == -1){
             bodyFrame.bodies.some(function(body){
                 if(body.tracked){ drawBody(body); return(body.tracked);}
@@ -85,6 +98,6 @@
 
     var frameData =  JSON.parse(document.getElementById("frames").innerHTML);
 
-    IntervalID = animateCanvas1(frameData["bodyFrames"],frameData["bodyFrames"]["tracingId"]);
+    IntervalID = animateCanvas1(frameData["bodyFrames"][0],frameData["tracingId"]);
 
 </script>
