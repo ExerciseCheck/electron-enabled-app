@@ -49,7 +49,9 @@
       columns: [
         {
           data: "bodyFrames.bodyFrames",
-          defaultContent: ""
+          render: function (data, type, row) {
+            return data.join(' ');
+          }
         },
         {
           data: "time",

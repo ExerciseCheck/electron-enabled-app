@@ -38,7 +38,9 @@ RefExercise.payload = Joi.object().keys({
 
 
 
-RefExercise.indexes = [];
+RefExercise.indexes = [
+  {key: {'_id': 1}},
+];
 
 
 module.exports = RefExercise;

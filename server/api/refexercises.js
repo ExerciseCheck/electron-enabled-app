@@ -35,7 +35,7 @@ internals.applyRoutes = function (server, next) {
         bodyFrames: { $regex: request.query['search[value]'].toLowerCase() }
       };
 
-      RefExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+      RefExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
         if (err) {
           return reply(err);
