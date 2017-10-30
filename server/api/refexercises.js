@@ -11,6 +11,7 @@ internals.applyRoutes = function (server, next) {
   const RefExercise = server.plugins['hicsail-hapi-mongo-models'].RefExercise;
 
 
+
   server.route({
     method: 'GET',
     path: '/table/refexercises',
@@ -24,58 +25,17 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const accessLevel = User.highestRole(request.auth.credentials.user.roles);
       const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
       const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
-      let fields = request.query.fields;
+      const fields = request.query.fields;
 
       const query = {
         bodyFrames: { $regex: request.query['search[value]'].toLowerCase() }
       };
-      //no role
-      if (accessLevel === 0) {
-        query.userId = request.auth.credentials.user._id.toString();
-      }
-      //analyst
-      else if (accessLevel === 1) {
-        if (fields) {
-          fields = fields.split(' ');
-          let length = fields.length;
-          for (let i = 0; i < length; ++i) {
-            if (User.PHI().indexOf(fields[i]) !== -1) {
 
-              fields.splice(i, 1);
-              i--;
-              length--;
-            }
-          }
-          fields = fields.join(' ');
-        }
-      }
-      //clinician
-      else if (accessLevel === 2) {
-        //query.userId = request.auth.credentials.user._id.toString();
-      }
-
-      let userFields = 'studyID name username';
-      if (accessLevel === 1) {
-        //if analyst remove PHI
-        userFields = userFields.split(' ');
-        let length = userFields.length;
-        for (let i = 0; i < length; ++i) {
-          if (User.PHI().indexOf(userFields[i]) !== -1) {
-
-            userFields.splice(i, 1);
-            i--;
-            length--;
-          }
-        }
-        userFields = userFields.join(' ');
-      }
-
-      RefExercise.pagedLookupById(query,sort,limit,page,User,'user','userId',fields, userFields, (err, results) => {
+      RefExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
 
         if (err) {
           return reply(err);
@@ -195,7 +155,7 @@ internals.applyRoutes = function (server, next) {
       const id = request.params.id;
       const update = {
         $set: {
-          bodyFrames: request.payload.bodyFrames, 
+          bodyFrames: request.payload.bodyFrames,
         }
       };
 
