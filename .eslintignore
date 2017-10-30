@@ -1,0 +1,4 @@
+node_modules/*
+.idea/
+server/web/public/*
+server/web/min-js/*

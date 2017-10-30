@@ -38,11 +38,11 @@ lab.experiment('RefExercise Class Methods', () => {
       'bodyFrames',
       (err, result) => {
 
-      Code.expect(err).to.not.exist();
-      Code.expect(result).to.be.an.instanceOf(RefExercise);
+        Code.expect(err).to.not.exist();
+        Code.expect(result).to.be.an.instanceOf(RefExercise);
 
-      done();
-    });
+        done();
+      });
   });
 
 
@@ -61,12 +61,12 @@ lab.experiment('RefExercise Class Methods', () => {
       'bodyFrames',
       (err, result) => {
 
-      Code.expect(err).to.be.an.object();
-      Code.expect(result).to.not.exist();
+        Code.expect(err).to.be.an.object();
+        Code.expect(result).to.not.exist();
 
-      RefExercise.insertOne = realInsertOne;
+        RefExercise.insertOne = realInsertOne;
 
-      done();
-    });
+        done();
+      });
   });
 });

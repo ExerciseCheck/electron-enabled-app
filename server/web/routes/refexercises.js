@@ -84,9 +84,9 @@ internals.applyRoutes = function (server, next) {
         }
 
         return reply.view('refexercises/play', {
-          frameData: JSON.stringify(document["bodyFrames"])
+          frameData: JSON.stringify(document.bodyFrames)
         });
-    });
+      });
     }
   });
 

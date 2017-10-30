@@ -27,7 +27,7 @@ let stub;
 lab.before((done) => {
 
   stub = {
-  RefExercise: MakeMockModel()
+    RefExercise: MakeMockModel()
   };
 
   const proxy = {};
@@ -50,7 +50,7 @@ lab.before((done) => {
 
   const plugins = [HapiAuthBasic, HapiAuthCookie, HapiAuthJWT, ModelsPlugin, AuthPlugin, RefExercisePlugin];
   server = new Hapi.Server();
-  server.connection({port: Config.get('/port/web')});
+  server.connection({ port: Config.get('/port/web') });
   server.register(plugins, (err) => {
 
     if (err) {
@@ -110,7 +110,7 @@ lab.experiment('RefExercise Plugin Result List', () => {
       const args = Array.prototype.slice.call(arguments);
       const callback = args.pop();
 
-      callback(null, {data: [{}, {}, {}]});
+      callback(null, { data: [{}, {}, {}] });
     };
 
     server.inject(request, (response) => {
@@ -371,7 +371,7 @@ lab.experiment('RefExercise Plugin Read', () => {
 
     stub.RefExercise.findById = function (id, callback) {
 
-      callback(null, {_id: '93EP150D35'});
+      callback(null, { _id: '93EP150D35' });
     };
 
     server.inject(request, (response) => {
@@ -458,7 +458,7 @@ lab.experiment('RefExercise Plugin Update', () => {
       method: 'PUT',
       url: '/refexercises/420000000000000000000000',
       payload: {
-      bodyFrames: 'bodyFrames',
+        bodyFrames: 'bodyFrames'
       },
       credentials: AuthenticatedAdmin
     };
@@ -524,7 +524,7 @@ lab.experiment('RefExercise Plugin Create', () => {
       method: 'POST',
       url: '/refexercises',
       payload: {
-        bodyFrames: 'bodyFrames',
+        bodyFrames: 'bodyFrames'
       },
       credentials: AuthenticatedAdmin
     };

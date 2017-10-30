@@ -122,19 +122,20 @@ internals.applyRoutes = function (server, next) {
     config: {
     },
     handler: function (request, reply) {
-      console.log("request is....");
+
+      console.log('request is....');
       console.log(request);
 
       RefExercise.create(
-          request.payload,
+        request.payload,
         (err, document) => {
 
-        if (err) {
-          return reply(err);
-        }
+          if (err) {
+            return reply(err);
+          }
 
-        reply(document);
-      });
+          reply(document);
+        });
     }
   });
 
@@ -155,7 +156,7 @@ internals.applyRoutes = function (server, next) {
       const id = request.params.id;
       const update = {
         $set: {
-          bodyFrames: request.payload.bodyFrames,
+          bodyFrames: request.payload.bodyFrames
         }
       };
 
