@@ -9,6 +9,7 @@ const internals = {};
 internals.applyRoutes = function (server, next) {
 
   const RefExercise = server.plugins['hicsail-hapi-mongo-models'].RefExercise;
+  const Token = server.plugins['hicsail-hapi-mongo-models'].Token;
 
 
 
@@ -125,6 +126,8 @@ internals.applyRoutes = function (server, next) {
 
       console.log('request is....');
       console.log(request);
+
+
 
       RefExercise.create(
         request.payload,

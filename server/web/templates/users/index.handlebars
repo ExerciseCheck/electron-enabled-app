@@ -24,6 +24,8 @@
                   <th>Update Password</th>
                   <th>Edit</th>
                   <th>Delete</th>
+                  <th>Create Ground Truth</th>
+
                 {{/role}}
               </tr>
               </thead>
@@ -115,8 +117,14 @@
               return '<button class="btn btn-danger" id="delete'+row._id+'" onclick="deleteDoc(\'' + row._id + '\')">Delete</button>';
             },
             visible: false
-          }
-        {{/role}}
+          },
+          {
+              data: "_id",
+              render: function (data, type, row) {
+                  return '<button class="btn btn-danger" id="cgt'+row._id+'" onclick="createGroundTruth(\'' + row._id + '\')">Create Ground Truth</button>';
+              },
+              visible: false
+          }        {{/role}}
       ]
     });
   });

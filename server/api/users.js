@@ -306,6 +306,30 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  server.route({
+    method: 'POST',
+
+    path: '/users/{id}/createGroundTruth',
+    config: {
+      auth: {
+        strategy: 'session',
+        scope: ['root', 'admin']
+      },
+      validate: {
+        params: {
+          id: Joi.string().invalid('000000000000000000000000')
+        }
+      }
+    },
+    handler: function (request, reply) {
+      console.log("Inside route..");
+      return reply.view('users/createGroundTruth', {
+        user: request.auth.credentials.user,
+        projectName: Config.get('/projectName')
+      });
+    }
+  });
+
 
   server.route({
     method: 'PUT',

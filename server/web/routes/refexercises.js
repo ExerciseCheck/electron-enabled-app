@@ -67,6 +67,32 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
+    path: '/refexercises/play/{id}',
+    config: {
+      // auth: {
+      //   strategy: 'session',
+      //   scope: ['root','admin']
+      // }
+    },
+    handler: function (request, reply) {
+
+      //noinspection JSAnnotator
+      RefExercise.findOne({}, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('refexercises/play', {
+          projectName: Config.get('/projectName'),
+          frameData: JSON.stringify(document.bodyFrames)
+        });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
     path: '/refexercises/play',
     config: {
       // auth: {

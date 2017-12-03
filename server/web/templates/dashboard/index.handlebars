@@ -4,9 +4,12 @@
     <div class="col-sm-9 col-md-10">
       <div style="padding: 30px">
         <h3>Welcome to Exercise Check!</h3><br>
-        <a href="../refexercises/play">Play Recorded Exercise</a>
-
-        <hr>
+        {{#unless user.roles.root}}
+            <a href="../refexercises/play">View your reference exercise</a>
+        {{else}}
+            Hi there! Welcome to the Exercise Check Admin interface.
+        {{/unless}}
+          <hr>
       </div>
     </div>
   </div>

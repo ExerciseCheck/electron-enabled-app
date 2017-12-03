@@ -23,3 +23,10 @@ function deleteDoc(id) {
 function editDoc(id) {
   window.location = '../refexercises/' + id
 }
+
+function showRecordedExercise(id) {
+  window.location =  "../refexercises/play/"+id;
+
+}
+
+

@@ -31,3 +31,8 @@ function viewUserEvent(id) {
 function viewChangePassword(id) {
   window.location = '../change-password/' + id
 }
+
+function createGroundTruth(id) {
+  alert(id);
+  window.location = '../create-ground-truth/' + id
+}

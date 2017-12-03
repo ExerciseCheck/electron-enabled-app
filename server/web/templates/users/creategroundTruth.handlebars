@@ -1,0 +1,19 @@
+<div class="container-fluid h-100">
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+          {{>dashboardNav}}
+            <div class="col-sm-9 col-md-10">
+                <div style="padding: 30px">
+                    <h5>Create Ground Truth Exercise.</h5><br>
+                    <hr>
+                </div>
+                <div class="row-fluid">Please make sure your EX-CHECK desktop app is running and connected to the Kinect.</div>
+                <div class="hidden" id="userID"{{userID}}></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<script type="text/javascript" src="http://requirejs.org/docs/release/2.2.0/minified/require.js"></script>
+<script type="text/javascript" src="../../public/scripts/users/createGroundTruth.js"></script>

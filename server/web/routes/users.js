@@ -102,6 +102,31 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
+    path: '/create-ground-truth/{id}',
+    config: {
+      auth: {
+        strategy: 'session',
+        scope: ['root', 'admin']
+      },
+      validate: {
+        params: {
+          id: Joi.string().invalid('000000000000000000000000')
+        }
+      }
+    },
+    handler: function (request, reply) {
+
+      return reply.view('users/createGroundTruth', {
+        user: request.auth.credentials.user,
+        userID:request.params.id,
+        projectName: Config.get('/projectName')
+      });
+    }
+  });
+
+
+  server.route({
+    method: 'GET',
     path: '/users/{id}',
     config: {
       auth: {
