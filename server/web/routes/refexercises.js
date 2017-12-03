@@ -77,7 +77,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      RefExercise.findOne({}, (err, document) => {
+      RefExercise.findOne({"auth.user._id":request.params.id}, (err, document) => {
 
         if (err) {
           return reply(err);
