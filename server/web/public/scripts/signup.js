@@ -1,5 +1,5 @@
 'use strict';
-const signUpSchema = Joi.object().keys({
+const signUpSchema = Joi.object({
   name: Joi.string().required(),
   username: Joi.string().lowercase().invalid('root').required(),
   email: Joi.string().email().required(),
@@ -18,10 +18,10 @@ $('#signup').click((event) => {
     delete values['confirmPassword'];
     $.ajax({
       type: 'POST',
-      url: '../api/signup',
+      url: '/api/signup',
       data: values,
       success: function (result) {
-        window.location = '../';
+        window.location = '/';
       },
       error: function (result) {
         errorAlert(result.responseJSON.message);

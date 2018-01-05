@@ -1,6 +1,6 @@
 'use strict';
 
-const schema = Joi.object().keys({
+const schema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().lowercase().required(),
   username: Joi.string().token().lowercase().invalid('root').required(),
@@ -19,10 +19,10 @@ $('#create').click((event) => {
     delete values['confirmPassword'];
     $.ajax({
       type: 'POST',
-      url: '../api/users',
+      url: '/api/users',
       data: values,
       success: function (result) {
-        window.location = '../users'
+        window.location = '/users'
       },
       error: function (result) {
         errorAlert(result.responseJSON.message);

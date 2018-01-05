@@ -1,5 +1,5 @@
 'use strict';
-const schema = Joi.object().keys({
+const schema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required().min(8).regex(/^[A-Z]+[a-z]+[0-9]+$/, '1 Uppercase, 1 lowercase, 1 number'),
   confirmPassword: Joi.string().required().min(8).regex(/^[A-Z]+[a-z]+[0-9]+$/, '1 Uppercase, 1 lowercase, 1 number')
@@ -16,14 +16,14 @@ $('#setup').click((event) => {
 
   $.ajax({
     type: 'POST',
-    url: '../setup',
+    url: '/setup',
     data: values,
     success: function (result) {
       values.username = values.email;
       delete values.email;
       $.ajax({
         type: 'POST',
-        url: '../api/login',
+        url: '/api/login',
         data: values,
         success: function (result) {
           window.location.reload();

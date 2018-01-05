@@ -29,7 +29,9 @@ internals.applyRoutes = function (server, next) {
         return reply.redirect('/');
       }
       return reply.view('login/login', {
-        projectName: Config.get('/projectName')
+        projectName: Config.get('/projectName'),
+        title: 'Login',
+        baseUrl: Config.get('/baseUrl')
       });
     }
   });
@@ -51,7 +53,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       const credentials = request.auth.credentials || { session: {} };
-      const session = credentials.session || {};
+      const session = credentials.session;
 
       Session.findByIdAndDelete(session._id, (err, sessionDoc) => {
 

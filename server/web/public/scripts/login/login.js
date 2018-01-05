@@ -1,5 +1,5 @@
 'use strict';
-const loginSchema = Joi.object().keys({
+const loginSchema = Joi.object({
   username: Joi.string().lowercase().required(),
   password: Joi.string().required()
 });
@@ -13,7 +13,7 @@ $('#login').click((event) => {
   });
   $.ajax({
     type: 'POST',
-    url: '../api/login',
+    url: '/api/login',
     data: values,
     success: function (result) {
       location.reload();

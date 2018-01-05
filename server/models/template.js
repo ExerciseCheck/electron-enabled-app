@@ -1,3 +1,4 @@
+/* $lab:coverage:off$ */
 'use strict';
 const Joi = require('joi');
 const MongoModels = require('hicsail-mongo-models');
@@ -27,14 +28,14 @@ class Template extends MongoModels {
 Template.collection = 'templates';
 
 
-Template.schema = Joi.object().keys({
+Template.schema = Joi.object({
   _id: Joi.object(),
   name: Joi.string().required(),
   userId: Joi.boolean().required(),
   time: Joi.date().required()
 });
 
-Template.payload = Joi.object().keys({
+Template.payload = Joi.object({
   name: Joi.string().required()
 });
 
@@ -47,3 +48,4 @@ Template.indexes = [
 
 
 module.exports = Template;
+/* $lab:coverage:on$ */

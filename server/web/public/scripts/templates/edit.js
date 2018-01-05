@@ -1,6 +1,6 @@
 'use strict';
 
-const schema = Joi.object().keys({
+const schema = Joi.object({
   name: Joi.string().required()
 });
 joiToForm('formFields',schema);
@@ -14,10 +14,10 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '../api/templates/' + documentID,
+    url: '/api/templates/' + documentID,
     data: values,
     success: function (result) {
-      window.location = '../templates'
+      window.location = '/templates'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

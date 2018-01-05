@@ -1,6 +1,6 @@
 'use strict';
 
-const schema = Joi.object().keys({
+const schema = Joi.object({
   tokenName: Joi.string().required()
 });
 joiToForm('formFields',schema);
@@ -28,10 +28,10 @@ $('#update').click((event) => {
   }
   $.ajax({
     type: 'PUT',
-    url: '../api/tokens/' + tokenID,
+    url: '/api/tokens/' + tokenID,
     data: values,
     success: function (result) {
-      window.location = '../tokens'
+      window.location = '/tokens'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
