@@ -32,7 +32,7 @@ class Invite extends MongoModels {
 Invite.collection = 'invite';
 
 
-Invite.schema = Joi.object().keys({
+Invite.schema = Joi.object({
   _id: Joi.object(),
   user: User.payload,
   userId: Joi.string().required(),
@@ -40,7 +40,7 @@ Invite.schema = Joi.object().keys({
   time: Joi.date().required()
 });
 
-Invite.payload = Joi.object().keys({
+Invite.payload = Joi.object({
   email: Joi.string().email().lowercase().required(),
   name: Joi.string().required(),
   description: Joi.string().optional()

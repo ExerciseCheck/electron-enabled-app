@@ -155,7 +155,7 @@ class User extends MongoModels {
 User.collection = 'users';
 
 
-User.schema = Joi.object().keys({
+User.schema = Joi.object({
   _id: Joi.object(),
   isActive: Joi.boolean().default(true),
   username: Joi.string().token().lowercase().required(),
@@ -163,21 +163,21 @@ User.schema = Joi.object().keys({
   name: Joi.string(),
   inStudy: Joi.boolean().default(true),
   email: Joi.string().email().lowercase().required(),
-  roles: Joi.object().keys({
+  roles: Joi.object({
     clinician: Clinician.schema,
     analyst: Joi.boolean().required(),
     researcher: Joi.boolean().required(),
     admin: Joi.boolean().required(),
     root: Joi.boolean().required()
   }),
-  resetPassword: Joi.object().keys({
+  resetPassword: Joi.object({
     token: Joi.string().required(),
     expires: Joi.date().required()
   }),
   timeCreated: Joi.date()
 });
 
-User.payload = Joi.object().keys({
+User.payload = Joi.object({
   username: Joi.string().token().lowercase().invalid('root').required(),
   password: Joi.string().required(),
   email: Joi.string().email().lowercase().required(),

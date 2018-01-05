@@ -1,6 +1,6 @@
 'use strict';
 
-const schema = Joi.object().keys({
+const schema = Joi.object({
   name: Joi.string().required()
 });
 joiToForm('formFields',schema);
@@ -13,7 +13,7 @@ $('#create').click((event) => {
   });
   $.ajax({
     type: 'POST',
-    url: '../api/templates',
+    url: '/api/templates',
     data: values,
     success: function (result) {
       window.location = '../templates'

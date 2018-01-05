@@ -6,8 +6,8 @@
   "scripts": {
     "start": "nodemon --inspect -e js,md,html,handlebars,css server.js",
     "first-time-setup": "node first-time-setup.js",
-    "test": "lab -c -L",
-    "lint": "lab -dL",
+    "test": "lab -c -L --leaks",
+    "lint": "lab -dL --leaks",
     "lint-fix": "lab -dL --lint-fix",
     "coveralls": "lab -r lcov | ./node_modules/.bin/coveralls"
   },
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/hicsail/anchor#readme",
   "engines": {
-    "node": ">=8.1.4"
+    "node": "8.x.x"
   },
   "dependencies": {
     "express": "^4.16.2",
@@ -55,9 +55,10 @@
     "mongo-models": "1.x.x",
     "mongodb": "2.x.x",
     "nodemailer": "4.x.x",
-    "nodemailer-markdown": "1.x.x",
+    "nodemailer-markdown": "1.0.2",
     "object-assign": "4.x.x",
     "slug": "0.9.x",
+    "useragent": "2.x.x",
     "uuid": "3.x.x",
     "vision": "4.x.x",
     "visionary": "6.x.x"

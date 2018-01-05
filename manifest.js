@@ -15,7 +15,7 @@ const manifest = {
     },
     connections: {
       routes: {
-        security: true,
+        security: true
       }
     }
   },
@@ -112,6 +112,12 @@ const manifest = {
       }
     },
     {
+      plugin: './server/api/clinician',
+      options: {
+        routes: { prefix: '/api' }
+      }
+    },
+    {
       plugin: './server/api/contact',
       options: {
         routes: { prefix: '/api' }
@@ -203,6 +209,9 @@ const manifest = {
     },
     {
       plugin: './server/web/routes/backup'
+    },
+    {
+      plugin: './server/web/routes/clinician'
     },
     {
       plugin: './server/web/routes/dashboard'

@@ -34,7 +34,7 @@ class Token extends MongoModels {
 Token.collection = 'tokens';
 
 
-Token.schema = Joi.object().keys({
+Token.schema = Joi.object({
   _id: Joi.object(),
   tokenName: Joi.string().required(),
   userId: Joi.boolean().required(),
@@ -44,7 +44,7 @@ Token.schema = Joi.object().keys({
   lastUsed: Joi.date().required()
 });
 
-Token.payload = Joi.object().keys({
+Token.payload = Joi.object({
   tokenName: Joi.string().required(),
   active: Joi.boolean().default(true)
 });

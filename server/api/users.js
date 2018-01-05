@@ -101,11 +101,12 @@ internals.applyRoutes = function (server, next) {
       const query = {
         $or: [
           { email: { $regex: request.query.term, $options: 'i' } },
-          { name: { $regex: request.query.term, $options: 'i' } }
+          { name: { $regex: request.query.term, $options: 'i' } },
+          { username: { $regex: request.query.term, $options: 'i' } }
         ]
 
       };
-      const fields = 'name email';
+      const fields = 'name email username';
       const limit = 25;
       const page = 1;
 
@@ -322,7 +323,7 @@ internals.applyRoutes = function (server, next) {
       }
     },
     handler: function (request, reply) {
-      console.log("Inside route..");
+
       return reply.view('users/createGroundTruth', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
@@ -801,7 +802,7 @@ internals.applyRoutes = function (server, next) {
         return reply(user);
       }
 
-      user.roles.clinician = new Clinician([]);
+      user.roles.clinician = Clinician.create([]);
       const update = {
         $set: {
           roles: user.roles

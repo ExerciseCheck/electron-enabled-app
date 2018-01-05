@@ -1,5 +1,5 @@
 'use strict';
-const schema = Joi.object().keys({
+const schema = Joi.object({
   key: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
@@ -16,7 +16,7 @@ $('#reset').click((event) => {
   delete values.confirmPassword;
   $.ajax({
     type: 'POST',
-    url: '../api/login/reset',
+    url: '/api/login/reset',
     data: values,
     success: function (result) {
       location.reload();

@@ -1,4 +1,4 @@
-const schema = Joi.object().keys({
+const schema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().lowercase().required(),
   username: Joi.string().token().lowercase().required(),
@@ -12,10 +12,10 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '../api/users/my',
+    url: '/api/users/my',
     data: values,
     success: function (result) {
-      window.location = '../account';
+      window.location = '/account';
     },
     fail: function (result) {
       errorAlert(result.responseJSON.message);

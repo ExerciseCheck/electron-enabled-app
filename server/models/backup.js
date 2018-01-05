@@ -29,7 +29,7 @@ class Backup extends MongoModels {
 Backup.collection = 'backups';
 
 
-Backup.schema = Joi.object().keys({
+Backup.schema = Joi.object({
   _id: Joi.object(),
   backupId: Joi.string().required(),
   zip: Joi.boolean().required(),

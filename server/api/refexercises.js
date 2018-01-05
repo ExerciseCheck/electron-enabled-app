@@ -9,9 +9,6 @@ const internals = {};
 internals.applyRoutes = function (server, next) {
 
   const RefExercise = server.plugins['hicsail-hapi-mongo-models'].RefExercise;
-  const Token = server.plugins['hicsail-hapi-mongo-models'].Token;
-
-
 
   server.route({
     method: 'GET',
@@ -31,11 +28,6 @@ internals.applyRoutes = function (server, next) {
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
-
-      const query = {
-        bodyFrames: { $regex: request.query['search[value]'].toLowerCase() }
-      };
-
       RefExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
         if (err) {

@@ -39,7 +39,7 @@ RefExercise.payload = Joi.object().keys({
 
 
 RefExercise.indexes = [
-  {key: {'_id': 1}},
+  { key: { '_id': 1 } }
 ];
 
 
