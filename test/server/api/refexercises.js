@@ -50,7 +50,7 @@ lab.before((done) => {
 
   const plugins = [HapiAuthBasic, HapiAuthCookie, HapiAuthJWT, ModelsPlugin, AuthPlugin, RefExercisePlugin];
   server = new Hapi.Server();
-  server.connection({ port: Config.get('/port/web') });
+  server.connection({ port: Config.get('/port/web'), });
   server.register(plugins, (err) => {
 
     if (err) {

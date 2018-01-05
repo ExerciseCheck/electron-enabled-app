@@ -15,7 +15,7 @@ const manifest = {
     },
     connections: {
       routes: {
-        security: true
+        security: true,
       }
     }
   },
