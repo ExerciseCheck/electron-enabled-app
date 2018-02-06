@@ -4,14 +4,13 @@ const MongoModels = require('hicsail-mongo-models');
 
 class UserExercise extends MongoModels {
 
-  static create(userId, exerciseId, type, numSessions, referenceId, bodyFrames, callback){
+  static create(userId, exerciseId, type, numSessions, bodyFrames, callback){
 
     const document = {
       userId,
       exerciseId,
       type,
       numSessions,
-      referenceId,
       //isActive is set to true by default
       isActive: true,
       bodyFrames,
@@ -40,7 +39,6 @@ UserExercise.schema = Joi.object().keys({
   //we can also define a boolean field as isReference instead 
   type: Joi.string().valid('Reference','Practice').required(),
   numSessions: Joi.number().integer().required(),
-  referenceId: Joi.string().required(),
   isActive: Joi.boolean().required(),
   bodyFrames: Joi.array().required(),
   createdAt: Joi.date().required()
@@ -68,6 +66,17 @@ UserExercise.updatePayload = Joi.object().keys({
 
 UserExercise.activatePayload = Joi.object().keys({
   isActive: Joi.boolean().required()
+});
+
+UserExercise.refPayload = Joi.object().keys({
+  numSessions: Joi.number().integer().required(),
+  userId: Joi.string().required(),
+  exerciseId: Joi.string().required()
+});
+
+UserExercise.pracPayload = Joi.object().keys({
+  userId: Joi.string().required(),
+  exerciseId: Joi.string().required()
 });
 
 UserExercise.indexes = [

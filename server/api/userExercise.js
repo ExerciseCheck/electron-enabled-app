@@ -325,6 +325,7 @@ internals.applyRoutes = function (server, next) {
         createExercise:['findReference', function (results, done) {
 
           UserExercise.create(
+
             request.payload.userId,
             request.payload.exerciseId,
             'Practice',
@@ -338,7 +339,7 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-        if (!results.findExerciseId || results.findPracticeExercises === undefined) {
+        if (!results.findReference) {
           return reply(Boom.notFound('Document not found.'));
         }
 
@@ -412,6 +413,89 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
+
+  server.route({
+    method: 'POST',
+    path: '/userexercise/dummy/reference',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: UserExercise.refPayload
+      }
+    },
+    handler: function (request, reply) {
+
+      UserExercise.create(
+        request.payload.userId,
+        request.payload.exerciseId,
+        'Reference',
+        request.payload.numSessions,
+        [],
+        (err, document) => {
+
+          if (err) {
+            return reply(err);
+          }
+
+          reply(document);
+
+        });
+    }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/userexercise/dummy/practice',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: UserExercise.pracPayload
+      }
+    },
+    handler: function (request, reply) {
+
+      Async.auto({
+
+        findReference: function (done) {
+
+          const query = {
+            userId: request.payload.userId,
+            exerciseId: request.payload.exerciseId,
+            type: 'Reference'
+          };
+
+          UserExercise.findOne(query, done);
+        },
+        createExercise:['findReference', function (results, done) {
+
+          UserExercise.create(
+
+            request.payload.userId,
+            request.payload.exerciseId,
+            'Practice',
+            results.findReference.numSessions,
+            [],
+            done);
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findReference) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(results.createExercise);
+      });
+    }
+  });
+
 
 
   next();

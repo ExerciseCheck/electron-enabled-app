@@ -1,13 +1,14 @@
 'use strict';
 const internals = {};
 const Config = require('../../../config');
-const RefExercise = require('../../models/refexercise');
+const UserExercise = require('../../models/userExercise');
+const Exercise = require('../../models/exercise');
 
 internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/refexercises',
+    path: '/userexercise',
     config: {
       auth: {
         strategy: 'session'
@@ -15,7 +16,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      return reply.view('refexercises/index', {
+      return reply.view('userexercise/index', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
       });
@@ -24,7 +25,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/refexercises/create',
+    path: '/userexercise/create',
     config: {
       auth: {
         strategy: 'session'
@@ -32,7 +33,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      return reply.view('refexercises/create', {
+      return reply.view('userexercise/create', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
       });
@@ -41,7 +42,41 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/refexercises/{id}',
+    path: '/userexercise/create/practice',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      return reply.view('userexercise/createpractice', {
+        user: request.auth.credentials.user,
+        projectName: Config.get('/projectName')
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/create/ref',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      return reply.view('userexercise/createref', {
+        user: request.auth.credentials.user,
+        projectName: Config.get('/projectName')
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/{id}',
     config: {
       auth: {
         strategy: 'session',
@@ -50,15 +85,41 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      RefExercise.findById(request.params.id, (err, document) => {
+      UserExercise.findById(request.params.id, (err, document) => {
 
         if (err) {
           return reply(err);
         }
 
-        return reply.view('refexercises/edit', {
+        return reply.view('userexercise/edit', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName')
+        });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/viewexercises',
+    config: {
+      auth: {
+        strategy: 'session'
+        //scope: ['root','admin', 'patient']
+      }
+    },
+    handler: function (request, reply) {
+
+      Exercise.find({}, (err, exercises) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('userexercise/viewexercises', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          exercises
         });
       });
     }
@@ -77,7 +138,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      RefExercise.findOne({ 'auth.user._id':request.params.id }, (err, document) => {
+      UserExercise.findOne({ 'auth.user._id':request.params.id }, (err, document) => {
 
         if (err) {
           return reply(err);
@@ -93,7 +154,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/refexercises/play',
+    path: '/userexercise/play',
     config: {
       // auth: {
       //   strategy: 'session',
@@ -103,13 +164,13 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      RefExercise.findOne({}, (err, document) => {
+      UserExercise.findOne({}, (err, document) => {
 
         if (err) {
           return reply(err);
         }
 
-        return reply.view('refexercises/play', {
+        return reply.view('userexercises/play', {
           frameData: JSON.stringify(document.bodyFrames)
         });
       });
@@ -128,6 +189,6 @@ exports.register = function (server, options, next) {
 };
 
 exports.register.attributes = {
-  name: 'refexercisesList',
+  name: 'userexerciseList',
   dependencies: 'visionary'
 };

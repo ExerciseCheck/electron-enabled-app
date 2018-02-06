@@ -337,7 +337,7 @@ internals.applyRoutes = function (server, next) {
         exerciseName: { $regex: request.query.term, $options: 'i' }
       };
 
-      const fields = 'name';
+      const fields = 'exerciseName';
       const limit = 25;
       const page = 1;
 
