@@ -18,7 +18,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      if (!request.auth.isAuthenticated) {
+      if (!request.auth.isAuthenticated || request.auth.credentials.user.roles.admin || request.auth.credentials.user.roles.root || request.auth.credentials.user.roles.clinician) {
 
         return reply.view('dashboard/index', {
           user: request.auth.credentials.user,
@@ -45,6 +45,20 @@ internals.applyRoutes = function (server, next) {
 
           const Ids = [];
           const length = results.findRefExercises.length;
+
+          //if there are no refrence exercises for the user show the original version of dashboard for now
+          //eventully we won't need to have this check becuase we konw that patients will log in only after 
+          //they have recorded a reference exercise
+          if (length === 0) {
+
+            return reply.view('dashboard/index', {
+              user: request.auth.credentials.user,
+              projectName: Config.get('/projectName'),
+              title: 'Dashboard',
+              baseUrl: Config.get('/baseUrl')
+            });
+
+          }
 
           for (let i = 0; i < length; ++i) {
 
@@ -75,11 +89,11 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-        if ( !results.findRefExercises || !results.exercises || !results.findLatestSession) {
+
+        if (!results.exercises || !results.findLatestSession) {
           return reply(Boom.notFound('Document not found.'));
         }
 
-        console.log(JSON.stringify(results.findLatestSession));
         return reply.view('userexercise/viewexercises', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
