@@ -1,6 +1,7 @@
 'use strict';
 const internals = {};
 const Config = require('../../../config');
+const Exercise = require('../../models/exercise');
 
 internals.applyRoutes = function (server, next) {
 
@@ -19,6 +20,34 @@ internals.applyRoutes = function (server, next) {
         projectName: Config.get('/projectName'),
         title: 'Clinician',
         baseUrl: Config.get('/baseUrl')
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/clinician/patientexercises/{patientId}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      Exercise.find({}, (err, exercises) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('clinician/viewpatientexercises', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          title: 'Exercises',
+          baseUrl: Config.get('/baseUrl'),
+          patientId: request.params.patientId,
+          exercises
+        });
       });
     }
   });

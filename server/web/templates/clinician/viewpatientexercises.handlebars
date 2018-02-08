@@ -4,14 +4,15 @@
         <div class="col-sm-9 col-md-10">
             <div style="padding: 30px; color: #525B74;">
                 <br><br>
-                <h1 style= "text-align: center; font-size: 50px;" font-weight: bold; >Hello {{user.name}}, Select an exercise to continue.</h1>
-                <h3 align="center" style="color:#428BCA; font-size: 25px;">Your last session was on {{formatDate lastSession}}.</h3>
+                <h1 style= "text-align: center; font-size: 50px; font-weight: bold;" >Select an exercise.</h1>
+                <h3 align="center" style="color:#428BCA; font-size: 20px;">You are currently working with patient {{patientId}}.</h3>
                 <br>
                 <form style= "padding-left: 50px;">
                   <!div style="padding: 0px;">
                     <label for="mySearch"></label>
                     <input type="search" id="search" name="q" onkeyup="f() style= "padding-left: 50px;">
                     <button id="searchButton" onclick="search()" style= "padding-bottom: 3px;">SEARCH</button>
+                    <button id="addExercise" onclick="addExercise()">ADD EXERCISE +</button>
                     <span class="validity"></span>
                  <!/div>
                </form>
@@ -22,7 +23,7 @@
                           {{#each exercises}}
                              <li style= "padding: 10px">
                                <div class="listButtons">
-                                 <a href= '/userexercise/session/{{this._id}}' style="color: #525B74;">{{this.exerciseName}}</a>
+                                 <a href= '/userexercise/session/{{this.patientId}}/{{this._id}}' style="color: #525B74;">{{this.exerciseName}}</a>
                                </div> 
                              <li>
                           {{/each}}

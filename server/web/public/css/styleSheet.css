@@ -2,11 +2,11 @@
   width: 70%;
   height: 50px;
   border: 1px solid #E8F3FF;
-  border-radius: 12px;
+  border-radius: 5px;
   background-color: #E8F3FF;
   text-align: left;
-  font-size:25px;
-  
+  font-size:20px;
+  text-indent: 15px;
 }
 
 
@@ -17,13 +17,45 @@
   -moz-columns: 2;
 }
 
-#myInput {
+#search {
     
-    width: 100%;  
+    width: 26%;
+    height: 50px;  
     font-size: 16px;  
     padding: 12px 20px 12px 40px;  
-    border: 1px solid #ddd;  
-    margin-bottom: 12px;  
+    margin-bottom: 12px;
+    border: 1px solid #428BCA;
+    border-radius: 5px;
+    border-width: 2px;
+    font-size:25px; 
+}
+
+#addExercise {
+    
+    width: 13%;
+    height: 40px;  
+    font-size: 15px;  
+    border: 1px solid #428BCA;
+    color: #428BCA;
+    border-radius: 5px;
+    border-width: 2px;
+    padding-bottom: 3px;
+    margin-left: 500px;
+    background-color: white;
+    font-weight: bold; 
+}
+
+#searchButton {
+    
+    width: 8%; 
+    height: 40px; 
+    font-size: 16px;  
+    background-color: #428BCA;
+    border: 1px solid #428BCA;
+    border-radius: 5px;
+    color: white; 
+    left: 100px;
+    font-weight: bold; 
 }
 
 .bodyCanvas {
