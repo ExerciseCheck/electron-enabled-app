@@ -30,18 +30,3 @@ internals.setKeyVal = function setKeyVal(storage, key, val){
 
   storage.setItem(key, val);
 };
-
-
-exports.register = function (server, options, next) {
-
-  server.expose('createStorageObject', exports.createStorageObject);
-  server.expose('setKeyVal', internals.setKeyVal);
-
-  next();
-};
-
-// function to set keyvals
-exports.register.attributes = {
-  name: 'helperMethods'
-};
-
