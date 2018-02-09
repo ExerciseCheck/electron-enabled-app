@@ -9,7 +9,11 @@
   text-indent: 15px;
 }
 
+.notMatched {
+  background-color: white;
+  border: none; 
 
+}
 .ul {
   list-style-type: none;
   columns: 2;

@@ -2,6 +2,7 @@
 const internals = {};
 const Config = require('../../../config');
 const Exercise = require('../../models/exercise');
+const Async = require('async');
 
 internals.applyRoutes = function (server, next) {
 
@@ -39,14 +40,20 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
+        //add the patientId to each exercise so we can access the patientId on the template
+        Async.each(exercises, (exercise, callback) => {
+
+          exercise.patientId = request.params.patientId;
+          callback(null, exercise);
+        });
 
         return reply.view('clinician/viewpatientexercises', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           title: 'Exercises',
           baseUrl: Config.get('/baseUrl'),
-          patientId: request.params.patientId,
-          exercises
+          exercises,
+          patientId: request.params.patientId
         });
       });
     }

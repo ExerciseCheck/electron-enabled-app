@@ -90,3 +90,25 @@ function remove(clinicainId) {
     });
   }
 }
+
+function addExercise() {
+  console.log("here");
+  window.location = '/exercise/create';
+}
+
+function filter() {
+  const  input = $("#search");
+  const filter = input.val().toUpperCase();
+  const  ul = $("#ul");
+  const li =$("li");
+
+  $("div.listButtons").each(function() {
+    if ($(this)[0].innerHTML.toUpperCase().indexOf(filter) > -1) {
+      $(this).show();
+    }
+    else {
+      $(this).hide();
+             
+    }
+  })
+}

@@ -10,7 +10,7 @@
                 <form style= "padding-left: 50px;">
                   <!div style="padding: 0px;">
                     <label for="mySearch"></label>
-                    <input type="search" id="search" name="q" onkeyup="f() style= "padding-left: 50px;">
+                    <input type="input" id="search" name="q" onkeyup="filter()" style= "padding-left: 50px;">
                     <button id="searchButton" onclick="search()" style= "padding-bottom: 3px;">SEARCH</button>
                     <button id="addExercise" onclick="addExercise()">ADD EXERCISE +</button>
                     <span class="validity"></span>
@@ -23,7 +23,7 @@
                           {{#each exercises}}
                              <li style= "padding: 10px">
                                <div class="listButtons">
-                                 <a href= '/userexercise/session/{{this.patientId}}/{{this._id}}' style="color: #525B74;">{{this.exerciseName}}</a>
+                                 <a href= '/userexercise/clinician/session/{{this.patientId}}/{{this._id}}' style="color: #525B74;">{{this.exerciseName}}</a>
                                </div> 
                              <li>
                           {{/each}}
@@ -35,4 +35,4 @@
     </div>
 </div>
 <link rel="stylesheet" href="../public/css/styleSheet.css">
-<script type="text/javascript" src="../../public/scripts/userexercise/viewexercise.js"></script>
+<script type="text/javascript" src="../../public/scripts/clinician.js"></script>
