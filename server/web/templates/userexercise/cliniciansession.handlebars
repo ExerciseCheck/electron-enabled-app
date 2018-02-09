@@ -1,0 +1,48 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div style="padding: 30px">
+        <canvas id="bodyCanvas" class="bodyCanvas" style="padding-left: 0;
+                                padding-right: 0;
+                                left: 100px
+                                margin-left: auto;
+                                margin-right: auto;
+                                margin-top: 30px;
+                                background: grey;
+                                display: block;
+                                height: 800px;
+                                width: 1100px;"></canvas>
+        {{#if userExerciseInfo.referenceExists}}
+        <h1 id="line1" style="position: absolute; right: 100px; top: 300px">Set {{ userExerciseInfo.numPractices }} of {{userExerciseInfo.numSessions}}</h1>
+        <h3 id="line2" style="position: absolute; right: 10px; top: 350px">Current Exercise : {{ userExerciseInfo.exerciseName}}</h3>
+        <h4 id="line3" style="position: absolute; right: 55px; top: 400px; color: blue;"> What would you like to do?</h4>
+        <div class="btn btn-primary" id="updateReference" onclick="updateReference()" style="position: absolute;   
+                                                       right: 50px; 
+                                                       top: 450px; 
+                                                       background-color: blue; 
+                                                       width:300px; 
+                                                       color:white;">Update Reference</div>
+        <div class="btn btn-primary" id="createPractice" onclick="createPractice()" style="position: absolute; 
+                                                       right: 50px; 
+                                                       top: 500px; 
+                                                       background-color: blue;
+                                                       width:300px; 
+                                                       color:white;">Create Practice</div>         
+         <hr>
+      {{else}} 
+       
+      <h3 id="line2" style="position: absolute; right: 10px; top: 350px">Current Exercise : {{ userExerciseInfo.exerciseName}}</h3>
+      <div class="btn btn-primary" id="updateReference" onclick="CreateReference()" style="position: absolute;   
+                                                       right: 50px; 
+                                                       top: 450px; 
+                                                       background-color: blue; 
+                                                       width:300px; 
+                                                       color:white;">Create Reference</div>    
+         
+        </div>
+    </div>
+   {{/if}}
+  </div>
+</div>
+<script type="text/javascript" src="/public/scripts/userexercise/cliniciansession.js"></script>
