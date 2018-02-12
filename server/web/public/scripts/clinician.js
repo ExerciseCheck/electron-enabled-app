@@ -92,7 +92,7 @@ function remove(clinicainId) {
 }
 
 function addExercise() {
-  console.log("here");
+   
   window.location = '/exercise/create';
 }
 
