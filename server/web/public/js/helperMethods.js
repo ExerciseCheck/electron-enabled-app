@@ -1,9 +1,6 @@
-// function to make object
 'use strict';
 
-const internals = {};
-
-internals.storageAvailable = function storageAvailable(type) {
+function storageAvailable(type) {
 
   try {
     const storage = window[type];
@@ -17,16 +14,12 @@ internals.storageAvailable = function storageAvailable(type) {
   }
 };
 
-internals.createStorageObject = function createStorageObject() {
+function createStorageObject(storage, key, val) {
 
-  if (internals.storageAvailable('localStorage')){
+  if (storageAvailable('localStorage')){
     const storage = window.localStorage;
-    return storage;
+    if (storage.setItem(key, val)){
+      return true;
   }
   return false;
-};
-
-internals.setKeyVal = function setKeyVal(storage, key, val){
-
-  storage.setItem(key, val);
 };
