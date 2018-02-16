@@ -10,7 +10,7 @@ function storageAvailable(type) {
     return true;
   }
   catch (e){
-    return e;
+    return false;
   }
 };
 
