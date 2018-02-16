@@ -17,7 +17,6 @@ internals.applyRoutes = function (server, next) {
   const User = server.plugins['hicsail-hapi-mongo-models'].User;
 
 
-
   server.route({
     method: 'POST',
     path: '/login',
@@ -115,7 +114,6 @@ internals.applyRoutes = function (server, next) {
           username: request.pre.user.username,
           email: request.pre.user.email,
           roles: request.pre.user.roles
-
         },
         session: request.pre.session,
         authHeader
