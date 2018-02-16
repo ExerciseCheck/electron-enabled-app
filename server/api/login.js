@@ -107,7 +107,6 @@ internals.applyRoutes = function (server, next) {
 
       const credentials = request.pre.session._id.toString() + ':' + request.pre.session.key;
       const authHeader = 'Basic ' + new Buffer(credentials).toString('base64');
-      console.log(JSON.stringify(request.pre.exercises));
 
       reply({
         user: {

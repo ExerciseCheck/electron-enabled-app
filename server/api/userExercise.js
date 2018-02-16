@@ -116,7 +116,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //retrieves reference exercise for the logged-in patient, used in #16
-  //if we want to rende them in a table we use this route, using datatable
+  //if we want to render them in a table we use this route, using datatable
   server.route({
     method: 'GET',
     path: '/table/userexercise/reference/my',
@@ -267,9 +267,13 @@ internals.applyRoutes = function (server, next) {
     method: 'POST',
     path: '/userexercise/reference',
     config: {
-      /*validate: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root','admin','clinician']
+      },
+      validate: {
         payload: UserExercise.referencePayload
-      }*/
+      }
     },
 
     handler: function (request, reply) {
@@ -279,7 +283,6 @@ internals.applyRoutes = function (server, next) {
         request.payload.exerciseId,
         'Reference',
         request.payload.numSessions,
-        -1,
         request.payload.bodyFrames,
         (err, document) => {
 
@@ -301,10 +304,10 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
-      }
-      /*validate: {
+      },
+      validate: {
         payload: UserExercise.practicePayload
-      }*/
+      }
     },
     handler: function (request, reply) {
 
