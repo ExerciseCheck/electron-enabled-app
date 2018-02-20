@@ -4,13 +4,14 @@ const MongoModels = require('hicsail-mongo-models');
 
 class UserExercise extends MongoModels {
 
-  static create(userId, exerciseId, type, numSessions, bodyFrames, callback){
+  static create(userId, exerciseId, type, numSessions, numRepetition, bodyFrames, callback){
 
     const document = {
       userId,
       exerciseId,
       type,
       numSessions,
+      numRepetition,
       //isActive is set to true by default
       isActive: true,
       bodyFrames,
@@ -39,6 +40,7 @@ UserExercise.schema = Joi.object().keys({
   //we can also define a boolean field as isReference instead 
   type: Joi.string().valid('Reference','Practice').required(),
   numSessions: Joi.number().integer().required(),
+  numRepetition: Joi.number().integer().required(),
   isActive: Joi.boolean().required(),
   bodyFrames: Joi.array().required(),
   createdAt: Joi.date().required()
@@ -55,6 +57,7 @@ UserExercise.practicePayload = Joi.object().keys({
 UserExercise.referencePayload = Joi.object().keys({
   bodyFrames: Joi.array().required(),
   numSessions: Joi.number().integer().required(),
+  numRepitition: Joi.number().integer().required(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required()
 });
@@ -71,6 +74,7 @@ UserExercise.activatePayload = Joi.object().keys({
 //this is used for validating payload of dummy post requests when creating reference exercise
 UserExercise.refPayload = Joi.object().keys({
   numSessions: Joi.number().integer().required(),
+  numRepetition: Joi.number().integer().required(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required()
 });

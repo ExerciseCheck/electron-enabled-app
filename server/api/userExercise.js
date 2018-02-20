@@ -279,6 +279,7 @@ internals.applyRoutes = function (server, next) {
         request.payload.exerciseId,
         'Reference',
         request.payload.numSessions,
+        request.payload.numRepetition,
         -1,
         request.payload.bodyFrames,
         (err, document) => {
@@ -330,6 +331,7 @@ internals.applyRoutes = function (server, next) {
             request.payload.exerciseId,
             'Practice',
             results.findReference.numSessions,
+            results.findReference.numRepetition,
             results.findReference.referenceId,
             request.payload.bodyFrames,
             done);
@@ -433,6 +435,7 @@ internals.applyRoutes = function (server, next) {
         request.payload.exerciseId,
         'Reference',
         request.payload.numSessions,
+        request.payload.numRepetition,
         [],
         (err, document) => {
 
@@ -479,6 +482,7 @@ internals.applyRoutes = function (server, next) {
             request.payload.exerciseId,
             'Practice',
             results.findReference.numSessions,
+            results.findReference.numRepetition,
             [],
             done);
         }]
