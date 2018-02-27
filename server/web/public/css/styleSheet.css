@@ -1,22 +1,3 @@
-.listButtons {
-  width: 70%;
-  height: 50px;
-  border: 1px solid #E8F3FF;
-  border-radius: 12px;
-  background-color: #E8F3FF;
-  text-align: left;
-  font-size:25px;
-  
-}
-
-
-.ul {
-  list-style-type: none;
-  columns: 2;
-  -webkit-columns: 2;
-  -moz-columns: 2;
-}
-
 #myInput {
     
     width: 100%;  

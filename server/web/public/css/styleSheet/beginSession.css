@@ -1,0 +1,39 @@
+.bodyCanvas {
+  padding-left: 0;
+  padding-right: 0;
+  left: 100px
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  background: grey;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+#line3 {
+  color: blue;
+  visibility: hidden;
+}
+
+#line4 {
+  color: blue;
+}
+
+#startSession {
+  color: blue; 
+  width:300px; 
+  color:white;
+}
+
+#discard {
+  color: blue;
+  visibility: hidden; 
+  width:300px; 
+  color:white;
+}
+
+ 
+
+ 
+

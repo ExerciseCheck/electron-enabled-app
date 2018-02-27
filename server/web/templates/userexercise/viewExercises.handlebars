@@ -1,0 +1,32 @@
+<div class="container-fluid h-100">
+    <div class="row h-100">
+      {{>dashboardNav}}
+        <div class="col-sm-9 col-md-10">
+            <div class="contentPadding">
+                <h1>Hello {{user.name}}, Select an exercise to continue.</h1>
+                <h3>Your last session was on {{formatDate lastSession}}.</h3> 
+                <br><br><br>
+                <form>
+                  <div>
+                    <label for="mySearch">Search for exercises</label>
+                    <input type="search" id="search" name="q" placeholder="search for an exercise" onkeyup="f()">
+                    <button onclick="search()">Search</button>
+                    <span class="validity"></span>
+                 </div>
+               </form>
+               <br>    
+               <ul>
+                 {{#each exercises}}
+                   <li style= "padding: 10px">
+                     <div class="listButtons">
+                       <a href= '/userexercise/session/{{this._id}}' class="listItem">{{this.exerciseName}}</a>
+                     </div> 
+                  <li>
+                 {{/each}}
+             </ul>
+        </div>
+     </div>
+  </div>
+</div>
+<link rel="stylesheet" href="../public/css/styleSheet/viewExercise.css">
+<script type="text/javascript" src="../../public/scripts/userexercise/viewexercise.js"></script>

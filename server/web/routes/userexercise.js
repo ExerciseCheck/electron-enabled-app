@@ -73,7 +73,7 @@ internals.applyRoutes = function (server, next) {
           return reply(err);
         }
 
-        return reply.view('userexercise/beginsession', {
+        return reply.view('userexercise/beginSession', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           exercise
@@ -141,7 +141,7 @@ internals.applyRoutes = function (server, next) {
           return reply(err);
         }
 
-        return reply.view('userexercise/viewexercises', {
+        return reply.view('userexercise/viewExercises', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           exercises
