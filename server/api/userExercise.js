@@ -161,7 +161,7 @@ internals.applyRoutes = function (server, next) {
 
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
-  //this route is used if we tag userExercise documents with a referenceId tag 
+  //this route is used if we don't tag userExercise documents with a referenceId tag 
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{referenceId}',
@@ -172,39 +172,6 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const query = {
-        userId: request.auth.credentials.user._id.toString(),
-        referenceId: request.params.referenceId,
-        type: 'Practice'
-      };
-
-      UserExercise.find(query, (err, practiceExercises) => {
-
-        if (err) {
-          return reply(err);
-        }
-
-        if (!practiceExercises) {
-          return reply(Boom.notFound('Document not found.'));
-        }
-
-        reply(practiceExercises);
-      });
-    }
-  });
-
-  //retrieves practice exercise with a particular referenceId for the logged in patient
-  //this route is used if we don't tag userExercise documents with a referenceId tag 
-  /*server.route({
-    method: 'GET',
-    path: '/userexercise/practice/{referenceId}',
-    config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session']
-      }
-    },
-    handler: function (request, reply) {
-    
       Async.auto({
 
         //first we need to find the exerciseId of the reference
@@ -234,7 +201,7 @@ internals.applyRoutes = function (server, next) {
         reply(results.findPracticeExercises);
       });
     }
-  });*/
+  });
 
 
   server.route({
