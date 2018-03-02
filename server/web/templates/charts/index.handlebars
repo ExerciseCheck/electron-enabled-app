@@ -1,0 +1,88 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div style="padding: 30px">
+        <h3>Charts</h3>
+        <hr>
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-primary active">
+            <input type="radio" name="options" id="option1" autocomplete="off" checked> Day
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option2" autocomplete="off"> Week
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option3" autocomplete="off"> Month
+          </label>
+        </div>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/series-label.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+        <div id="chart-container"></div>
+
+        <script>
+          var chart = Highcharts.chart('chart-container', {
+
+              title: {
+                  text: 'Sessions Completed'
+              },
+
+              yAxis: {
+                  title: {
+                      text: 'Sessions'
+                  }
+              },
+              legend: {
+                  layout: 'vertical',
+                  align: 'right',
+                  verticalAlign: 'middle'
+              },
+
+              plotOptions: {
+                  series: {
+                      label: {
+                          connectorAllowed: false
+                      },
+                      pointStart: 2010
+                  }
+              },
+
+              series: [{
+                  name: 'Recommended',
+                  data: [20, 20, 20, 20, 20, 20, 20, 20]
+              }, {
+                  name: 'Your Progress',
+                  data: [12, 15, 14, 10, 6, 12, 15, 14]
+              }],
+
+              responsive: {
+                  rules: [{
+                      condition: {
+                          maxWidth: 500
+                      },
+                      chartOptions: {
+                          legend: {
+                              layout: 'horizontal',
+                              align: 'center',
+                              verticalAlign: 'bottom'
+                          }
+                      }
+                  }]
+              }
+
+          });
+
+          // on button click, get data with chart.series[1].processedYData
+          // manipulate data then run update function
+          /*
+          chart.series[1].update({
+              data: t
+          }, true);
+          */
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
