@@ -7,13 +7,13 @@
         <hr>
         <div class="btn-group" data-toggle="buttons">
           <label class="btn btn-primary active">
-            <input type="radio" name="options" id="option1" autocomplete="off" checked> Day
+            <input type="radio" name="options" id="day" autocomplete="off" checked> Day
           </label>
           <label class="btn btn-primary">
-            <input type="radio" name="options" id="option2" autocomplete="off"> Week
+            <input type="radio" name="options" id="week" autocomplete="off"> Week
           </label>
           <label class="btn btn-primary">
-            <input type="radio" name="options" id="option3" autocomplete="off"> Month
+            <input type="radio" name="options" id="month" autocomplete="off"> Month
           </label>
         </div>
         <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -39,22 +39,35 @@
                   align: 'right',
                   verticalAlign: 'middle'
               },
-
-              plotOptions: {
-                  series: {
-                      label: {
-                          connectorAllowed: false
-                      },
-                      pointStart: 2010
+              xAxis: {
+                  type: 'datetime',
+                  dateTimeLabelFormats: {
+                     day: '%d %b %Y'    //ex- 01 Jan 2016
                   }
               },
 
               series: [{
                   name: 'Recommended',
-                  data: [20, 20, 20, 20, 20, 20, 20, 20]
+                  data: [
+                          [Date.UTC(2018, 9, 1), 20],
+                          [Date.UTC(2018, 9, 2), 20],
+                          [Date.UTC(2018, 9, 3), 20],
+                          [Date.UTC(2018, 9, 4), 20],
+                          [Date.UTC(2018, 9, 5), 20],
+                          [Date.UTC(2018, 9, 6), 20],
+                          [Date.UTC(2018, 9, 7), 20]
+                        ]
               }, {
                   name: 'Your Progress',
-                  data: [12, 15, 14, 10, 6, 12, 15, 14]
+                  data: [
+                          [Date.UTC(2018, 9, 1), Math.round(Math.random() * 10) + 10],
+                          [Date.UTC(2018, 9, 2), Math.round(Math.random() * 10) + 10],
+                          [Date.UTC(2018, 9, 3), Math.round(Math.random() * 10) + 10],
+                          [Date.UTC(2018, 9, 4), Math.round(Math.random() * 10) + 10],
+                          [Date.UTC(2018, 9, 5), Math.round(Math.random() * 10) + 10],
+                          [Date.UTC(2018, 9, 6), Math.round(Math.random() * 10) + 10],
+                          [Date.UTC(2018, 9, 7), Math.round(Math.random() * 10) + 10]
+                        ]
               }],
 
               responsive: {
@@ -70,17 +83,113 @@
                           }
                       }
                   }]
-              }
+              },
+              chart: {
+                events: {
+                    load: function () {
+                      $(".btn-group>.btn").click(function(){
+                        //console.log(chart.series[1].processedYData)
+                        val = $(this).children()[0].id
+                        if (val == "day") {
+                          chart.update({
+                            xAxis: {
+                                    type: 'datetime',
+                                    dateTimeLabelFormats: {
+                                       day: '%d %b %Y'    //ex- 01 Jan 2016
+                                    }
+                            },
+                            series: [{
+                                name: 'Recommended',
+                                data: [
+                                        [Date.UTC(2018, 9, 1), 20],
+                                        [Date.UTC(2018, 9, 2), 20],
+                                        [Date.UTC(2018, 9, 3), 20],
+                                        [Date.UTC(2018, 9, 4), 20],
+                                        [Date.UTC(2018, 9, 5), 20],
+                                        [Date.UTC(2018, 9, 6), 20],
+                                        [Date.UTC(2018, 9, 7), 20]
+                                      ]
+                            }, {
+                                name: 'Your Progress',
+                                data: [
+                                        [Date.UTC(2018, 9, 1), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 9, 2), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 9, 3), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 9, 4), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 9, 5), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 9, 6), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 9, 7), Math.round(Math.random() * 10) + 10]
+                                      ]
+                            }]
+                          })
+                        } else if (val == "week") {
+                          chart.update({
+                            xAxis: {
+                                    type: 'datetime',
+                                    dateTimeLabelFormats: {
+                                       day: '%e. %b'    //ex- 01 Jan 2016
+                                    }
+                            },
+                            series: [{
+                                name: 'Recommended',
+                                data: [
+                                        [Date.UTC(2018, 1, 7), 20],
+                                        [Date.UTC(2018, 1, 14), 20],
+                                        [Date.UTC(2018, 1, 21), 20],
+                                        [Date.UTC(2018, 1, 28), 20]
+                                      ]
+                            }, {
+                                name: 'Your Progress',
+                                data: [
+                                        [Date.UTC(2018, 1, 7), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 1, 14), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 1, 21), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 1, 28), Math.round(Math.random() * 10) + 10]
+                                      ]
+                            }]
+                          })
+                        } else {
+                          chart.update({
+                            xAxis: {
+                                    type: 'datetime',
+                                    dateTimeLabelFormats: {
+                                       day: '%b %Y'    //ex- 01 Jan 2016
+                                    }
+                            },
+                            series: [{
+                                name: 'Recommended',
+                                data: [
+                                        [Date.UTC(2018, 1, 1), 20],
+                                        [Date.UTC(2018, 2, 2), 20],
+                                        [Date.UTC(2018, 3, 3), 20],
+                                        [Date.UTC(2018, 4, 4), 20],
+                                        [Date.UTC(2018, 5, 5), 20],
+                                        [Date.UTC(2018, 6, 6), 20],
+                                        [Date.UTC(2018, 7, 7), 20]
+                                      ]
+                            }, {
+                                name: 'Your Progress',
+                                data: [
+                                        [Date.UTC(2018, 1, 1), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 2, 2), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 3, 3), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 4, 4), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 5, 5), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 6, 6), Math.round(Math.random() * 10) + 10],
+                                        [Date.UTC(2018, 7, 7), Math.round(Math.random() * 10) + 10]
+                                      ]
+                            }]
+                          })
+                        }
 
+                        /*chart.series[1].update({
+                            data: Array.from({length: 8}, () => Math.round(Math.random() * 10) + 10)
+                        }, true);*/
+                      })
+                    }
+                }
+            }
           });
-
-          // on button click, get data with chart.series[1].processedYData
-          // manipulate data then run update function
-          /*
-          chart.series[1].update({
-              data: t
-          }, true);
-          */
         </script>
       </div>
     </div>
