@@ -94,7 +94,7 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('Document not found.'));
         }
 
-        return reply.view('userexercise/viewExercises', {
+        return reply.view('patient/viewExercises', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           title: 'Dashboard',

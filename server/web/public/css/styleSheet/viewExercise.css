@@ -1,3 +1,4 @@
+
 .listButtons {
   width: 70%;
   height: 50px;
@@ -35,5 +36,28 @@ h3 {
 .listItem {
   color: #525B74;
 }
+
+#search {
+  width:300px;
+  height:40px;
+  border:solid 2px #428BCA;
+  border-radius:5px;
+  margin-left: 60px;
+}
+
+.search {
+  display:inline-block;
+  position:relative
+}
+
+.search .fa-search { 
+  position: absolute;
+  top: 7px;
+  right:10px;
+  font-size: 20px;
+  color: gray;
+  font-weight: none;
+}  
+
 
  
