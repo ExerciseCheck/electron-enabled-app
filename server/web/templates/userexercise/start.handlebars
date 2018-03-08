@@ -8,18 +8,18 @@
             <canvas id="bodyCanvas" class="bodyCanvas"></canvas>
           </div>
           <div class="col-md-4 text-center col-v-centered no-float">
-            <div id="fistSection">
+            <div id= "firstSection">
               <p id="line1">Current Exercise:</p>
               <div class= "small">
                 <p>10 {{exercise.exerciseName}}s</p>
-                <p>Set 2 of 2</p>
+                <p>Set 2 of 2 </p>
               </div>
-              <div id= "secondSection" class="blue">
-                <h1 id="line4">To end the set,<h1>
-                <h2 id="line5">click Stop.<h2>
+              <div class="blue">
+                <h1 id="line4">To begin the set,<h1>
+                <h2 id="line5">click Start.<h2>
               </div>
               <div>
-                <button type="button" class="btn btn-primary" id="endSession" onclick="stop()">STOP</button>
+                <button type="button" class="btn btn-primary" id="startSession" onclick="start()">START</button>
               </div>
           </div>
         </div>
@@ -27,5 +27,5 @@
     </div>
   </div>
 </div>
-<link rel="stylesheet" href="../../public/css/styleSheet/play.css">
-<script type="text/javascript" src="/public/scripts/userexercise/play.js"></script>
+<link rel="stylesheet" href="../../public/css/styleSheet/start.css">
+<script type="text/javascript" src="/public/scripts/userexercise/start.js"></script>

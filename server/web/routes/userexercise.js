@@ -59,7 +59,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise/session/{exerciseId}',
+    path: '/userexercise/start/{exerciseId}',
     config: {
       auth: {
         strategy: 'session'
@@ -73,7 +73,57 @@ internals.applyRoutes = function (server, next) {
           return reply(err);
         }
 
-        return reply.view('userexercise/beginSession', {
+        return reply.view('userexercise/start', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          exercise
+        });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/play/{exerciseId}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      Exercise.findById(request.params.exerciseId, (err, exercise) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('userexercise/play', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          exercise
+        });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/stop/{exerciseId}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      Exercise.findById(request.params.exerciseId, (err, exercise) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('userexercise/stop', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           exercise
