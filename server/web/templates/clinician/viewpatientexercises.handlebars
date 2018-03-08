@@ -1,38 +1,39 @@
 <div class="container-fluid h-100">
-    <div class="row h-100">
-      {{>dashboardNav}}
-        <div class="col-sm-9 col-md-10">
-            <div style="padding: 30px; color: #525B74;">
-                <br><br>
-                <h1 style= "text-align: center; font-size: 50px; font-weight: bold;" >Select an exercise.</h1>
-                <h3 align="center" style="color:#428BCA; font-size: 20px;">You are currently working with patient {{patientId}}.</h3>
-                <br>
-                <form style= "padding-left: 50px;">
-                  <!div style="padding: 0px;">
-                    <label for="mySearch"></label>
-                    <input type="input" id="search" name="q" onkeyup="filter()" style= "padding-left: 50px;">
-                    <button id="searchButton" onclick="search()" style= "padding-bottom: 3px;">SEARCH</button>
-                    <a class="btn btn-primary" id="addExercise" href="/exercise/create">ADD EXERCISE +</a>
-                    <span class="validity"></span>
-                 <!/div>
-               </form>
-               <br><br>    
-               <!div class="card">
-                    <!div style="padding: 20px">
-                       <ul id ="ul" class = "ul">
-                          {{#each exercises}}
-                             <li style= "padding: 10px">
-                               <div class="listButtons">
-                                 <a href= '/userexercise/clinician/session/{{this.patientId}}/{{this._id}}' style="color: #525B74;">{{this.exerciseName}}</a>
-                               </div> 
-                             <li>
-                          {{/each}}
-                       </ul>
-                    <!/div>
-                <!/div>
-            </div>
-        </div>
+  <div class="row h-100">
+    {{>dashboardNav}}
+     <div class="col-sm-9 col-md-10">
+       <div id="mainContent">
+         <br><br>
+         <h1>Select an exercise.</h1>
+         <h3>You are currently working with Patient {{patientId}}.</h3>
+         <br>
+         <form>
+           <div class="form-group">
+             <div class="search">
+               <span class="fa fa-search"></span>
+                 <input type="search" class="form-control" id="search" onkeyup="filter()" placeholder:"Search by Patient ID">
+              </div>
+              <span id="AddExrcsSpan">
+                <button type="button" class="btn btn-primary" id="addExercise" href="/exercise/create">
+                  <span>ADD EXERCISE <i class="fa fa-plus"></i></span>
+                </button>
+             </span>
+           </div>              
+         </form>
+         <br><br>    
+         <ul>
+           {{#each exercises}}
+             <li>
+               <div class="listButtons">
+                 <a href= '/userexercise/clinician/session/{{this.patientId}}/{{this._id}}'>{{this.exerciseName}}</a>
+               </div> 
+             <li>
+          {{/each}}
+        </ul>
+      </div>
     </div>
+   </div>
 </div>
-<link rel="stylesheet" href="../public/css/styleSheet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="../public/css/styleSheet/viewPatientExercises.css">
 <script type="text/javascript" src="../../public/scripts/clinician.js"></script>
