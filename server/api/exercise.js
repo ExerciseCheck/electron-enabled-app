@@ -2,17 +2,15 @@
 const Boom = require('boom');
 const Joi = require('joi');
 
-
 const internals = {};
-
 
 internals.applyRoutes = function (server, next) {
 
-  const RefExercise = server.plugins['hicsail-hapi-mongo-models'].RefExercise;
+  const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
 
   server.route({
     method: 'GET',
-    path: '/table/refexercises',
+    path: '/table/exercise',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -28,7 +26,7 @@ internals.applyRoutes = function (server, next) {
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
-      RefExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+      Exercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
         if (err) {
           return reply(err);
@@ -45,10 +43,9 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-
   server.route({
     method: 'GET',
-    path: '/refexercises',
+    path: '/exercise',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
@@ -71,7 +68,7 @@ internals.applyRoutes = function (server, next) {
       const limit = request.query.limit;
       const page = request.query.page;
 
-      RefExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+      Exercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
 
         if (err) {
           return reply(err);
@@ -82,10 +79,10 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-
+  //this route finds all the exercises created by the logged-in user
   server.route({
     method: 'GET',
-    path: '/refexercises/{id}',
+    path: '/exercise/my',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -93,36 +90,70 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      RefExercise.findById(request.params.id, (err, document) => {
+      const userID = request.auth.credentials.user._id.toString();
+
+      const query = {
+        userId: userID
+      };
+
+
+      Exercise.find(query, (err, results) => {
 
         if (err) {
           return reply(err);
         }
 
-        if (!document) {
+        if (!results || results === undefined){
           return reply(Boom.notFound('Document not found.'));
         }
 
-        reply(document);
+        reply(results);
       });
     }
   });
 
-
   server.route({
-    method: 'POST',
-    path: '/refexercises',
+    method: 'GET',
+    path: '/exercise/{id}',
     config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root', 'admin', 'researcher']
+      }
     },
     handler: function (request, reply) {
 
-      console.log('request is....');
-      console.log(request);
+      Exercise.findById(request.params.id, (err, result) => {
 
+        if (err) {
+          return reply(err);
+        }
 
+        if (!result || result === undefined){
+          return reply(Boom.notFound('Document not found.'));
+        }
+        reply(result);
+      });
+    }
+  });
 
-      RefExercise.create(
-        request.payload,
+  server.route({
+    method: 'POST',
+    path: '/exercise',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: Exercise.payload
+      }
+    },
+    handler: function (request, reply) {
+
+      Exercise.create(
+        request.payload.exerciseName,
+        request.payload.description,
+        request.auth.credentials.user._id.toString(),
         (err, document) => {
 
           if (err) {
@@ -130,58 +161,61 @@ internals.applyRoutes = function (server, next) {
           }
 
           reply(document);
+
         });
     }
   });
 
-
   server.route({
     method: 'PUT',
-    path: '/refexercises/{id}',
+    path: '/exercise/{id}',
     config: {
       auth: {
-        strategies: ['simple', 'jwt', 'session']
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root', 'admin']
       },
       validate: {
-        payload: RefExercise.payload
+        payload: Exercise.payload
       }
     },
     handler: function (request, reply) {
 
       const id = request.params.id;
+
       const update = {
         $set: {
-          bodyFrames: request.payload.bodyFrames
+          exerciseName: request.payload.exerciseName,
+          description: request.payload.description
         }
       };
 
-      RefExercise.findByIdAndUpdate(id, update, (err, document) => {
+      Exercise.findByIdAndUpdate(id, update, (err, results) => {
 
         if (err) {
           return reply(err);
         }
 
-        if (!document) {
+        if (!results || results === undefined) {
           return reply(Boom.notFound('Document not found.'));
         }
 
-        reply(document);
+        reply(results);
       });
     }
   });
 
   server.route({
     method: 'DELETE',
-    path: '/refexercises/{id}',
+    path: '/exercise/{id}',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
-        scope: ['root','admin']
+        scope: ['root', 'admin']
       }
     },
     handler: function (request, reply) {
 
-      RefExercise.findByIdAndDelete(request.params.id, (err, document) => {
+      Exercise.findByIdAndDelete(request.params.id, (err, document) => {
 
         if (err) {
           return reply(err);
@@ -197,6 +231,48 @@ internals.applyRoutes = function (server, next) {
   });
 
 
+  server.route({
+    method: 'GET',
+    path: '/select2/exercise',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        query: {
+          term: Joi.string(),
+          _type: Joi.string(),
+          q: Joi.string()
+        }
+      }
+    },
+    handler: function (request, reply) {
+
+
+      const query = {
+        exerciseName: { $regex: request.query.term, $options: 'i' }
+      };
+
+      const fields = 'exerciseName';
+      const limit = 25;
+      const page = 1;
+
+      Exercise.pagedFind(query, fields, null, limit, page, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        reply({
+          results: results.data,
+          pagination: {
+            more: results.pages.hasNext
+          }
+        });
+      });
+    }
+  });
+
   next();
 };
 
@@ -210,5 +286,5 @@ exports.register = function (server, options, next) {
 
 
 exports.register.attributes = {
-  name: 'refexercises'
+  name: 'exercise'
 };

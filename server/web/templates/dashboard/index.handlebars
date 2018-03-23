@@ -6,11 +6,13 @@
         <h3>Welcome to Exercise Check!</h3><br>
         {{#unless user.roles.root}}
             <a href="../refexercises/play">View your reference exercise</a>
+            <br>
+            <a href="../userexercise/viewexercises">View list of exercises</a>
         {{else}}
             Hi there! Welcome to the Exercise Check Admin interface.
         {{/unless}}
           <hr>
       </div>
     </div>
-  </div>
+   </div>
 </div>

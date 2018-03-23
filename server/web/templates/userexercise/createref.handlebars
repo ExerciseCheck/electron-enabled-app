@@ -1,0 +1,29 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div class= "level1-padding">
+        <h3>Create Reference Exercise</h3>
+        <div class="card">
+          <div class= "level2-padding">
+            <form id="form">
+              <div id="formFields"></div>
+              <div class="form-group">
+                <hr>
+                <label for="userId">Select the user:</label>
+                <select id="userId"></select>
+                <hr>
+                <label for="exerciseId">Select the exercise:</label>
+                <select id="exerciseId"></select>
+              </div>
+              <button id="create" type="submit" class="btn btn-primary">Create</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="../../public/css/styleSheet/createref.css">
+<script type="text/javascript" src="../../public/scripts/userexercise/createref.js"></script>
+ 
