@@ -57,7 +57,7 @@ UserExercise.practicePayload = Joi.object().keys({
 UserExercise.referencePayload = Joi.object().keys({
   //bodyFrames: Joi.array().required(),
   numSessions: Joi.number().integer().required(),
-  numRepitition: Joi.number().integer().required(),
+  numRepetition: Joi.number().integer().required(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required()
 });
@@ -71,19 +71,6 @@ UserExercise.activatePayload = Joi.object().keys({
   isActive: Joi.boolean().required()
 });
 
-//this is used for validating payload of dummy post requests when creating reference exercise
-UserExercise.refPayload = Joi.object().keys({
-  numSessions: Joi.number().integer().required(),
-  numRepetition: Joi.number().integer().required(),
-  userId: Joi.string().required(),
-  exerciseId: Joi.string().required()
-});
-
-//this is used for validating payload of dummy put requests when updating a reference exercise
-UserExercise.pracPayload = Joi.object().keys({
-  userId: Joi.string().required(),
-  exerciseId: Joi.string().required()
-});
 
 UserExercise.indexes = [
   { key: { '_id': 1 } },
