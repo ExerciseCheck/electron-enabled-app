@@ -8,7 +8,7 @@ $('#create').click((event) => {
   values.exerciseId = $('#exerciseId').val();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/dummy/practice',
+    url: '/api/userexercise/practice',
     data: values,
     success: function (result) {
       window.location = '/userexercise'

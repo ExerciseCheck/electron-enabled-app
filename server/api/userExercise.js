@@ -116,7 +116,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //retrieves reference exercise for the logged-in patient, used in #16
-  //if we want to rende them in a table we use this route, using datatable
+  //if we want to render them in a table we use this route, using datatable
   server.route({
     method: 'GET',
     path: '/table/userexercise/reference/my',
@@ -161,7 +161,7 @@ internals.applyRoutes = function (server, next) {
 
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
-  //this route is used if we tag userExercise documents with a referenceId tag 
+  //this route is used if we don't tag userExercise documents with a referenceId tag 
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{referenceId}',
@@ -172,39 +172,6 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const query = {
-        userId: request.auth.credentials.user._id.toString(),
-        referenceId: request.params.referenceId,
-        type: 'Practice'
-      };
-
-      UserExercise.find(query, (err, practiceExercises) => {
-
-        if (err) {
-          return reply(err);
-        }
-
-        if (!practiceExercises) {
-          return reply(Boom.notFound('Document not found.'));
-        }
-
-        reply(practiceExercises);
-      });
-    }
-  });
-
-  //retrieves practice exercise with a particular referenceId for the logged in patient
-  //this route is used if we don't tag userExercise documents with a referenceId tag 
-  /*server.route({
-    method: 'GET',
-    path: '/userexercise/practice/{referenceId}',
-    config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session']
-      }
-    },
-    handler: function (request, reply) {
-    
       Async.auto({
 
         //first we need to find the exerciseId of the reference
@@ -234,7 +201,7 @@ internals.applyRoutes = function (server, next) {
         reply(results.findPracticeExercises);
       });
     }
-  });*/
+  });
 
 
   server.route({
@@ -267,9 +234,13 @@ internals.applyRoutes = function (server, next) {
     method: 'POST',
     path: '/userexercise/reference',
     config: {
-      /*validate: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root','admin','clinician']
+      },
+      validate: {
         payload: UserExercise.referencePayload
-      }*/
+      }
     },
 
     handler: function (request, reply) {
@@ -280,8 +251,7 @@ internals.applyRoutes = function (server, next) {
         'Reference',
         request.payload.numSessions,
         request.payload.numRepetition,
-        -1,
-        request.payload.bodyFrames,
+        [],
         (err, document) => {
 
           if (err) {
@@ -302,10 +272,10 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
-      }
-      /*validate: {
+      },
+      validate: {
         payload: UserExercise.practicePayload
-      }*/
+      }
     },
     handler: function (request, reply) {
 
@@ -332,8 +302,7 @@ internals.applyRoutes = function (server, next) {
             'Practice',
             results.findReference.numSessions,
             results.findReference.numRepetition,
-            results.findReference.referenceId,
-            request.payload.bodyFrames,
+            [],
             done);
         }]
       }, (err, results) => {
@@ -415,92 +384,6 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
-
-
-  server.route({
-    method: 'POST',
-    path: '/userexercise/dummy/reference',
-    config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session']
-      },
-      validate: {
-        payload: UserExercise.refPayload
-      }
-    },
-    handler: function (request, reply) {
-
-      UserExercise.create(
-        request.payload.userId,
-        request.payload.exerciseId,
-        'Reference',
-        request.payload.numSessions,
-        request.payload.numRepetition,
-        [],
-        (err, document) => {
-
-          if (err) {
-            return reply(err);
-          }
-
-          reply(document);
-
-        });
-    }
-  });
-
-  server.route({
-    method: 'POST',
-    path: '/userexercise/dummy/practice',
-    config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session']
-      },
-      validate: {
-        payload: UserExercise.pracPayload
-      }
-    },
-    handler: function (request, reply) {
-
-      Async.auto({
-
-        findReference: function (done) {
-
-          const query = {
-            userId: request.payload.userId,
-            exerciseId: request.payload.exerciseId,
-            type: 'Reference'
-          };
-
-          UserExercise.findOne(query, done);
-        },
-        createExercise:['findReference', function (results, done) {
-
-          UserExercise.create(
-
-            request.payload.userId,
-            request.payload.exerciseId,
-            'Practice',
-            results.findReference.numSessions,
-            results.findReference.numRepetition,
-            [],
-            done);
-        }]
-      }, (err, results) => {
-
-        if (err) {
-          return reply(err);
-        }
-        if (!results.findReference) {
-          return reply(Boom.notFound('Document not found.'));
-        }
-
-        reply(results.createExercise);
-      });
-    }
-  });
-
-
 
   next();
 };
