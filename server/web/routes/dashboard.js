@@ -46,12 +46,13 @@ internals.applyRoutes = function (server, next) {
             users: clinician.roles.clinician.userAccess,
             baseUrl: Config.get('/baseUrl')
           });
-        });
+      })
+        ;
       }
 
       else {
-        Async.auto({
 
+        Async.auto({
           findRefExercises: function (done) {
 
             const query = {
@@ -61,13 +62,13 @@ internals.applyRoutes = function (server, next) {
 
             UserExercise.find(query, done);
           },
-          exercises:['findRefExercises', function (results, done) {
+          exercises: ['findRefExercises', function (results, done) {
 
             const Ids = [];
             const length = results.findRefExercises.length;
 
             //if there are no refrence exercises for the user show the original version of dashboard for now
-            //eventully we won't need to have this check becuase we konw that patients will log in only after 
+            //eventully we won't need to have this check becuase we konw that patients will log in only after
             //they have recorded a reference exercise
             if (length === 0) {
 
@@ -86,49 +87,54 @@ internals.applyRoutes = function (server, next) {
             }
 
             const query = {
-              _id : { $in : Ids }
+              _id: {$in: Ids}
             };
 
             Exercise.find(query, done);
           }],
-          findLatestSession:['exercises', function (results, done) {
+          findLatestSession: ['exercises', function (results, done) {
 
             const pipeLine = [
-              { '$match': { 'userId' : request.auth.credentials.user._id.toString() } },
-              { '$group': {
-                '_id': null,
-                'latestSession': { '$last': '$createdAt' }
-              }
+              {'$match': {'userId': request.auth.credentials.user._id.toString()}},
+              {
+                '$group': {
+                  '_id': null,
+                  'latestSession': {'$last': '$createdAt'}
+                }
               }
             ];
 
             UserExercise.aggregate(pipeLine, done);
           }]
         }, (err, results) => {
-
           if (err) {
             return reply(err);
           }
-
-          if (!results.exercises || !results.findLatestSession) {
-            return reply(Boom.notFound('Document not found.'));
-          }
-
-          return reply.view('userexercise/viewexercises', {
-            user: request.auth.credentials.user,
-            projectName: Config.get('/projectName'),
-            title: 'Dashboard',
-            exercises: results.exercises,
-            lastSession: results.findLatestSession[0].latestSession,
-            baseUrl: Config.get('/baseUrl')
-          });
+          if (
+        !results.exercises || !results.findLatestSession
+      )
+        {
+          return reply(Boom.notFound('Document not found.'));
+        }
+        return reply.view('patient/viewExercises', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          title: 'Dashboard',
+          exercises: results.exercises,
+          lastSession: results.findLatestSession[0].latestSession,
+          baseUrl: Config.get('/baseUrl')
         });
-      }
-    }
-  });
+
+      });//async auto ends
+
+      }//else
+    }//handler
+
+  })//server route
 
   next();
 };
+
 
 
 exports.register = function (server, options, next) {

@@ -37,7 +37,7 @@ UserExercise.schema = Joi.object().keys({
   _id: Joi.object(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required(),
-  //we can also define a boolean field as isReference instead 
+  //we can also define a boolean field as isReference instead
   type: Joi.string().valid('Reference','Practice').required(),
   numSessions: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required(),
@@ -48,14 +48,14 @@ UserExercise.schema = Joi.object().keys({
 
 //this is used for validating payload of post requests when creating practice exercise
 UserExercise.practicePayload = Joi.object().keys({
-  bodyFrames: Joi.array().required(),
+  //bodyFrames: Joi.array().required(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required()
 });
 
 //this is used for validating payload of post requests when creating reference exercise
 UserExercise.referencePayload = Joi.object().keys({
-  bodyFrames: Joi.array().required(),
+  //bodyFrames: Joi.array().required(),
   numSessions: Joi.number().integer().required(),
   numRepitition: Joi.number().integer().required(),
   userId: Joi.string().required(),
@@ -84,6 +84,7 @@ UserExercise.pracPayload = Joi.object().keys({
   userId: Joi.string().required(),
   exerciseId: Joi.string().required()
 });
+
 
 UserExercise.indexes = [
   { key: { '_id': 1 } },

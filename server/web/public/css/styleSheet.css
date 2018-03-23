@@ -1,3 +1,4 @@
+
 .listButtons {
   width: 70%;
   height: 50px;
@@ -11,7 +12,7 @@
 
 .notMatched {
   background-color: white;
-  border: none; 
+  border: none;
 
 }
 .ul {
@@ -21,24 +22,24 @@
   -moz-columns: 2;
 }
 
-#search {
-    
+#myInput {
+
     width: 26%;
-    height: 50px;  
-    font-size: 16px;  
-    padding: 12px 20px 12px 40px;  
+    height: 50px;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
     margin-bottom: 12px;
     border: 1px solid #428BCA;
     border-radius: 5px;
     border-width: 2px;
-    font-size:25px; 
+    font-size:25px;
 }
 
 #addExercise {
-    
+
     width: 13%;
-    height: 40px;  
-    font-size: 15px;  
+    height: 40px;
+    font-size: 15px;
     border: 1px solid #428BCA;
     color: #428BCA;
     border-radius: 5px;
@@ -46,20 +47,20 @@
     padding-bottom: 3px;
     margin-left: 500px;
     background-color: white;
-    font-weight: bold; 
+    font-weight: bold;
 }
 
 #searchButton {
-    
-    width: 8%; 
-    height: 40px; 
-    font-size: 16px;  
+
+    width: 8%;
+    height: 40px;
+    font-size: 16px;
     background-color: #428BCA;
     border: 1px solid #428BCA;
     border-radius: 5px;
-    color: white; 
+    color: white;
     left: 100px;
-    font-weight: bold; 
+    font-weight: bold;
 }
 
 .bodyCanvas {
