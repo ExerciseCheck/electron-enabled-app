@@ -257,6 +257,9 @@ const manifest = {
       plugin: './server/web/routes/templates'
     },
     {
+      plugin: './server/web/routes/timer'
+    },
+    {
       plugin: './server/web/routes/userexercise'
     },
     {
