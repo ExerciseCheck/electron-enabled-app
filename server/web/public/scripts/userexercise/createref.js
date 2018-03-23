@@ -17,7 +17,7 @@ $('#create').click((event) => {
   values.exerciseId = $('#exerciseId').val();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/dummy/reference',
+    url: '/api/userexercise/reference',
     data: values,
     success: function (result) {
       window.location = '/userexercise'
@@ -74,5 +74,6 @@ $(document).ready(function() {
     minimumInputLength: 1,
   });
 });
+
 
 
