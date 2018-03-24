@@ -36,6 +36,7 @@
     "boom": "5.x.x",
     "child_process": "1.x.x",
     "confidence": "3.x.x",
+    "dtw": "0.0.3",
     "dotenv": "4.x.x",
     "glue": "4.x.x",
     "handlebars": "4.x.x",
@@ -73,7 +74,7 @@
     "promptly": "2.x.x",
     "proxyquire": "1.x.x"
   },
-  "pre-commit":[
+  "pre-commit": [
     "lint"
   ]
 }

@@ -257,6 +257,9 @@ const manifest = {
     },
     {
       plugin: './server/web/routes/users'
+    },
+    {
+      plugin: './server/web/routes/dtw_test'
     }
   ]
 };
