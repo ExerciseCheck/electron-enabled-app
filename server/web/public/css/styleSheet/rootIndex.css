@@ -1,6 +1,6 @@
  
  .list-group-item {
-     background-color: white;
+     background-color:white;
      margin-top: 5px; 
      box-shadow: 0px 5px #d9d9d9;
      height: 70px;
@@ -13,7 +13,10 @@
   }
 
   .changeMembersBtn {
-     color: #525B75;
+     //color: #525B75;
+     color: #8A2BE2;
+     border:none;
+     background-color:white;
   }
 
   .list-group-item-heading {
@@ -52,7 +55,36 @@
     color: #525B75;
     font-size: 25px;
     font-weight: bold; 
-  } 
+  }
+
+  .labels {
+    color: #525B75;
+    font-size: 20px;
+    font-weight: bold; 
+  }
+
+  #clinicians {
+    width: 100%;
+  }
+
+  #patients {
+    width: 100%;
+  }
+
+  #submitPatientsBtn {
+    margin-top: 15px;
+  }
+
+   #submitClinicianBtn {
+    margin-top: 15px;
+  }
+
+   
+  
+  
+
+   
+ 
  
 
 

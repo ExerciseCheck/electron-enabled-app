@@ -2,7 +2,7 @@
  <div id="popUp">
    <div id="patientsPopUp">
      <form class="form-group" id="form">
-       <input type="hidden" id="experimentId">
+       <input type="hidden" id="clinicianId">
        <div class="row">
          <div class="col-sm-2">
            <button type="button" class="cancel" onclick ="hidePopUp()">CANCEL</button>
@@ -11,7 +11,7 @@
            <h5 style="text-align:center;">SELECT PATIENTS</h5>
          </div>
         <div class="col-sm-2">
-           <button id="shareUsers" class="update" type="submit">ADD</button> 
+           <button class="update" type="submit" onclick="update()">ADD</button> 
         </div>
         <div class="col-md-12">
           <div class="form-group" id="patientsList">

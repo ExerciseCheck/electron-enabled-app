@@ -224,6 +224,27 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  server.route({
+    method: 'GET',
+    path: '/clinicians/userAccess/{clinicianId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root']
+      }
+    },
+    handler: function (request, reply) {
+
+      User.findById(request.params.clinicianId, (err, clinician) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        reply(JSON.parse(clinician.roles.clinician.userAccess));
+      });
+    }
+  });
 
   server.route({
     method: 'PUT',
@@ -430,6 +451,71 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
+  //This route updates userAccess of the clinicinan with id: clinicianId
+  server.route({
+    method: 'PUT',
+    path: '/clinicians/userAccess/{clinicianId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope:['root']
+
+      },
+      validate: {
+        payload: Clinician.payload
+      },
+      pre: [
+        {
+          assign: 'clinician',
+          method: function (request, reply) {
+
+            User.findById(request.params.clinicianId, (err, user) => {
+
+              if (err) {
+                return (err);
+              }
+
+              if (!user) {
+                return reply(Boom.notFound('Clinician not found'));
+              }
+
+              if (!user.roles.clinician) {
+                return reply(Boom.conflict('User is not a clinician'));
+              }
+
+              reply(user);
+            });
+          }
+        }
+      ]
+    },
+    handler: function (request, reply) {
+
+      const clinician = request.pre.clinician;
+      const clinicianId = request.params.clinicianId;
+      clinician.roles.clinician.userAccess = request.payload.userAccess;
+
+      const update = {
+        $set: {
+          roles : clinician.roles
+        }
+      };
+      User.findByIdAndUpdate(clinicianId, update, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!document) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply({ message: 'Success.' });
+      });
+    }
+  });
+
 
 
   server.route({

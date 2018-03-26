@@ -1,32 +1,3 @@
- 
-/*$('.changeMembersBtn').each(function(index, item) {
-  console.log($(item));   
-  $(item).find("button").on("mouseover", function() {
-    console.log("here");
-    $(item).find("button").show();
-  })    
-});
-
-$('.changeMembersBtn').mouseout(function(event)
-{
-   $(this).find('button').hide();
-});*/
-
-
-/*function filter() {
-  const  input = $("#search");
-  const filter = input.val().toUpperCase();
-
-  $(".list-group-item").each(function() {
-    if ($(this)[0].innerHTML.toUpperCase().indexOf(filter) > -1) {
-      $(this).show();
-    }
-    else {
-      $(this).hide();
-             
-    }
-  })
-}*/
 
 function filter(inputId, classSelector) {
 
@@ -59,4 +30,62 @@ function showPopUp(clinicianId, userAccess) {
   
   $("#popUp").show();
 }
+
+function submitClinician() {
+   
+  const clinicianId = $('#clinicians').val();
+  const url = '/api/clinicians/userAccess/' + clinicianId;
+  $.get(url , function( data ) {
+     $.each(data, function(i,e){
+       console.log(e);
+       $("#patients option[value='" + e + "']").prop("selected", true);
+     })
+  });
+}
+
+$(document).ready(function() {
+  $('#patients').select2({
+    ajax: {
+      delay: 250,
+      url: '/api/select2/users',
+      dataType: 'json',
+      processResults: function (data) {
+        var results = [];
+        for(var i = 0; i < data.results.length; i++) {
+          results.push({
+            id: data.results[i]._id,
+            text: data.results[i].name
+          })
+        }
+        data.results = results;
+        return data;
+      },
+      cache: true
+    },
+    placeholder: 'Search for a user by name or email',
+    minimumInputLength: 1,
+  });
+
+  $('#clinicians').select2({
+    ajax: {
+      delay: 250,
+      url: '/api/select2/clinicians',
+      dataType: 'json',
+      processResults: function (data) {
+        var results = [];
+        for(var i = 0; i < data.results.length; i++) {
+          results.push({
+            id: data.results[i]._id,
+            text: data.results[i].name
+          })
+        }
+        data.results = results;
+        return data;
+      },
+      cache: true
+    },
+    placeholder: 'Search for a user by name or email',
+    minimumInputLength: 1,
+  });
+});
 
