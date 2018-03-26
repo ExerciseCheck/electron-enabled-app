@@ -67,7 +67,7 @@ internals.applyRoutes = function (server, next) {
             const length = results.findRefExercises.length;
 
             //if there are no refrence exercises for the user show the original version of dashboard for now
-            //eventully we won't need to have this check becuase we konw that patients will log in only after 
+            //eventully we won't need to have this check becuase we konw that patients will log in only after
             //they have recorded a reference exercise
             if (length === 0) {
 

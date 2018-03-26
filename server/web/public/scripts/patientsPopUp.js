@@ -1,0 +1,7 @@
+function hidePopUp(){
+
+ $("#popUp").hide();
+  
+}
+
+
