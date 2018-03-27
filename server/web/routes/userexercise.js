@@ -1,5 +1,7 @@
 'use strict';
 const internals = {};
+const Async = require('async');
+const Boom = require('boom');
 const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
 const Exercise = require('../../models/exercise');
@@ -67,7 +69,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      Exercise.findById(request.params.exerciseId, (err, exercise) => {
+      /*Exercise.findById(request.params.exerciseId, (err, exercise) => {
 
         if (err) {
           return reply(err);
@@ -77,6 +79,50 @@ internals.applyRoutes = function (server, next) {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           exercise
+        });
+      });*/
+      Async.auto({
+        findNumSets: function (done) {
+
+          const query = {
+            userId: request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+            type: 'Reference'
+          };
+
+          UserExercise.findOne(query, done);
+        },
+        findNumPractices:['findNumSets', function (results, done) {
+
+          if (!results.findNumSets || results.findNumSets === undefined ) {
+            return reply(Boom.notFound('Reference exercise not found'));
+          }
+          const query = {
+            userId: request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+            type: 'Practice'
+          };
+
+          UserExercise.find(query, done);
+        }],
+        findExercise:['findNumPractices', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findExercise || results.findExercise === undefined) {
+          return reply(Boom.notFound('exercise not found'));
+        }
+        return reply.view('userexercise/start', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          numSets: results.findNumSets.numRepetition,
+          setNumber: results.findNumPractices.length + 1,
+          exercise : results.findExercise
         });
       });
     }
