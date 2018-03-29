@@ -13,8 +13,8 @@
   }
 
   .changeMembersBtn {
-     //color: #525B75;
-     color: #8A2BE2;
+     //color: #8A2BE2;
+     color:#000000;
      border:none;
      background-color:white;
   }
@@ -78,6 +78,17 @@
    #submitClinicianBtn {
     margin-top: 15px;
   }
+
+  #submitPatientsBtn {
+    background-color: #708090;
+    border: none;
+    font-weight: bold; 
+    color: white;
+  }
+
+   
+
+   
 
    
   

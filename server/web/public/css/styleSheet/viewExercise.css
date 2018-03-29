@@ -1,22 +1,26 @@
 
 .listButtons {
   width: 70%;
-  height: 50px;
+  height: 45px;
   border: 1px solid #E8F3FF;
   border-radius: 12px;
   background-color: #E8F3FF;
   text-align: left;
   font-size:25px;
   padding: 10px;
+  -webkit-column-break-inside: avoid;  
+  page-break-inside: avoid; 
+  break-inside: avoid;
 }
 
 
-ul {
+.ul {
   list-style-type: none;
   columns: 2;
   -webkit-columns: 2;
   -moz-columns: 2;
-} 
+}
+  
 
 h1 {
   text-align: center;

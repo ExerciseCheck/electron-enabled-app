@@ -1,19 +1,23 @@
 <div class="container-fluid h-100">
   <div class="row h-100">
     {{>dashboardNav}}
-    <div class="col-sm-9 col-md-10">
+    <div class="col-sm-9">
       <form id="form">
         <div class="form-group">
           <div class ="row">  
             <div class="col-md-6">   
               <label  class="labels" for="clinicians">Select Clinician:</label>
-              <select id="clinicians"></select>
-              <button type="button" class="btn btn-primary" onclick="submitClinician()" id="submitClinicianBtn">SUBMIT</button>
-              <hr>
-              <label class="labels" for="patients">Select Patients</label>
-              <select id="patients" multiple="multiple"></select>
-              <button type="button" class="btn btn-primary" id="submitPatientsBtn">UPDATE</button> 
-            </div> 
+              <select id="clinicians" style="width:100%;"></select>
+              <div class="form-group">
+                <hr>
+                <label class="labels" for="patients">Select Patients</label>
+                <select id="patients" multiple="multiple" style="width:100%;">
+                  {{#each patients}}
+                    <option value={{this._id}}>{{this.name}}</option>
+                  {{/each}}
+                </select>
+                <button type="button" class="btn" id="submitPatientsBtn" onclick="updatePatients()">UPDATE</button>
+             </div> 
           </div>
         </div>
       </form>
@@ -51,7 +55,7 @@
 </div>
 {{> patientsPopUp}}
 
-<link rel="stylesheet" href="../public/css/styleSheet/rootIndex.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="../public/css/styleSheet/rootIndex.css">
 <script type="text/javascript" src="../public/scripts/rootIndex.js"></script>
  

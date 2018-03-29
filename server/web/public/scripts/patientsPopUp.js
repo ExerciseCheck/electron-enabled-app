@@ -31,7 +31,6 @@ function update(){
       errorAlert(result.responseJSON.message);
     }
   });
-
 }
 
 
