@@ -1,7 +1,8 @@
 'use strict';
 
 const schema = Joi.object({
-  numSessions: Joi.number().integer().required()
+  numSessions: Joi.number().integer().required(),
+  numRepetition: Joi.number().integer().required()
 });
 
 joiToForm('formFields',schema);
@@ -73,5 +74,6 @@ $(document).ready(function() {
     minimumInputLength: 1,
   });
 });
+
 
 

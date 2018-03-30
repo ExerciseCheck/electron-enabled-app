@@ -250,6 +250,7 @@ internals.applyRoutes = function (server, next) {
         request.payload.exerciseId,
         'Reference',
         request.payload.numSessions,
+        request.payload.numRepetition,
         [],
         (err, document) => {
 
@@ -300,6 +301,7 @@ internals.applyRoutes = function (server, next) {
             request.payload.exerciseId,
             'Practice',
             results.findReference.numSessions,
+            results.findReference.numRepetition,
             [],
             done);
         }]
@@ -398,3 +400,4 @@ exports.register = function (server, options, next) {
 exports.register.attributes = {
   name: 'userExercises'
 };
+

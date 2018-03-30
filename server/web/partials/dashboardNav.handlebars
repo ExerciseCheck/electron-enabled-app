@@ -19,32 +19,32 @@
       {{/if}}
     </h6>
     <li class="nav-item">
-      <a class="nav-link text-light" href="../dashboard">Dashboard</a>
+      <a class="nav-link text-light" href="/dashboard">Dashboard</a>
     </li>
   </ul>
   <ul class="nav nav-pills flex-column" style="padding-top: 20px">
     <h6 class="text-dark">Collections</h6>
     <li class="nav-item">
       {{#role user 'researcher'}}
-        <a class="nav-link text-light" href="../authAttempts">Auth Attempts</a>
-        <a class="nav-link text-light" href="../exercise">Exercises</a>
-        <a class="nav-link text-light" href="../userexercise">User Exercises</a>
-        <a class="nav-link text-light" href="../clinician">Clinicians</a>
-        <a class="nav-link text-light" href="../events">Events</a>
-        <a class="nav-link text-light" href="../sessions">Sessions</a>
-        <a class="nav-link text-light" href="../users">Users</a>
+        <a class="nav-link text-light" href="/authAttempts">Auth Attempts</a>
+        <a class="nav-link text-light" href="/exercise">Exercises</a>
+        <a class="nav-link text-light" href="/userexercise">User Exercises</a>
+        <a class="nav-link text-light" href="/clinician">Clinicians</a>
+        <a class="nav-link text-light" href="/events">Events</a>
+        <a class="nav-link text-light" href="/sessions">Sessions</a>
+        <a class="nav-link text-light" href="/users">Users</a>
       {{/role}}
-        <a class="nav-link text-light" href="../feedback">Feedback</a>
-        <a class="nav-link text-light" href="../invite">Invites</a>
-        <a class="nav-link text-light" href="../clinician">Clinicians</a>
+        <a class="nav-link text-light" href="/feedback">Feedback</a>
+        <a class="nav-link text-light" href="/invite">Invites</a>
+        <a class="nav-link text-light" href="/clinician">Clinicians</a>
     </li>
   </ul>
   {{#role user 'researcher'}}
     <ul class="nav nav-pills flex-column" style="padding-top: 20px">
       <h6 class="text-dark">Population Settings</h6>
       <li class="nav-item">
-        <a class="nav-link text-light" href="../roles">Roles</a>
-        <a class="nav-link text-light" href="../participation">Participation</a>
+        <a class="nav-link text-light" href="/roles">Roles</a>
+        <a class="nav-link text-light" href="/participation">Participation</a>
       </li>
     </ul>
   {{/role}}
@@ -52,7 +52,7 @@
     <ul class="nav nav-pills flex-column" style="padding-top: 20px">
       <h6 class="text-dark">API Access</h6>
       <li class="nav-item">
-        <a class="nav-link text-light" href="../tokens">Tokens</a>
+        <a class="nav-link text-light" href="/tokens">Tokens</a>
       </li>
     </ul>
   {{/role}}
@@ -60,8 +60,8 @@
     <ul class="nav nav-pills flex-column" style="padding-top: 20px">
       <h6 class="text-dark">Application Settings</h6>
       <li class="nav-item">
-        <a class="nav-link text-light" href="../backups">Backups</a>
-        <a class="nav-link text-light" href="../env">Env</a>
+        <a class="nav-link text-light" href="/backups">Backups</a>
+        <a class="nav-link text-light" href="/env">Env</a>
       </li>
     </ul>
   {{/role}}
