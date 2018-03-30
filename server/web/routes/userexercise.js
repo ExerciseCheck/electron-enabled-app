@@ -3,6 +3,7 @@ const internals = {};
 const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
 const Exercise = require('../../models/exercise');
+const Async = require('async');
 
 internals.applyRoutes = function (server, next) {
 
@@ -78,6 +79,92 @@ internals.applyRoutes = function (server, next) {
           projectName: Config.get('/projectName'),
           exercise
         });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/clinician/session/{patientId}/{exerciseId}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      //this obejct will contains all the infomation about user exercise including numSession, numRepitition, if there exists a reference
+      // we pass it to the template we are replying with 
+      const userExerciseInfo = {};
+
+      Async.auto({
+
+        //first we query userExercise model to find the reference 
+        findReference: function (done) {
+
+          const query = {
+            userId: request.params.patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Reference'
+          };
+
+          UserExercise.findOne(query, done);
+        },
+        updateUserExerciseInfo:['findReference', function (results, done) {
+
+          //case where there is no reference 
+          if ( !results.findReference ){
+
+            userExerciseInfo.referenceExists = false;
+
+          }
+
+          //case where there is a reference, find number of practice exercises 
+          else if ( results.findReference )  {
+            userExerciseInfo.referenceExists = true;
+            //by doing this we have access to all information including numSessions, numRepetitions
+            userExerciseInfo.numSessions = results.findReference.numSessions;
+          }
+
+          //anyway we count the number of practice exercises for the patient 
+          const pipeLine = [
+            { '$match': { 'userId' : request.params.patientId, 'exerciseId': request.params.exerciseId, 'type': 'Practice' } },
+            { '$group': {
+              '_id': null,
+              count: { $sum: 1 }
+            }
+            }
+          ];
+
+          UserExercise.aggregate(pipeLine, done);
+
+        }],
+        findExerciseName:['updateUserExerciseInfo', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        //need this check to avoid error, if there is no practice exercise,results.updateUserExerciseInfo[0] will be undefined
+        if ( results.updateUserExerciseInfo.length > 0 ) {
+          userExerciseInfo.numPractices = results.updateUserExerciseInfo[0].count;
+        }
+        else {
+          userExerciseInfo.numPractices = 0;
+        }
+        console.log(JSON.stringify(userExerciseInfo));
+        userExerciseInfo.exerciseName = results.findExerciseName.exerciseName;
+        return reply.view('userexercise/cliniciansession', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          userExerciseInfo
+
+        });
+
       });
     }
   });
