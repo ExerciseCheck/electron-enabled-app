@@ -143,3 +143,4 @@ exports.register.attributes = {
   name: 'dashboard',
   dependencies: 'visionary'
 };
+

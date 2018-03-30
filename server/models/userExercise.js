@@ -37,7 +37,7 @@ UserExercise.schema = Joi.object().keys({
   _id: Joi.object(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required(),
-  //we can also define a boolean field as isReference instead 
+  //we can also define a boolean field as isReference instead
   type: Joi.string().valid('Reference','Practice').required(),
   numSessions: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required(),
@@ -71,7 +71,6 @@ UserExercise.activatePayload = Joi.object().keys({
   isActive: Joi.boolean().required()
 });
 
-
 UserExercise.indexes = [
   { key: { '_id': 1 } },
   { key: { userId: 1 } },
@@ -80,3 +79,4 @@ UserExercise.indexes = [
 
 
 module.exports = UserExercise;
+
