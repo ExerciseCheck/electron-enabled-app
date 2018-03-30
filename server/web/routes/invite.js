@@ -30,7 +30,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategy: 'session',
-        scope: ['root', 'admin','researcher']
+        scope: ['root', 'admin','clinician','researcher']
       }
     },
     handler: function (request, reply) {
@@ -94,12 +94,16 @@ internals.applyRoutes = function (server, next) {
       Invite.findById(request.params.id, (err, invite) => {
 
         if (err) {
+          console.log('invite not found....');
           return reply(err);
         }
         let valid = false;
         if (invite) {
           const date = new Date().getTime();
-          if (invite.status === 'Pending' && date > invite.expiredAt.getTime()) {
+
+          if (invite.status === 'Pending' && date < invite.expiredAt.getTime()) {
+
+
             valid = true;
           }
         }

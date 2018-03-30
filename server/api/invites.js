@@ -56,8 +56,11 @@ internals.applyRoutes = function (server, next) {
       }
       //clinician
       else if (accessLevel === 2) {
-        query.username = request.auth.credentials.user.username;
+        query.userId = request.auth.credentials.user._id.toString();
       }
+
+      console.log('query');
+      console.log(query);
 
       let userFields = 'studyID username';
       if (accessLevel === 1) {
