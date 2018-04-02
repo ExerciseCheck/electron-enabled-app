@@ -1,5 +1,4 @@
 .bodyCanvas {
-
   padding-left: 0;
   padding-right: 0;
   left: 100px
@@ -17,7 +16,6 @@
   font-size: 25px;
   font-family:serif;
   line-height: 15px;
-   
 }
 
 .blue {
@@ -27,18 +25,13 @@
   line-height: 15px;
   padding: 20px;
   margin-top:0px;
-   
 }
-
-
 
 #line1 {
   color: #525B75;
   font-size: 40px;
   font-family:serif;
 }
-
- 
 
 #line4 {
   color: #1E89FB;
@@ -59,7 +52,7 @@
 }
 
 #startSession {
-  background-color:#428BCA; 
+  background-color:#1E89FB; 
   width:250px; 
   color:white;
   border:none;
@@ -73,7 +66,7 @@
 }
 
 #save {
-  background-color:blue; 
+  background-color:#1E89FB; 
   width:250px; 
   color:white;
   border:none;
@@ -92,6 +85,7 @@
   width:250px; 
   color:white;
   border:none;
+  margin-bottom:10px;
 }
 
 #firstSection {
@@ -100,10 +94,8 @@
   padding-bottom: 20px;
 }
 
-
 .mh1 {
     height: 100vh; /* 100% of viewport height*/
 } 
 
- 
 
