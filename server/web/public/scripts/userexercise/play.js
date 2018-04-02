@@ -1,7 +1,10 @@
 'use strict';
 
-function stop() {
+function stop(numSets,numRepetition,setNumber) {
   
-  const exerciseId = window.location.pathname.split('/').pop();
-  window.location = '/userexercise/stop/' + exerciseId
+  const url = window.location.pathname.split('/');
+  const exerciseId = url[3];
+  console.log(url);
+  window.location = '/userexercise/stop/' + exerciseId + '/' 
+         + numSets + '/' + numRepetition + '/' + setNumber; 
 }

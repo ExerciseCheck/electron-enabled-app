@@ -11,15 +11,15 @@
             <div id="fistSection">
               <p id="line1">Current Exercise:</p>
               <div class= "small">
-                <p>10 {{exercise.exerciseName}}s</p>
-                <p>Set 2 of 2</p>
+                <p>{{numRepetition}} {{exercise.exerciseName}}s</p>
+                <p>Set {{setNumber}} of {{numSets}}</p>
               </div>
               <div id= "secondSection" class="blue">
                 <h1 id="line4">To end the set,<h1>
                 <h2 id="line5">click Stop.<h2>
               </div>
               <div>
-                <button type="button" class="btn btn-primary" id="endSession" onclick="stop()">STOP</button>
+                <button type="button" class="btn btn-primary" id="endSession" onclick="stop('{{numSets}}','{{numRepetition}}','{{setNumber}}')">STOP</button>
               </div>
           </div>
         </div>
@@ -27,5 +27,5 @@
     </div>
   </div>
 </div>
-<link rel="stylesheet" href="../../public/css/styleSheet/play.css">
+<link rel="stylesheet" href="/public/css/styleSheet/play.css">
 <script type="text/javascript" src="/public/scripts/userexercise/play.js"></script>

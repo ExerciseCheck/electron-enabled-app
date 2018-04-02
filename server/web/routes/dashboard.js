@@ -35,6 +35,7 @@ internals.applyRoutes = function (server, next) {
         const clinicianId = request.auth.credentials.user._id.toString();
         User.findById(clinicianId, (err, clinician) => {
 
+          const users = JSON.parse(clinician.roles.clinician.userAccess);
           if (err) {
             return reply(err);
           }
@@ -43,7 +44,7 @@ internals.applyRoutes = function (server, next) {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             title: 'Dashboard',
-            users: clinician.roles.clinician.userAccess,
+            users,
             baseUrl: Config.get('/baseUrl')
           });
         });
