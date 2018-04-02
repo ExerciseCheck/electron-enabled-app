@@ -17,21 +17,22 @@
                   {{/each}}
                 </select>
                 <button type="button" class="btn" id="submitPatientsBtn" onclick="updatePatients()">UPDATE</button>
-             </div> 
+              </div>
+            </div> 
           </div>
         </div>
       </form>
       <div class="row">
         <div class="col-md-6 col-md-offset-3">
-           <div class="form-group" id="clinicianList">
+          <div class="form-group" id="clinicianList">
               <div class="search">
                 <span class="fa fa-search"></span>
                 <label id="searchLabel" for="search">Search by Clinician name
                   <input type="search" class="form-control" id="clinicianSearch" onkeyup="filter('#clinicianSearch','.list-group-item')" placeholder="Search by Clinician name">
                 </label>
-             </div>
-           </div>
-           <ul class="list-group">
+              </div>
+          </div>
+          <ul class="list-group">
             {{#each clinicians}}
               <li class="list-group-item">
                 <a>
