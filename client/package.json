@@ -1,0 +1,18 @@
+{
+  "name": "exercisecheck",
+  "version": "0.0.0",
+  "description": "",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/ExerciseCheck/exercisecheck",
+  "author": "GitHub",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "~1.8.3"
+  },
+  "dependencies": {
+    "kinect2": "^0.1.5"
+  }
+}

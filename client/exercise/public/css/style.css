@@ -1,0 +1,134 @@
+canvas {
+    border:2px dashed green;
+    width: 640 px;
+    height: 640 px;
+}
+
+.canvas-color{
+  background-color: #e6e6e6;
+}
+
+body, .stage {
+  background: #042029;
+  /*background: #695757;*/
+
+}
+
+h1{
+  color: white;
+}
+span#text{
+  color: white;
+}
+div#frm *{
+        display:inline;
+        /*float:left;*/
+        margin-bottom:10px;
+      }
+#vid-box {
+  /*width: 150px;*/
+  /*height: 150px;*/
+  /*padding: 0.5em;
+  border: 2px solid;
+  padding: 20px;
+  width: 200px;
+  height: 200px;
+  border-radius: 200px;
+  resize: both;
+  overflow: auto;*/
+  z-index: 100;
+ }
+
+
+ video {
+  border-radius: 50px;
+  width: 20%    !important;
+  height: auto   !important;
+}
+
+.long-shadow {
+  display: inline-block;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  padding: 25px;
+  border: none;
+  font: normal 40px/1 "Fredoka One", Helvetica, sans-serif;
+  color: rgba(255,255,255,1);
+  text-align: center;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  /*text-shadow: 3px 3px 0 #0199d9 , 4px 4px 0 #0199d9 , 5px 5px 0 #0199d9 , 6px 6px 0 #0199d9 , 7px 7px 0 #0199d9 , 8px 8px 0 #0199d9 , 9px 9px 0 #0199d9 , 10px 10px 0 #0199d9 , 11px 11px 0 #0199d9 , 12px 12px 0 #0199d9 , 13px 13px 0 #0199d9 , 14px 14px 0 #0199d9 , 15px 15px 0 #0199d9 , 16px 16px 0 #0199d9 , 17px 17px 0 #0199d9 , 18px 18px 0 #0199d9 , 19px 19px 0 #0199d9 , 20px 20px 0 #0199d9 ;*/
+}
+.button-shadow{
+  background-color: #4CAF50; /* Green */
+  border: none;
+  display: inline-block;
+  width: 160px;
+  /*-webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;*/
+
+  padding: 15px;
+  border: none;
+  font: normal 40px/1 "Fredoka One", Helvetica, sans-serif;
+  color: rgba(255,255,255,1);
+  text-align: center;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+}
+.button-shadow-small{
+  background-color: #4CAF50; /* Green */
+  border: none;
+  display: inline-block;
+  width:160px;
+  padding: 10px;
+  border: none;
+  font: normal 24px/1 "Fredoka One", Helvetica, sans-serif;
+  color: rgba(255,255,255,1);
+  text-align: center;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+}
+
+.graph{
+  display: inline-block;
+  padding: 25px;
+}
+
+canvas.canvasjs-chart-canvas{
+  border:2px dashed green;
+  /*display: inline-block;*/
+  /*padding: 25px;*/
+}
+
+.row1{
+    display:flex;
+    flex-direction:row;
+justify-content: space-around;
+}
+
+.column1{
+    display:flex;
+    flex-direction:column;
+}
+
+.forms-inline
+ {
+   display:inline-block;
+ }
+ .disabled{
+   opacity: 0.6;
+   cursor: not-allowed;
+ }
+
+ footer {
+             /*background-color: #333;*/
+             width: 13%;
+             bottom: 0;
+             position: fixed;
+             color: white;
+             /*font: normal 10px/1 "Fredoka One", Helvetica, sans-serif;*/
+             font-size: 70%;
+             text-align: center;
+         }
