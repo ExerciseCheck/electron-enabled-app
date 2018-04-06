@@ -27,29 +27,11 @@
     overflow: hidden;
   }
   #num {
-    font-size: 36px;
+    font-size: 96px;
     color: white;
   }
 </style>
 <div id="cover">
 <span id="num"></span>
 </div>
-<script>
-  $(document).ready(function(){
-    $("#num").text("3");
-    setTimeout(function(){
-      $("#num").text("2");
-      setTimeout(function(){
-        $("#num").text("1");
-        setTimeout(function(){
-          $("#num").text("");
-          $("#start").text("Time to start!");
-          $("#cover").css("display", "none");
-          var event = new Event('timer-done');
-          elem.dispatchEvent(event);
-        }, 1000)
-      }, 1000)
-    }, 1000)
-  });
-</script>
-<script type="text/javascript" src="/public/scripts/clinician.js"></script>
+<script type="text/javascript" src="/public/scripts/timer.js"></script>
