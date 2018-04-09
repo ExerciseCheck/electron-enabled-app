@@ -240,8 +240,12 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-
-        reply(JSON.parse(clinician.roles.clinician.userAccess));
+        if (clinician.roles.clinician.userAccess.length === 0) {
+          reply([]);
+        }
+        else {
+          reply(JSON.parse(clinician.roles.clinician.userAccess));
+        }
       });
     }
   });

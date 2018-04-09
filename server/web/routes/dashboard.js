@@ -34,7 +34,11 @@ internals.applyRoutes = function (server, next) {
         const clinicianId = request.auth.credentials.user._id.toString();
         User.findById(clinicianId, (err, clinician) => {
 
-          const users = JSON.parse(clinician.roles.clinician.userAccess);
+          const users = [];
+
+          if (clinician.roles.clinician.userAccess.length !== 0) {
+            users = JSON.parse(clinician.roles.clinician.userAccess);
+          }
 
           if (err) {
             return reply(err);
