@@ -18,10 +18,10 @@
          </form>
          <br><br>    
          <ul id ="ul" class = "ul">
-           {{#each users}}
+           {{#each patients}}
              <li style= "padding: 10px">
                <div class="listButtons">
-                 <a href= '/clinician/patientexercises/{{this}}' style="color: #525B74;">{{this}}</a>
+                 <a href= '/clinician/patientexercises/{{this.patientId}}' style="color: #525B74;" title='{{this.name}}'>{{this.patientId}}</a>
               </div> 
             <li>
           {{/each}}

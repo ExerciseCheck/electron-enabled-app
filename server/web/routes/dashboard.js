@@ -33,9 +33,34 @@ internals.applyRoutes = function (server, next) {
       else if (request.auth.credentials.user.roles.clinician) {
 
         const clinicianId = request.auth.credentials.user._id.toString();
+        const patients = [];
         User.findById(clinicianId, (err, clinician) => {
 
-          const users = JSON.parse(clinician.roles.clinician.userAccess);
+          let users = [];
+
+          if (clinician.roles.clinician.userAccess.length !== 0) {
+            users = JSON.parse(clinician.roles.clinician.userAccess);
+          }
+          Async.each(users, (patientId, done) => {
+
+            User.findById(patientId, (err, user) => {
+
+              const patient = {};
+              patient.patientId = patientId;
+              if (err) {
+                done(err);
+              }
+              console.log(user);
+              patient.name = user.name;
+              patients.push(patient);
+
+            });
+            //return done();
+            //callback(null,userId);
+          });
+
+
+
           if (err) {
             return reply(err);
           }
@@ -44,7 +69,7 @@ internals.applyRoutes = function (server, next) {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             title: 'Dashboard',
-            users,
+            patients,
             baseUrl: Config.get('/baseUrl')
           });
         });
@@ -68,7 +93,7 @@ internals.applyRoutes = function (server, next) {
             const length = results.findRefExercises.length;
 
             //if there are no refrence exercises for the user show the original version of dashboard for now
-            //eventully we won't need to have this check becuase we konw that patients will log in only after 
+            //eventully we won't need to have this check becuase we konw that patients will log in only after
             //they have recorded a reference exercise
             if (length === 0) {
 
