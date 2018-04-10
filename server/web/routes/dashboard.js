@@ -47,19 +47,16 @@ internals.applyRoutes = function (server, next) {
 
               const patient = {};
               patient.patientId = patientId;
+
               if (err) {
                 done(err);
               }
-              console.log(user);
+
               patient.name = user.name;
               patients.push(patient);
 
             });
-            //return done();
-            //callback(null,userId);
           });
-
-
 
           if (err) {
             return reply(err);
