@@ -7,7 +7,7 @@
     display:none;
     position:fixed;
     background-color:#313131;
-    overflow:auto
+    overflow: auto;
   }
 
   div #patientsPopUp {
@@ -19,14 +19,14 @@
    }
 
   #patientsPopUp form {
-    max-width:1000px;
-    min-width:500px;
     width: 500px;
+    min-height:500px;
+    max-height:600px;
     padding:10px 50px;
     border:2px solid black;
     border-radius:2px;
-    //font-family:raleway;
     background-color:white;
+    overflow-y: scroll;
    }
    
  .container {

@@ -52,7 +52,7 @@ $('#clinicians').change(function() {
   $('#patients').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/users',
+      url: '/api/select2/patients',
       dataType: 'json',
       processResults: function (data) {
         var results = [];
@@ -104,7 +104,7 @@ $(document).ready(function() {
   $('#patients').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/users',
+      url: '/api/select2/patients',
       dataType: 'json',
       processResults: function (data) {
         var results = [];

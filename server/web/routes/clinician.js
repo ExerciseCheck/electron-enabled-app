@@ -31,7 +31,11 @@ internals.applyRoutes = function (server, next) {
           },
           findPatients:['findClinicians', function (resutls, done) {
 
-            User.find({}, done);
+            const query = {
+              'roles.clinician': { $exists: false }
+            };
+
+            User.find(query, done);
           }]
         }, (err, results) => {
 
