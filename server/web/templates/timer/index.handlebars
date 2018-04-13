@@ -12,26 +12,11 @@
     </div>
   </div>
 </div>
-<style>
-  #cover {
-    background-color: rgba(0,0,0,0.5);
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    align-items: center;
-    justify-content: center;
-    z-index: 99999;
-    overflow: hidden;
-  }
-  #num {
-    font-size: 96px;
-    color: white;
-  }
-</style>
 <div id="cover">
 <span id="num"></span>
 </div>
-<script type="text/javascript" src="/public/scripts/timer.js"></script>
+<script>
+  $(document).ready(function(){
+    startTimer();
+  });
+</script>
