@@ -14,14 +14,12 @@
 .small {
   color: #525B75;
   font-size: 25px;
-  font-family:serif;
   line-height: 15px;
 }
 
 .blue {
   color: #525B75;
   font-size: 25px;
-  font-family:serif;
   line-height: 15px;
   padding: 20px;
   margin-top:0px;
@@ -30,7 +28,6 @@
 #line1 {
   color: #525B75;
   font-size: 40px;
-  font-family:serif;
 }
 
 #line4 {
