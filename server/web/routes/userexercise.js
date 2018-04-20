@@ -94,12 +94,12 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //this obejct will contains all the infomation about user exercise including numSession, numRepitition, if there exists a reference
-      // we pass it to the template we are replying with 
+      // we pass it to the template we are replying with
       const userExerciseInfo = {};
 
       Async.auto({
 
-        //first we query userExercise model to find the reference 
+        //first we query userExercise model to find the reference
         findReference: function (done) {
 
           const query = {
@@ -112,21 +112,21 @@ internals.applyRoutes = function (server, next) {
         },
         updateUserExerciseInfo:['findReference', function (results, done) {
 
-          //case where there is no reference 
+          //case where there is no reference
           if ( !results.findReference ){
 
             userExerciseInfo.referenceExists = false;
 
           }
 
-          //case where there is a reference, find number of practice exercises 
+          //case where there is a reference, find number of practice exercises
           else if ( results.findReference )  {
             userExerciseInfo.referenceExists = true;
             //by doing this we have access to all information including numSessions, numRepetitions
             userExerciseInfo.numSessions = results.findReference.numSessions;
           }
 
-          //anyway we count the number of practice exercises for the patient 
+          //anyway we count the number of practice exercises for the patient
           const pipeLine = [
             { '$match': { 'userId' : request.params.patientId, 'exerciseId': request.params.exerciseId, 'type': 'Practice' } },
             { '$group': {

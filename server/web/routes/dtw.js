@@ -3,6 +3,7 @@ const internals = {};
 const Config = require('../../../config');
 const Algorithm = require('../public/scripts/algorithm');
 
+
 internals.applyRoutes = function (server, next) {
 
   server.route({
@@ -35,14 +36,15 @@ internals.applyRoutes = function (server, next) {
   next();
 };
 
+
 exports.register = function (server, options, next) {
 
-  server.dependency(['auth', 'hapi-mongo-models'], internals.applyRoutes);
+  server.dependency(['auth'], internals.applyRoutes);
 
   next();
 };
 
-
 exports.register.attributes = {
-  name: 'dtw_test'
+  name: 'dtwTest',
+  dependencies: 'visionary'
 };
