@@ -71,8 +71,6 @@ UserExercise.activatePayload = Joi.object().keys({
   isActive: Joi.boolean().required()
 });
 
-
-
 UserExercise.indexes = [
   { key: { '_id': 1 } },
   { key: { userId: 1 } },

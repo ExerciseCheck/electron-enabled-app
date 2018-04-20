@@ -22,4 +22,4 @@ function createStorageObject(storage, key, val) {
       return true;
   }
   return false;
-};
+}
