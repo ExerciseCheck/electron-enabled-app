@@ -31,7 +31,6 @@ internals.applyRoutes = function (server, next) {
 
       //if logged in user is cilinician we dispaly list of patients associated with clinician
       else if (request.auth.credentials.user.roles.clinician) {
-
         const clinicianId = request.auth.credentials.user._id.toString();
         const patients = [];
         User.findById(clinicianId, (err, clinician) => {
@@ -67,6 +66,7 @@ internals.applyRoutes = function (server, next) {
             projectName: Config.get('/projectName'),
             title: 'Dashboard',
             patients,
+            users,
             baseUrl: Config.get('/baseUrl')
           });
         });

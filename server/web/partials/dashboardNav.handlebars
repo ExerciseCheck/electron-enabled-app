@@ -29,14 +29,15 @@
         <a class="nav-link text-light" href="/authAttempts">Auth Attempts</a>
         <a class="nav-link text-light" href="/exercise">Exercises</a>
         <a class="nav-link text-light" href="/userexercise">User Exercises</a>
-        <a class="nav-link text-light" href="/clinician">Clinicians</a>
         <a class="nav-link text-light" href="/events">Events</a>
         <a class="nav-link text-light" href="/sessions">Sessions</a>
         <a class="nav-link text-light" href="/users">Users</a>
       {{/role}}
+      {{#if user.roles.root}}
+        <a class="nav-link text-light" href="/clinician">Clinicians</a>
+      {{/if}}
         <a class="nav-link text-light" href="/feedback">Feedback</a>
         <a class="nav-link text-light" href="/invite">Invites</a>
-        <a class="nav-link text-light" href="/clinician">Clinicians</a>
     </li>
   </ul>
   {{#role user 'researcher'}}

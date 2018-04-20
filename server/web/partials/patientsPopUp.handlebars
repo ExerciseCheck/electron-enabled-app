@@ -1,0 +1,47 @@
+ <!-- pop up window section for adding more users to experiments created by the user -->
+ <div id="popUp">
+   <div id="patientsPopUp">
+     <form class="form-group" id="form">
+       <input type="hidden" id="clinicianId">
+       <div class="row">
+         <div class="col-sm-2">
+           <button type="button" class="cancel" onclick ="hidePopUp()">CANCEL</button>
+         </div>
+         <div class="col-sm-8">
+           <h5 style="text-align:center; font-weight:bold;">SELECT PATIENTS</h5>
+         </div>
+        <div class="col-sm-2">
+           <button class="update" type="submit" onclick="update()">ADD</button> 
+        </div>
+        <div class="col-md-12">
+          <div class="form-group" id="patientsList">
+            <div class="search">
+              <span class="fa fa-search"></span>
+              <input type="input" class="form-control" placeholder="Search" id="patientSearch" name="q" onkeyup="filter('#patientSearch', '.popupItems')">
+            </div>
+          </div>
+          </div>
+      </div>
+      <hr>
+       <!-- Declaring checkbox list sections -->
+       {{#each patients}}
+         <div class = "popupItems">
+           <div class="row">
+             <div class="col-sm-8">
+               <span style= "font-weight:bold;">{{this.name}}</span> 
+             </div>
+           <div class="col-sm-4">
+             <label class="container">
+               <input style= "float:right;" type="checkbox" value='{{this._id}}'><span class="checkmark"></span>
+             </label>
+           </div>
+         </div>
+         <hr> 
+       </div>
+    {{/each}}
+    </form>
+  </div>
+ </div>
+
+<link rel="stylesheet" href="../public/css/styleSheet/patientsPopUp.css">
+<script type="text/javascript" src="../public/scripts/patientsPopUp.js"></script>
