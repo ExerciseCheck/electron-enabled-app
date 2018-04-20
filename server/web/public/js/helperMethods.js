@@ -12,7 +12,7 @@ function storageAvailable(type) {
   catch (e){
     return e;
   }
-};
+}
 
 function createStorageObject(storage, key, val) {
 
@@ -20,6 +20,6 @@ function createStorageObject(storage, key, val) {
     const storage = window.localStorage;
     if (storage.setItem(key, val)){
       return true;
-  }
+  }}
   return false;
-};
+}
