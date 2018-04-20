@@ -1,0 +1,70 @@
+.bodyCanvas {
+
+  padding-left: 0;
+  padding-right: 0;
+  left: 100px
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  background: grey;
+  display: block;
+  height: 95%;
+  width: 100%;
+}
+
+.small {
+  color: #525B75;
+  font-size: 25px;
+  font-family:serif;
+  line-height: 15px;
+   
+}
+
+.blue {
+  color: #525B75;
+  font-size: 25px;
+  font-family:serif;
+  line-height: 15px;
+  margin-top: 30px;
+   
+}
+
+
+
+#line1 {
+  color: #525B75;
+  font-size: 40px;
+  font-family:serif;
+}
+
+ 
+
+#line4 {
+  color: #1E89FB;
+  margin-top: 30px;
+}
+
+#line5 {
+  color: #1E89FB;
+}
+
+#startSession {
+  color: blue; 
+  width:250px; 
+  color:white;
+  border:none;
+}
+
+#discard {
+  color: blue;
+  visibility: hidden; 
+  width:250px; 
+  color:white;
+}
+
+.mh1 {
+    height: 100vh; /* 100% of viewport height*/
+} 
+
+ 
+

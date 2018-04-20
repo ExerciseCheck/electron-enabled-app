@@ -7,10 +7,10 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '../api/refexercises/' + id,
+      url: '../api/userexercise/' + id,
       type: 'DELETE',
       success: function (result) {
-        successAlert('RefExercise Deleted');
+        successAlert('UserExercise Deleted');
         table.ajax.reload();
       },
       error: function (result) {
@@ -21,7 +21,7 @@ function deleteDoc(id) {
 }
 
 function editDoc(id) {
-  window.location = '../refexercises/' + id
+  window.location = '../userexercise/' + id
 }
 
 function showRecordedExercise(id) {

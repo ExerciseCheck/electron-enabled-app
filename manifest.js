@@ -68,7 +68,8 @@ const manifest = {
             Invite: './server/models/invite',
             Session: './server/models/session',
             Template: './server/models/template',
-            RefExercise: './server/models/refexercise',
+            UserExercise: './server/models/userExercise',
+            Exercise: './server/models/exercise',
             Token: './server/models/token',
             User: './server/models/user'
           },
@@ -184,7 +185,13 @@ const manifest = {
       }
     },
     {
-      plugin: './server/api/refexercises',
+      plugin: './server/api/userExercise',
+      options: {
+        routes: { prefix: '/api' }
+      }
+    },
+    {
+      plugin: './server/api/exercise',
       options: {
         routes: { prefix: '/api' }
       }
@@ -250,7 +257,13 @@ const manifest = {
       plugin: './server/web/routes/templates'
     },
     {
-      plugin: './server/web/routes/refexercises'
+      plugin: './server/web/routes/timer'
+    },
+    {
+      plugin: './server/web/routes/userexercise'
+    },
+    {
+      plugin: './server/web/routes/exercises'
     },
     {
       plugin: './server/web/routes/tokens'
