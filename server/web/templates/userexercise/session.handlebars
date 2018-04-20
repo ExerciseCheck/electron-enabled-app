@@ -1,53 +1,51 @@
 <div class="container-fluid h-100">
-  <div class="row">
-    {{>dashboardNav}}
-    <div class="col-sm-9 col-md-10">
-      <div style="padding: 30px;">
-        <div class="row mh1">
-          <div class="col-md-8">
-            <canvas id="bodyCanvas" class="bodyCanvas"></canvas>
+  <div style="padding: 30px;">
+    <div class="row mh1">
+      <div class="col-md-9">
+        <canvas id="bodyCanvas" class="bodyCanvas"></canvas>
+      </div>
+      <div class="col-md-3 text-center col-v-centered no-float">
+        <div id= "firstSection">
+          <p id="line1">Current Exercise:</p>
+          <div class= "small">
+            <p id="firstLine">{{numRepetition}} {{exercise.exerciseName}}s</p>
+            <p id="secondLine">Set {{setNumber}} of {{numSets}}</p>
           </div>
-          <div class="col-md-4 text-center col-v-centered no-float">
-            <div id= "firstSection">
-              <p id="line1">Current Exercise:</p>
-              <div class= "small">
-                <p id="firstLine">{{numRepetition}} {{exercise.exerciseName}}s</p>
-                <p id="secondLine">Set {{setNumber}} of {{numSets}}</p>
-              </div>
-              <div class="blue">
-                {{#compare mode 'start'}}
-                  <h1 id="line4">To begin the set,<h1>
-                  <h2 id="line5">click Start.<h2>
-                {{/compare}}
-                {{#compare mode 'play'}}
-                  <h1 id="line4">To end the set,<h1>
-                  <h2 id="line5">click Stop.<h2>
-                {{/compare}}
-                {{#compare mode 'stop'}}
-                  <h1 id="line4">Set ended.<h1>
-                  <h2 id="line5">What would you like to do?<h2>
-                {{/compare}}
-              </div>
-              <div>
-                {{#compare mode 'start'}}
-                  <button type="button" class="btn btn-primary" id="startSession" onclick="start()">START</button>
-                {{/compare}}
-                {{#compare mode 'play'}}
-                  <button type="button" class="btn btn-primary" id="endSession" onclick="stop()">STOP</button>
-                {{/compare}}
-                {{#compare mode 'stop'}}
-                  {{#if user.roles.clinician}}
-                    <button class="btn btn-primary" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
-                  {{/if}}
-                  <button class="btn btn-primary" id="save" onclick="save()">SAVE SET</button>
-                  <button class="btn btn-primary" id="discard" onclick="discard()">DISCARD & RESTART</button>
-                {{/compare}}
-              </div>
+          <div class="blue">
+            {{#compare mode 'start'}}
+              <h1 id="line4">To begin the set,</h1>
+              <h2 id="line5">click Start.</h2>
+            {{/compare}}
+            {{#compare mode 'play'}}
+              <h1 id="line4">To end the set,</h1>
+              <h2 id="line5">click Stop.</h2>
+            {{/compare}}
+            {{#compare mode 'stop'}}
+              <h1 id="line4">Set ended.</h1>
+              <h2 id="line5">What would you like to do?</h2>
+            {{/compare}}
+          </div>
+          <div>
+            {{#compare mode 'start'}}
+              <button type="button" class="btn btn-primary" id="startSession" onclick="action('start')">START</button>
+            {{/compare}}
+            {{#compare mode 'play'}}
+              <button type="button" class="btn btn-primary" id="endSession" onclick="action('stop')">STOP</button>
+            {{/compare}}
+            {{#compare mode 'stop'}}
+              {{#if user.roles.clinician}}
+                <button class="btn btn-primary" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
+              {{/if}}
+              <button class="btn btn-primary" id="save" onclick="save()">SAVE SET</button>
+              <button class="btn btn-primary" id="discard" onclick="action('discard')">DISCARD & RESTART</button>
+            {{/compare}}
           </div>
         </div>
-      </div>
+      </div>    
     </div>
   </div>
+</div>
+    
 </div>
 <link rel="stylesheet" href="/public/css/styleSheet/session.css">
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
