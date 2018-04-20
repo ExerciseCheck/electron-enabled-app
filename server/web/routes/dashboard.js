@@ -31,9 +31,14 @@ internals.applyRoutes = function (server, next) {
 
       //if logged in user is cilinician we dispaly list of patients associated with clinician
       else if (request.auth.credentials.user.roles.clinician) {
-
         const clinicianId = request.auth.credentials.user._id.toString();
         User.findById(clinicianId, (err, clinician) => {
+
+          let users = [];
+
+          if (clinician.roles.clinician.userAccess.length !== 0) {
+            users = JSON.parse(clinician.roles.clinician.userAccess);
+          }
 
           if (err) {
             return reply(err);
@@ -43,7 +48,7 @@ internals.applyRoutes = function (server, next) {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             title: 'Dashboard',
-            users: clinician.roles.clinician.userAccess,
+            users,
             baseUrl: Config.get('/baseUrl')
           });
         });
@@ -67,7 +72,7 @@ internals.applyRoutes = function (server, next) {
             const length = results.findRefExercises.length;
 
             //if there are no refrence exercises for the user show the original version of dashboard for now
-            //eventully we won't need to have this check becuase we konw that patients will log in only after 
+            //eventully we won't need to have this check becuase we konw that patients will log in only after
             //they have recorded a reference exercise
             if (length === 0) {
 

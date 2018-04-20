@@ -7,6 +7,7 @@
   text-align: left;
   font-size:20px;
   text-indent: 15px;
+  -webkit-column-break-inside: avoid;
 }
  
 .ul {
