@@ -13,21 +13,21 @@
           </div>
           <div class="blue">
             {{#compare mode 'start'}}
-              <h1 id="line4">To begin the set,</h1>
-              <h2 id="line5">click Start.</h2>
+              <p id="line4">To begin the set,</p>
+              <p id="line5">click Start.</p>
             {{/compare}}
             {{#compare mode 'play'}}
-              <h1 id="line4">To end the set,</h1>
-              <h2 id="line5">click Stop.</h2>
+              <p id="line4">To end the set,</p>
+              <p id="line5">click Stop.</p>
             {{/compare}}
             {{#compare mode 'stop'}}
-              <h1 id="line4">Set ended.</h1>
-              <h2 id="line5">What would you like to do?</h2>
+              <p id="line4">Set ended.</p>
+              <p id="line5">What would you like to do?</p>
             {{/compare}}
           </div>
           <div>
             {{#compare mode 'start'}}
-              <button type="button" class="btn btn-primary" id="startSession" onclick="action('start')">START</button>
+              <button type="button" class="btn btn-primary" id="startSession" onclick="action('play')">START</button>
             {{/compare}}
             {{#compare mode 'play'}}
               <button type="button" class="btn btn-primary" id="endSession" onclick="action('stop')">STOP</button>
@@ -37,7 +37,7 @@
                 <button class="btn btn-primary" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
               {{/if}}
               <button class="btn btn-primary" id="save" onclick="save()">SAVE SET</button>
-              <button class="btn btn-primary" id="discard" onclick="action('discard')">DISCARD & RESTART</button>
+              <button class="btn btn-primary" id="discard" onclick="action('start')">DISCARD & RESTART</button>
             {{/compare}}
           </div>
         </div>

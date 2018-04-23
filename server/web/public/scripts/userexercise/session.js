@@ -25,30 +25,17 @@ function parseURL(url) {
 }
 
 
-function action(action) {
-
+function action(nextMode) {
+  
+  
   const parsedURL = parseURL(window.location.pathname);
   var patientId = parsedURL.patientId;
   var exerciseId = parsedURL.exerciseId;
+
+ window.location = (parsedURL.patientId !== null)? 
+ '/userexercise/session/' + nextMode + '/' + exerciseId + '/' + patientId:
+ '/userexercise/session/' + nextMode + '/' + exerciseId;                                                  
    
-  if ( action === 'start') {
-    window.location = (parsedURL.patientId !== null)? 
-    '/userexercise/session/play/' + exerciseId + '/' + patientId:
-    '/userexercise/session/play/' + exerciseId;                                                  
-  }
-
-  if ( action === 'discard' ) {
-    window.location = (parsedURL.patientId !== null)? 
-    '/userexercise/session/start/' + exerciseId + '/' + patientId:
-    '/userexercise/session/start/' + exerciseId;                                                  
-  } 
- 
-
-  else if ( action === 'stop' ) {
-    window.location = (parsedURL.patientId !== null)? 
-    '/userexercise/session/stop/' + exerciseId + '/' + patientId:
-    '/userexercise/session/stop/' + exerciseId;             
-  }
 }
 
  

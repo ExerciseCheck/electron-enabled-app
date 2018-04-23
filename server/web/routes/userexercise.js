@@ -69,6 +69,10 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
+      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop') {
+        return reply(Boom.notFound('Invalid Mode'));
+      }
+
       let patientId = '';
       //logged-in user is clinician 
       if (request.params.patientId ) {

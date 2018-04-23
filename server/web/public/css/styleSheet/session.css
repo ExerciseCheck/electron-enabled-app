@@ -22,7 +22,7 @@
 .blue {
   color: #525B75;
   font-size: 25px;
-  line-height: 15px;
+  line-height: 50px;
   padding: 20px;
   margin-top:0px;
 }
@@ -30,11 +30,14 @@
 #line1 {
   color: #525B75;
   font-size: 40px;
+  
 }
 
 #line4 {
   color: #1E89FB;
   margin-top: 30px;
+  font-size: 35px;
+  line-height: 15px;
 }
 
 #line6 {
@@ -44,6 +47,7 @@
 
 #line5 {
   color: #1E89FB;
+  font-size: 35px;
 }
 
 #line7 {
