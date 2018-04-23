@@ -408,6 +408,42 @@ internals.applyRoutes = function (server, next) {
   });
 
   server.route({
+    method: 'PUT',
+    path: '/userexercise/reference/{id}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: UserExercise.updatePayload
+      }
+    },
+    handler: function (request, reply) {
+
+      const update = {
+        $set: {
+          numSessions: request.payload.numSessions,
+          numRepetition: request.payload.numRepetition
+        }
+      };
+
+      UserExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!document) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(document);
+      });
+    }
+  });
+
+
+  server.route({
     method: 'DELETE',
     path: '/userexercise/{id}',
     config: {

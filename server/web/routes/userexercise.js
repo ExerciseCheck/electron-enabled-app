@@ -284,15 +284,15 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      UserExercise.findById(request.params.id, (err, document) => {
+      UserExercise.findById(request.params.id, (err, userExercise) => {
 
         if (err) {
           return reply(err);
         }
-
         return reply.view('userexercise/edit', {
           user: request.auth.credentials.user,
-          projectName: Config.get('/projectName')
+          projectName: Config.get('/projectName'),
+          userExercise
         });
       });
     }
