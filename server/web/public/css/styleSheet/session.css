@@ -1,4 +1,3 @@
-
 .bodyCanvas {
   padding-left: 0;
   padding-right: 0;
@@ -11,94 +10,53 @@
   height: 95%;
   width: 100%;
 }
-
  
 .small {
-  color: #525B75;
   font-size: 25px;
-  line-height: 15px;
 }
 
-.blue {
-  color: #525B75;
-  font-size: 25px;
-  line-height: 50px;
-  padding: 20px;
-  margin-top:0px;
-}
-
-#line1 {
-  color: #525B75;
+.large {
   font-size: 40px;
-  
 }
 
-#line4 {
-  color: #1E89FB;
-  margin-top: 30px;
+.secondSection {
   font-size: 35px;
-  line-height: 15px;
+  line-height: 30px;
+  margin-top:60px;
+  margin-bottom:60px;
 }
 
-#line6 {
-  color: #1E89FB;
-  margin-top: 30px;
-}
-
-#line5 {
-  color: #1E89FB;
-  font-size: 35px;
-}
-
-#line7 {
-  color: #1E89FB;
-}
-
-#startSession {
-  background-color:#1E89FB; 
+.actionBtn {
   width:250px; 
-  color:white;
-  border:none;
-}
-
-#endSession {
-  background-color: #FF3860; 
-  width:250px; 
-  color:white;
-  border:none;
-}
-
-#save {
-  background-color:#1E89FB; 
-  width:250px; 
-  color:white;
   border:none;
 }
 
 #discard {
-  background-color:#FF3860; 
-  width:250px; 
-  color:white;
-  border:none;
   margin-top:10px;
 }
 
 #updateReference {
-  background-color:#428BCA; 
-  width:250px; 
-  color:white;
-  border:none;
   margin-bottom:10px;
-}
-
-#firstSection {
-  margin-top:150px;
-  line-height:40px;
-  padding-bottom: 20px;
 }
 
 .mh1 {
     height: 100vh; /* 100% of viewport height*/
-} 
+}
 
+.red:hover {
+  background-color: #FF3860;
+}
+
+.darkBlue:hover {
+  background-color:#428BCA;
+}
+
+.blueBackground:hover {
+  background-color: #1E89FB;
+}
+
+.actionBtn:hover {
+  box-shadow: 2px 5px #D3D3D3;
+  font-weight: bold;
+} 
 

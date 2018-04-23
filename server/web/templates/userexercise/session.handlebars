@@ -5,47 +5,47 @@
         <canvas id="bodyCanvas" class="bodyCanvas"></canvas>
       </div>
       <div class="col-md-3 text-center col-v-centered no-float">
-        <div id= "firstSection">
-          <p id="line1">Current Exercise:</p>
-          <div class= "small">
-            <p id="firstLine">{{numRepetition}} {{exercise.exerciseName}}s</p>
-            <p id="secondLine">Set {{setNumber}} of {{numSets}}</p>
+        <div class="black" style="margin-top:150px;">
+          <p class="large">Current Exercise:</p>
+          <div class= "small" style="line-height: 15px;">
+            <p>{{numRepetition}} {{exercise.exerciseName}}s</p>
+            <p>Set {{setNumber}} of {{numSets}}</p>
           </div>
-          <div class="blue">
-            {{#compare mode 'start'}}
-              <p id="line4">To begin the set,</p>
-              <p id="line5">click Start.</p>
-            {{/compare}}
-            {{#compare mode 'play'}}
-              <p id="line4">To end the set,</p>
-              <p id="line5">click Stop.</p>
-            {{/compare}}
-            {{#compare mode 'stop'}}
-              <p id="line4">Set ended.</p>
-              <p id="line5">What would you like to do?</p>
-            {{/compare}}
-          </div>
-          <div>
-            {{#compare mode 'start'}}
-              <button type="button" class="btn btn-primary" id="startSession" onclick="action('play')">START</button>
-            {{/compare}}
-            {{#compare mode 'play'}}
-              <button type="button" class="btn btn-primary" id="endSession" onclick="action('stop')">STOP</button>
-            {{/compare}}
-            {{#compare mode 'stop'}}
-              {{#if user.roles.clinician}}
-                <button class="btn btn-primary" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
-              {{/if}}
-              <button class="btn btn-primary" id="save" onclick="save()">SAVE SET</button>
-              <button class="btn btn-primary" id="discard" onclick="action('start')">DISCARD & RESTART</button>
-            {{/compare}}
-          </div>
+        </div>
+        <div class="blueColor secondSection">
+          {{#compare mode 'start'}}
+            <p>To begin the set,</p>
+            <p>click Start.</p>
+          {{/compare}}
+          {{#compare mode 'play'}}
+            <p>To end the set,</p>
+            <p>click Stop.</p>
+          {{/compare}}
+          {{#compare mode 'stop'}}
+            <p>Set ended.</p>
+            <p class="small">What would you like to do?</p>
+          {{/compare}}
+        </div>
+        <div>
+          {{#compare mode 'start'}}
+            <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play')">START</button>
+          {{/compare}}
+          {{#compare mode 'play'}}
+              <button type="button" class="red white actionBtn btn btn-primary" onclick="action('stop')">STOP</button>
+          {{/compare}}
+          {{#compare mode 'stop'}}
+            {{#if user.roles.clinician}}
+              <button class="btn btn-primary darkBlue white actionBtn" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
+            {{/if}}
+            <button class="btn btn-primary blueBackground white actionBtn" onclick="save()">SAVE SET</button>
+            <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start')">DISCARD & RESTART</button>
+          {{/compare}}
         </div>
       </div>    
     </div>
   </div>
 </div>
-    
-</div>
+
 <link rel="stylesheet" href="/public/css/styleSheet/session.css">
+<link rel="stylesheet" href="/public/css/styleSheet/color.css">
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
