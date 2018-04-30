@@ -1,7 +1,7 @@
- 
+
  .list-group-item {
      background-color:white;
-     margin-top: 5px; 
+     margin-top: 5px;
      box-shadow: 0px 5px #d9d9d9;
      height: 70px;
   }
@@ -33,14 +33,13 @@
     position:relative
   }
 
-  #clinicianList .search .fa-search { 
+  #clinicianList .search .fa-search {
     position: absolute;
     top: 45px;
     right:10px;
     font-size: 20px;
     color: gray;
-    font-weight: none;
-  }  
+  }
 
   #search {
     width:300px;
@@ -48,19 +47,19 @@
     border:solid 2px #525B75;
     border-radius:5px;
     margin-left:0;
- } 
+ }
 
-  #searchLabel { 
+  #searchLabel {
     display:block;
     color: #525B75;
     font-size: 25px;
-    font-weight: bold; 
+    font-weight: 500;
   }
 
   .labels {
     color: #525B75;
     font-size: 20px;
-    font-weight: bold; 
+    font-weight: bold;
   }
 
   #clinicians {
@@ -82,6 +81,6 @@
   #submitPatientsBtn {
     background-color: #708090;
     border: none;
-    font-weight: bold; 
+    font-weight: bold;
     color: white;
   }

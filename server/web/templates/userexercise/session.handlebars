@@ -5,14 +5,14 @@
         <canvas id="bodyCanvas" class="bodyCanvas"></canvas>
       </div>
       <div class="col-md-3 text-center col-v-centered no-float">
-        <div class="black" style="margin-top:150px;">
-          <p class="large">Current Exercise:</p>
+        <div class="black margin-top-p30">
+          <p class="large">Current Exercise</p>
           <div class= "small" style="line-height: 15px;">
             <p>{{numRepetition}} {{exercise.exerciseName}}s</p>
             <p>Set {{setNumber}} of {{numSets}}</p>
           </div>
         </div>
-        <div class="blueColor secondSection">
+        <div class="curiousBlueColor secondSection">
           {{#compare mode 'start'}}
             <p>To begin the set,</p>
             <p>click Start.</p>
@@ -35,7 +35,7 @@
           {{/compare}}
           {{#compare mode 'stop'}}
             {{#if user.roles.clinician}}
-              <button class="btn btn-primary darkBlue white actionBtn" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
+              <button class="btn btn-primary curiousBlue white actionBtn" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
             {{/if}}
             <button class="btn btn-primary blueBackground white actionBtn" onclick="save()">SAVE SET</button>
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start')">DISCARD & RESTART</button>
@@ -48,6 +48,7 @@
 
 <link rel="stylesheet" href="/public/css/styleSheet/session.css">
 <link rel="stylesheet" href="/public/css/styleSheet/color.css">
+<link rel="stylesheet" href="/public/css/styleSheet/genericStyles.css">
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
 <script src="/public/data.js"></script>
 
