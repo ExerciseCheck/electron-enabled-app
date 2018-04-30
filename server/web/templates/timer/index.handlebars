@@ -1,0 +1,22 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div style="padding: 30px">
+        <h3>Timer Test</h3>
+        <hr>
+        <div class="row">
+          <span id="start"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="cover">
+<span id="num"></span>
+</div>
+<script>
+  $(document).ready(function(){
+    startTimer();
+  });
+</script>
