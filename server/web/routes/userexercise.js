@@ -1,9 +1,10 @@
 'use strict';
 const internals = {};
+const Async = require('async');
+const Boom = require('boom');
 const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
 const Exercise = require('../../models/exercise');
-const Async = require('async');
 
 internals.applyRoutes = function (server, next) {
 
@@ -60,7 +61,148 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise/session/{exerciseId}',
+    path: '/userexercise/session/{mode}/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop') {
+        return reply(Boom.notFound('Invalid Mode'));
+      }
+
+      let patientId = '';
+      //logged-in user is clinician 
+      if (request.params.patientId ) {
+        patientId = request.params.patientId;
+      }
+      //logged-in user is patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+      Async.auto({
+        findReference: function (done) {
+
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Reference'
+          };
+
+          UserExercise.findOne(query, done);
+        },
+        findNumPractices:['findReference', function (results, done) {
+
+          if (!results.findReference || results.findReference === undefined ) {
+            return reply(Boom.notFound('Reference exercise not found'));
+          }
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Practice'
+          };
+
+          UserExercise.find(query, done);
+        }],
+        findExercise:['findNumPractices', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findExercise || results.findExercise === undefined) {
+          return reply(Boom.notFound('exercise not found'));
+        }
+        return reply.view('userexercise/session', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          numRepetition: results.findReference.numRepetition,
+          numSets: results.findReference.numSessions,
+          setNumber: results.findNumPractices.length + 1,
+          exercise : results.findExercise,
+          mode: request.params.mode
+        });
+      });
+    }
+  });
+
+
+  /*server.route({
+    method: 'GET',
+    path: '/userexercise/start/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+       var patientId = '';
+       //logged-in user is clinician 
+       if (request.params.patientId ) {
+         patientId = request.params.patientId;
+       }
+       //logged-in user is patient
+       else {
+         patientId = request.auth.credentials.user._id.toString();
+       }
+      Async.auto({
+        findReference: function (done) {
+
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Reference'
+          };
+
+          UserExercise.findOne(query, done);
+        },
+        findNumPractices:['findReference', function (results, done) {
+
+          if (!results.findReference || results.findReference === undefined ) {
+            return reply(Boom.notFound('Reference exercise not found'));
+          }
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Practice'
+          };
+
+          UserExercise.find(query, done);
+        }],
+        findExercise:['findNumPractices', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }]
+      }, (err, results) => {
+       
+        console.log(results.findExercise);
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findExercise || results.findExercise === undefined) {
+          return reply(Boom.notFound('exercise not found'));
+        }
+        return reply.view('userexercise/start', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          numRepetition: results.findReference.numRepetition,
+          numSets: results.findReference.numSessions,
+          setNumber: results.findNumPractices.length + 1,
+          exercise : results.findExercise
+        });
+      });
+    }
+  });*/
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/play/{exerciseId}/{numSets}/{numRepetition}/{setNumber}',
     config: {
       auth: {
         strategy: 'session'
@@ -74,9 +216,12 @@ internals.applyRoutes = function (server, next) {
           return reply(err);
         }
 
-        return reply.view('userexercise/beginSession', {
+        return reply.view('userexercise/play', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
+          numRepetition: request.params.numRepetition,
+          numSets: request.params.numSets,
+          setNumber: request.params.setNumber,
           exercise
         });
       });
@@ -85,7 +230,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise/clinician/session/{patientId}/{exerciseId}',
+    path: '/userexercise/stop/{exerciseId}/{numSets}/{numRepetition}/{setNumber}',
     config: {
       auth: {
         strategy: 'session'
@@ -93,78 +238,20 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      //this obejct will contains all the infomation about user exercise including numSession, numRepitition, if there exists a reference
-      // we pass it to the template we are replying with 
-      const userExerciseInfo = {};
-
-      Async.auto({
-
-        //first we query userExercise model to find the reference 
-        findReference: function (done) {
-
-          const query = {
-            userId: request.params.patientId,
-            exerciseId: request.params.exerciseId,
-            type: 'Reference'
-          };
-
-          UserExercise.findOne(query, done);
-        },
-        updateUserExerciseInfo:['findReference', function (results, done) {
-
-          //case where there is no reference 
-          if ( !results.findReference ){
-
-            userExerciseInfo.referenceExists = false;
-
-          }
-
-          //case where there is a reference, find number of practice exercises 
-          else if ( results.findReference )  {
-            userExerciseInfo.referenceExists = true;
-            //by doing this we have access to all information including numSessions, numRepetitions
-            userExerciseInfo.numSessions = results.findReference.numSessions;
-          }
-
-          //anyway we count the number of practice exercises for the patient 
-          const pipeLine = [
-            { '$match': { 'userId' : request.params.patientId, 'exerciseId': request.params.exerciseId, 'type': 'Practice' } },
-            { '$group': {
-              '_id': null,
-              count: { $sum: 1 }
-            }
-            }
-          ];
-
-          UserExercise.aggregate(pipeLine, done);
-
-        }],
-        findExerciseName:['updateUserExerciseInfo', function (results, done) {
-
-          Exercise.findById(request.params.exerciseId, done);
-        }]
-      }, (err, results) => {
+      Exercise.findById(request.params.exerciseId, (err, exercise) => {
 
         if (err) {
           return reply(err);
         }
 
-        //need this check to avoid error, if there is no practice exercise,results.updateUserExerciseInfo[0] will be undefined
-        if ( results.updateUserExerciseInfo.length > 0 ) {
-          userExerciseInfo.numPractices = results.updateUserExerciseInfo[0].count;
-        }
-        else {
-          userExerciseInfo.numPractices = 0;
-        }
-        console.log(JSON.stringify(userExerciseInfo));
-        userExerciseInfo.exerciseName = results.findExerciseName.exerciseName;
-        return reply.view('userexercise/cliniciansession', {
+        return reply.view('userexercise/stop', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
-          userExerciseInfo
-
+          numRepetition: request.params.numRepetition,
+          numSets: request.params.numSets,
+          setNumber: request.params.setNumber,
+          exercise
         });
-
       });
     }
   });
@@ -197,15 +284,15 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      UserExercise.findById(request.params.id, (err, document) => {
+      UserExercise.findById(request.params.id, (err, userExercise) => {
 
         if (err) {
           return reply(err);
         }
-
         return reply.view('userexercise/edit', {
           user: request.auth.credentials.user,
-          projectName: Config.get('/projectName')
+          projectName: Config.get('/projectName'),
+          userExercise
         });
       });
     }

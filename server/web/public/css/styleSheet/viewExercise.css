@@ -8,8 +8,8 @@
   text-align: left;
   font-size:25px;
   padding: 10px;
-  -webkit-column-break-inside: avoid;  
-  page-break-inside: avoid; 
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
   break-inside: avoid;
 }
 
@@ -20,7 +20,7 @@
   -webkit-columns: 2;
   -moz-columns: 2;
 }
-  
+
 
 h1 {
   text-align: center;
@@ -54,14 +54,14 @@ h3 {
   position:relative
 }
 
-.search .fa-search { 
+.search .fa-search {
   position: absolute;
   top: 7px;
   right:10px;
   font-size: 20px;
   color: gray;
   font-weight: none;
-}  
+}
 
 
- 
+

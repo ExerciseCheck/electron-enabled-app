@@ -91,7 +91,7 @@ function remove(clinicainId) {
   }
 }
 
-function addExercise() {
+function addExr() {
    
   window.location = '/exercise/create';
 }

@@ -10,6 +10,8 @@ const internals = {};
 internals.applyRoutes = function (server, next) {
 
   const UserExercise = server.plugins['hicsail-hapi-mongo-models'].UserExercise;
+  const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
+  const User = server.plugins['hicsail-hapi-mongo-models'].User;
 
   server.route({
     method: 'GET',
@@ -29,7 +31,32 @@ internals.applyRoutes = function (server, next) {
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
+
       UserExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+
+        const userExercises = [];
+        Async.each(results.data, (userExercise, done) => {
+
+          User.findById(userExercise.userId, (err, user) => {
+
+            if (err) {
+              done(err);
+            }
+
+            userExercise.name = user.name;
+          });
+
+          Exercise.findById(userExercise.exerciseId, (err, exercise) => {
+
+            if (err) {
+              done(err);
+            }
+            userExercise.exerciseName = exercise.exerciseName;
+
+          });
+
+          userExercises.push(userExercise);
+        });
 
         if (err) {
           return reply(err);
@@ -39,7 +66,7 @@ internals.applyRoutes = function (server, next) {
           draw: request.query.draw,
           recordsTotal: results.data.length,
           recordsFiltered: results.items.total,
-          data: results.data,
+          data: userExercises,
           error: err
         });
       });
@@ -203,7 +230,6 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-
   server.route({
     method: 'GET',
     path: '/userexercise/{id}',
@@ -229,7 +255,6 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route inserts a new exercise of type Reference into userExercise collection, trrigered only by clinician 
   server.route({
     method: 'POST',
     path: '/userexercise/reference',
@@ -240,9 +265,32 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: UserExercise.referencePayload
-      }
-    },
+      },
+      pre: [{
+        assign: 'referenceCheck',
+        method: function (request, reply) {
 
+          const query = {
+            userId: request.payload.userId,
+            exerciseId: request.payload.exerciseId,
+            type: 'Reference'
+          };
+
+          UserExercise.findOne(query, (err, userExercise) => {
+
+            if (err) {
+              return reply(err);
+            }
+
+            if (userExercise) {
+              return reply(Boom.conflict('Reference already exists.'));
+            }
+
+            reply(true);
+          });
+        }
+      }]
+    },
     handler: function (request, reply) {
 
       UserExercise.create(
@@ -358,6 +406,42 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
+  server.route({
+    method: 'PUT',
+    path: '/userexercise/reference/{id}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: UserExercise.updatePayload
+      }
+    },
+    handler: function (request, reply) {
+
+      const update = {
+        $set: {
+          numSessions: request.payload.numSessions,
+          numRepetition: request.payload.numRepetition
+        }
+      };
+
+      UserExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!document) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(document);
+      });
+    }
+  });
+
 
   server.route({
     method: 'DELETE',
