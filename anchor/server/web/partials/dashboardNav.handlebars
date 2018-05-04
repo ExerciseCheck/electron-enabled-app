@@ -20,23 +20,27 @@
     </h6>
     <li class="nav-item">
       <a class="nav-link text-light" href="/dashboard">Dashboard</a>
+      <a class="nav-link text-light" href="/timer">Timer Test</a>
     </li>
   </ul>
   <ul class="nav nav-pills flex-column" style="padding-top: 20px">
     <h6 class="text-dark">Collections</h6>
     <li class="nav-item">
+      {{#role user 'clinician'}}
+        <a class="nav-link text-light" href="/userexercise">User Exercises</a>
+      {{/role}}
       {{#role user 'researcher'}}
         <a class="nav-link text-light" href="/authAttempts">Auth Attempts</a>
         <a class="nav-link text-light" href="/exercise">Exercises</a>
-        <a class="nav-link text-light" href="/userexercise">User Exercises</a>
-        <a class="nav-link text-light" href="/clinician">Clinicians</a>
         <a class="nav-link text-light" href="/events">Events</a>
         <a class="nav-link text-light" href="/sessions">Sessions</a>
         <a class="nav-link text-light" href="/users">Users</a>
       {{/role}}
-        <a class="nav-link text-light" href="/feedback">Feedback</a>
-        <a class="nav-link text-light" href="/invite">Invites</a>
+      {{#if user.roles.root}}
         <a class="nav-link text-light" href="/clinician">Clinicians</a>
+        <a class="nav-link text-light" href="/feedback">Feedback</a>
+      {{/if}}
+      <a class="nav-link text-light" href="/invite">Invites</a>
     </li>
   </ul>
   {{#role user 'researcher'}}

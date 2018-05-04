@@ -1,12 +1,14 @@
 'use strict';
 
-const schema = Joi.object().keys({
-  bodyFrames: Joi.array().required()
+const schema = Joi.object({
+  numSessions: Joi.number().integer().required(),
+  numRepetition: Joi.number().integer().required()
 });
+
 joiToForm('formFields',schema);
 
 $('#update').click((event) => {
-  const documentID = window.location.pathname.split('/').pop();
+  const userExerciseId = window.location.pathname.split('/').pop();
   event.preventDefault();
   const values = {};
   $.each($('#form').serializeArray(), (i, field) => {
@@ -14,13 +16,15 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '../api/refexercises/' + documentID,
+    url: '/api/userexercise/reference/' + userExerciseId,
     data: values,
     success: function (result) {
-      window.location = '../refexercises'
+      window.location = '/userexercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
     }
   });
 });
+
+

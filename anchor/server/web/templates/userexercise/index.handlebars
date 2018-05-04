@@ -4,17 +4,20 @@
         <div class="col-sm-9 col-md-10">
             <div style="padding: 30px">
                 <h3>User Exercises</h3>
-                <a class="btn btn-primary" href="/userexercise/create/ref">Create a reference exercise</a>
-                <a class="btn btn-primary" href="/userexercise/create/practice">Create a practice exercise</a>
+                <a class="btn btn-primary margin-bottom-p2" href="/userexercise/create/ref">Create a reference exercise</a>
+                <a class="btn btn-primary margin-bottom-p2" href="/userexercise/create/practice">Create a practice exercise</a>
                 <br>
                 <div class="card">
                     <div style="padding: 20px">
                         <table id="userTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
                             <tr>
+                                <th>name</th>
+                                <th>exerciseName</th>
                                 <th>UserId</th>
                                 <th>ExerciseId</th>
                                 <th>numSessions</th>
+                                <th>numRepetition</th>
                                 <th>type</th>
                                 <th>createdAt</th>
                               {{#role user 'admin'}}
@@ -47,27 +50,39 @@
             ajax: {
                 url: "../api/table/userexercise",
                 data: function (d) {
-                    d.fields = "userId exerciseId numSessions createdAt type";
+                    d.fields = "userId exerciseId numSessions createdAt type name exerciseName numRepetition";
                 }
             },
             columns: [
+                 {
+                    data: "name",
+                    defaultContent: ""
+                 },
+                 {
+                    data: "exerciseName",
+                    defaultContent: ""
+                },
                 {
                     data: "userId",
-                    defaultContent: "" 
-                         
-                    
+                    visible: false,
+                    defaultContent: ""
                 },
                 {
                     data: "exerciseId",
-                     defaultContent: "" 
+                    visible: false,
+                    defaultContent: ""
                 },
                 {
                     data: "numSessions",
-                    defaultContent: "" 
+                    defaultContent: ""
+                },
+                {
+                    data: "numRepetition",
+                    defaultContent: ""
                 },
                 {
                     data: "type",
-                    defaultContent: "" 
+                    defaultContent: ""
                 },
                 {
                     data: "createdAt",
@@ -81,7 +96,12 @@
                       data: "_id",
                       visible: false,
                       render: function (data, type, row) {
-                          return '<button class="btn btn-secondary" id="edit' + row._id + '" onclick="editDoc(\'' + row._id + '\')">Edit</button>';
+                          if ( row.type === 'Reference' ) {
+                            return '<button class="btn btn-secondary" id="edit' + row._id + '" onclick="editDoc(\'' + row._id + '\')">Edit</button>';
+                          }
+                          else {
+                            return'';
+                          }
                       },
                   },
                   {
@@ -98,3 +118,4 @@
     });
 </script>
 <script type="text/javascript" src="../../public/scripts/userexercise/index.js"></script>
+<link rel="stylesheet" href="../public/css/styleSheet/genericStyles.css">

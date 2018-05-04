@@ -91,7 +91,7 @@ function remove(clinicainId) {
   }
 }
 
-function addExercise() {
+function addExr() {
    
   window.location = '/exercise/create';
 }
@@ -99,8 +99,6 @@ function addExercise() {
 function filter() {
   const  input = $("#search");
   const filter = input.val().toUpperCase();
-  const  ul = $("#ul");
-  const li =$("li");
 
   $("div.listButtons").each(function() {
     if ($(this)[0].innerHTML.toUpperCase().indexOf(filter) > -1) {

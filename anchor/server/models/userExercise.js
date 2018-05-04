@@ -64,14 +64,14 @@ UserExercise.referencePayload = Joi.object().keys({
 
 //this is used for validating payload of put requests when updating a reference exercise
 UserExercise.updatePayload = Joi.object().keys({
-  bodyFrames: Joi.array().required()
+  //bodyFrames: Joi.array().required(),
+  numSessions: Joi.number().integer().required(),
+  numRepetition: Joi.number().integer().required()
 });
 
 UserExercise.activatePayload = Joi.object().keys({
   isActive: Joi.boolean().required()
 });
-
-
 
 UserExercise.indexes = [
   { key: { '_id': 1 } },

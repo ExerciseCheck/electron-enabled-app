@@ -1,0 +1,63 @@
+.bodyCanvas {
+  padding-left: 0;
+  padding-right: 0;
+  left: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  background: grey;
+  display: block;
+  height: 85%;
+  width: 97%;
+}
+
+.small {
+  font-size: 23px;
+}
+
+.large {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.secondSection {
+  font-size: 30px;
+  line-height: 30px;
+  margin-top:60px;
+  margin-bottom:60px;
+
+}
+
+.actionBtn {
+  width:250px;
+  border:none;
+}
+
+#discard {
+  margin-top:10px;
+}
+
+#updateReference {
+  margin-bottom:10px;
+}
+
+.mh1 {
+    height: 100vh; /* 100% of viewport height*/
+}
+
+.red:hover {
+  background-color: #FF3860;
+}
+
+.curiousBlue:hover {
+  background-color:#428BCA;
+}
+
+.blueBackground:hover {
+  background-color: #1E89FB;
+}
+
+.actionBtn:hover {
+  box-shadow: 2px 5px #D3D3D3;
+  font-weight: bold;
+}
+

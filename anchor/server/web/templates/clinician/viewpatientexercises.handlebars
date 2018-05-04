@@ -14,7 +14,7 @@
                  <input type="search" class="form-control" id="search" onkeyup="filter()" placeholder:"Search by Patient ID">
               </div>
               <span id="AddExrcsSpan">
-                <button type="button" class="btn btn-primary" id="addExercise" href="/exercise/create">
+                <button type="button" class="btn btn-primary" id="addExercise" onclick="addExr()">
                   <span>ADD EXERCISE <i class="fa fa-plus"></i></span>
                 </button>
              </span>
@@ -25,7 +25,7 @@
            {{#each exercises}}
              <li>
                <div class="listButtons">
-                 <a href= '/userexercise/clinician/session/{{this.patientId}}/{{this._id}}'>{{this.exerciseName}}</a>
+                 <a href= '/userexercise/session/start/{{this._id}}/{{patientId}}'>{{formatName this.exerciseName}}</a>
                </div> 
              <li>
           {{/each}}
