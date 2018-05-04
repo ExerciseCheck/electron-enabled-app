@@ -4,7 +4,8 @@
   "description": "",
   "main": "app/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "postinstall": "cd node_modules/kinect2/ && npm install async && npm run build:electron"
   },
   "repository": "https://github.com/ExerciseCheck/exercisecheck",
   "author": "GitHub",

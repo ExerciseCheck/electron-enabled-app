@@ -4,3 +4,4 @@ test/artifacts/*
 .idea
 server/backups
 .coveralls.yml
+db

@@ -1,0 +1,3 @@
+[submodule "exercisecheck"]
+	path = exercisecheck
+	url = https://github.com/ExerciseCheck/exercisecheck
