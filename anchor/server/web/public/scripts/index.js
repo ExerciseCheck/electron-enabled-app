@@ -2,15 +2,16 @@
   let processing, canvas, ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
 
-  window.Bridge.startKinect = () => {
-    if (isElectron()) {
+  if (isElectron()) {
+    document.addEventListener('DOMContentLoaded', function() {
       processing = false;
       canvas = document.getElementById('outputCanvas');
       ctx = canvas.getContext('2d');
-    }
-  };
+      window.Bridge.eStartKinect();
+    });
+  }
 
-  window.Bridge.onBodyFrame = (bodyFrame) => {
+  window.Bridge.aOnBodyFrame = (bodyFrame) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let index = 0;
     bodyFrame.bodies.forEach(function (body) {

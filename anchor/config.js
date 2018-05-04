@@ -2,7 +2,6 @@
 const Confidence = require('confidence');
 const Dotenv = require('dotenv');
 
-
 Dotenv.config({ silent: true });
 
 const criteria = {
@@ -37,7 +36,7 @@ const config = {
   },
   authAttempts: {
     forIp: 50,
-    forIpAndUser: 7
+    forIpAndUser: 100
   },
   authSecret: {
     $filter: 'env',

@@ -15,30 +15,31 @@ function init() {
   // !CAREFUL! do not expose any functionality or APIs that could compromise the
   // user's computer. E.g. don't directly expose core Electron (even IPC) or node.js modules.
   window.Bridge = {
-    processDataFrame
+    eProcessDataFrame,
+    eStartKinect
   };
 }
 
 function attachIPCListeners() {
   // we get this message from the main process
   ipc.on('startKinect', () => {
-    setupKinect();
+    //setupKinect();
   });
 }
 
-function processDataFrame() {
+function eProcessDataFrame() {
   if (process.platform === 'darwin') {
     console.log('message received');
   }
 }
 
-function setupKinect() {
+function eStartKinect() {
   const kinect = new Kinect2();
   if(kinect.open()) {
-    window.Bridge.startKinect();
+    //window.Bridge.startKinect();
     kinect.openBodyReader();
     kinect.on('bodyFrame', function(bodyFrame){
-      window.Bridge.onBodyFrame(bodyFrame);
+      window.Bridge.aOnBodyFrame(bodyFrame);
     });
   }
 }
