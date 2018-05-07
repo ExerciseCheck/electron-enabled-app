@@ -4,11 +4,12 @@ const MongoModels = require('hicsail-mongo-models');
 
 class UserExercise extends MongoModels {
 
-  static create(userId, exerciseId, type, numSessions, numRepetition, bodyFrames, callback){
+  static create(userId, exerciseId, referenceId, type, numSessions, numRepetition, bodyFrames, callback){
 
     const document = {
       userId,
       exerciseId,
+      referenceId,
       type,
       numSessions,
       numRepetition,
@@ -37,6 +38,7 @@ UserExercise.schema = Joi.object().keys({
   _id: Joi.object(),
   userId: Joi.string().required(),
   exerciseId: Joi.string().required(),
+  referenceId:  Joi.string().required(),
   //we can also define a boolean field as isReference instead
   type: Joi.string().valid('Reference','Practice').required(),
   numSessions: Joi.number().integer().required(),

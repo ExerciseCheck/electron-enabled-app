@@ -266,36 +266,13 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: UserExercise.referencePayload
       },
-      pre: [{
-        assign: 'referenceCheck',
-        method: function (request, reply) {
-
-          const query = {
-            userId: request.payload.userId,
-            exerciseId: request.payload.exerciseId,
-            type: 'Reference'
-          };
-
-          UserExercise.findOne(query, (err, userExercise) => {
-
-            if (err) {
-              return reply(err);
-            }
-
-            if (userExercise) {
-              return reply(Boom.conflict('Reference already exists.'));
-            }
-
-            reply(true);
-          });
-        }
-      }]
     },
     handler: function (request, reply) {
 
       UserExercise.create(
         request.payload.userId,
         request.payload.exerciseId,
+        -1,
         'Reference',
         request.payload.numSessions,
         request.payload.numRepetition,
@@ -331,34 +308,40 @@ internals.applyRoutes = function (server, next) {
 
         //first we need to find the referenceId of the exercise
         //finding one document matching the query is enough
-        findReference: function (done) {
+        findMostRecentReference: function (done) {
 
-          const query = {
+          const filter = {
             userId: request.payload.userId,
             exerciseId: request.payload.exerciseId,
-            type: 'Reference'
+            type:'Reference'
           };
 
-          UserExercise.findOne(query, done);
+           const pipeLine = [
+             { '$match': filter},
+             { '$sort': { createdAt: -1 } },
+             { '$limit': 1 }
+           ];
+           UserExercise.aggregate(pipeLine, done);
         },
-        createExercise:['findReference', function (results, done) {
+        createExercise:['findMostRecentReference', function (results, done) {
 
           UserExercise.create(
 
             request.payload.userId,
             request.payload.exerciseId,
+            results.findMostRecentReference[0]._id.toString(),
             'Practice',
-            results.findReference.numSessions,
-            results.findReference.numRepetition,
+            results.findMostRecentReference[0].numSessions,
+            results.findMostRecentReference[0].numRepetition,
             [],
             done);
         }]
       }, (err, results) => {
 
-        if (err) {
+       if (err) {
           return reply(err);
         }
-        if (!results.findReference) {
+        if (!results.findMostRecentReference) {
           return reply(Boom.notFound('Document not found.'));
         }
 
