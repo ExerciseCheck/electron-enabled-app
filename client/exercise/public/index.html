@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>ExerciseCheck Client</title>
+	<meta name="viewport" content = "width=device-width, initial-scale=1.0">
+	<title>ExerciseCheck Client</title>
+	<link href='https://fonts.googleapis.com/css?family=Bree+Serif|Merriweather:400,300,300italic,400italic,700,700italic' rel='stylesheet' type='text/css'>
+	<link async href="https://fonts.googleapis.com/css?family=Fredoka%20One" data-generated="http://enjoycss.com" rel="stylesheet" type="text/css"/>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="https://kevingleason.me/SimpleRTC/js/webrtc.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+</head>
+
+<body align = "center">
+	<h1 align="center">ExerciseCheck</h1>
+	<div id="vid-box" class="ui-widget-content">
+	</div>
+	<hr>
+	<!--button definition-->
+	<div>
+		<!-- <input id="exercise" class="button-shadow" type="button" value="Exercise"/> -->
+			<input id="command" class="button-shadow" type="button" value="Start"/>
+			<input id="report" class="button-shadow" type="button"  value="Report"/>
+			<input id="chat" class="button-shadow" type="button"  value="Chat"/>
+			<!-- <input id="clr" class="button-shadow" type="button" value="Clear"/> -->
+	</div>
+	<br>
+	<div id = "display">
+<input id ="gt" class="button-shadow-small" type="button"  value="Reference"/>
+<input id = "ex" class = "button-shadow-small" type="button" value="Exercise"/>
+<input id = "re" class= "button-shadow-small" type="button" value = "Discard"/>
+	</div>
+	<br>
+
+	<br>
+
+	<canvas id="bodyCanvas" width="700" height="700"></canvas>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="js/kinect.js"></script>
+	<script src="js/navigation.js"></script>
+
+</body>
+</html>

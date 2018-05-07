@@ -1,4 +1,7 @@
 version: 2
+general:
+  build_dir: anchor
+
 jobs:
   build:
     working_directory: ~/anchor
