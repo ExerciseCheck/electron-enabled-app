@@ -1,21 +1,24 @@
 <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-secondary sidebar" style="padding-top: 40px">
   <ul class="nav nav-pills flex-column">
     <h6 class="text-dark">Your Roles
-      <span class="badge badge-success">Patient</span>
-      {{#if user.roles.clinician}}
-        <span class="badge badge-primary">Clinician</span>
-      {{/if}}
-      {{#if user.roles.analyst}}
-        <span class="badge badge-light">Analyst</span>
-      {{/if}}
-      {{#if user.roles.researcher}}
-        <span class="badge badge-info">Researcher</span>
-      {{/if}}
-      {{#if user.roles.admin}}
-        <span class="badge badge-warning">Admin</span>
-      {{/if}}
-      {{#if user.roles.root}}
-        <span class="badge badge-dark">Root</span>
+      {{#if (isPatient user)}}
+        <span class="badge badge-success">Patient</span>
+        {{else}}
+          {{#if user.roles.clinician}}
+            <span class="badge badge-primary">Clinician</span>
+          {{/if}}
+          {{#if user.roles.analyst}}
+            <span class="badge badge-light">Analyst</span>
+          {{/if}}
+          {{#if user.roles.researcher}}
+            <span class="badge badge-info">Researcher</span>
+          {{/if}}
+          {{#if user.roles.admin}}
+            <span class="badge badge-warning">Admin</span>
+          {{/if}}
+          {{#if user.roles.root}}
+            <span class="badge badge-dark">Root</span>
+          {{/if}}
       {{/if}}
     </h6>
     <li class="nav-item">
