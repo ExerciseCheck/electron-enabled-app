@@ -5,7 +5,7 @@
        <div id="mainContent">
          <br><br>
          <h1>Select an exercise.</h1>
-         <h3>You are currently working with Patient {{patientId}}.</h3>
+         <h3>You are currently working with Patient {{formatName patientName}}.</h3>
          <br>
          <form>
            <div class="form-group">
@@ -14,7 +14,7 @@
                  <input type="search" class="form-control" id="search" onkeyup="filter()" placeholder:"Search by Patient ID">
               </div>
               <span id="AddExrcsSpan">
-                <button type="button" class="btn btn-primary" id="addExercise" onclick="addExr()">
+                <button type="button" class="btn addExercise" id="addExercise" onclick="addExr()">
                   <span>ADD EXERCISE <i class="fa fa-plus"></i></span>
                 </button>
              </span>
@@ -24,7 +24,7 @@
          <ul>
            {{#each exercises}}
              <li class="listButtons">
-               <a href= '/userexercise/session/start/{{this._id}}/{{patientId}}'>{{formatName this.exerciseName}}</a>
+               <a href= '/userexercise/session/start/{{this._id}}/{{../patientId}}'>{{formatName this.exerciseName}}</a>
              </li>
           {{/each}}
         </ul>
@@ -34,6 +34,6 @@
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../public/css/styleSheet/viewPatientExercises.css">
-<script type="text/javascript" src="../../public/scripts/clinician.js"></script>
+<script type="text/javascript" src="../public/scripts/clinician.js"></script>
 
 

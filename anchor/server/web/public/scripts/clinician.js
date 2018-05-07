@@ -97,10 +97,11 @@ function addExr() {
 }
 
 function filter() {
+   
   const  input = $("#search");
   const filter = input.val().toUpperCase();
 
-  $("div.listButtons").each(function() {
+  $("ul .listButtons").each(function() {
     if ($(this)[0].innerHTML.toUpperCase().indexOf(filter) > -1) {
       $(this).show();
     }

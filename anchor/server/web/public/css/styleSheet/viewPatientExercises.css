@@ -47,6 +47,10 @@ form {
   -webkit-column-break-inside: avoid;
 }
 
+.listButtons:hover {
+  font-size:22px;
+}
+
 ul {
   list-style-type: none;
   columns: 2;
@@ -86,15 +90,22 @@ ul {
 }
 
 #addExercise {
-    width: 200px;
-    height: 40px;
-    font-size: 15px;
-    border: 2px solid #428BCA;
-    color: #428BCA;
-    border-radius: 5px;
-    border-width: 2px;
-    background-color: white;
-    font-weight: bold;
+  width: 180px;
+  height: 40px;
+  color: #428BCA;
+  border:solid #428BCA;
+  border-width:2px;
+  background-color: white;
+}
+
+#addExercise:hover {
+  font-size: 16px;
+}
+
+.btn {
+  text-align:left;
+  padding-top: 0;
+  
 }
 
 

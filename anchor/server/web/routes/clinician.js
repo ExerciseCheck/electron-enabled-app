@@ -75,28 +75,34 @@ internals.applyRoutes = function (server, next) {
       }
     },
     handler: function (request, reply) {
+     
+     Async.auto({
+       findPatientName: function (done) {
 
-      Exercise.find({}, (err, exercises) => {
+         User.findById(request.params.patientId, done);
+       },
+       findAllExercises:['findPatientName', function (resutls, done) {
 
-        if (err) {
-          return reply(err);
-        }
-        //add the patientId to each exercise so we can access the patientId on the template
-        Async.each(exercises, (exercise, callback) => {
+         Exercise.find({}, done);
+       }]
+       }, (err, results) => {
 
-          exercise.patientId = request.params.patientId;
-          callback(null, exercise);
-        });
-
-        return reply.view('clinician/viewpatientexercises', {
-          user: request.auth.credentials.user,
-          projectName: Config.get('/projectName'),
-          title: 'Exercises',
-          baseUrl: Config.get('/baseUrl'),
-          exercises,
-          patientId: request.params.patientId
-        });
-      });
+         if (err) {
+            return reply(err);
+          }
+          if (!results.findPatientName || results.findPatientName === undefined) {
+            return reply(Boom.notFound('patient not found'));
+          }
+          return reply.view('clinician/viewpatientexercises', {
+            user: request.auth.credentials.user,
+            projectName: Config.get('/projectName'),
+            title: 'Exercises',
+            baseUrl: Config.get('/baseUrl'),
+            exercises: results.findAllExercises,
+            patientId: request.params.patientId,
+            patientName: results.findPatientName.name
+         });
+      }); 
     }
   });
 
