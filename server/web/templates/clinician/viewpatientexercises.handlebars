@@ -23,11 +23,9 @@
          <br><br>    
          <ul>
            {{#each exercises}}
-             <li>
-               <div class="listButtons">
-                 <a href= '/userexercise/session/start/{{this._id}}/{{patientId}}'>{{formatName this.exerciseName}}</a>
-               </div> 
-             <li>
+             <li class="listButtons">
+               <a href= '/userexercise/session/start/{{this._id}}/{{patientId}}'>{{formatName this.exerciseName}}</a>
+             </li>
           {{/each}}
         </ul>
       </div>
@@ -37,4 +35,5 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../public/css/styleSheet/viewPatientExercises.css">
 <script type="text/javascript" src="../../public/scripts/clinician.js"></script>
+
 

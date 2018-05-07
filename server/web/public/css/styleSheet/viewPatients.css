@@ -4,7 +4,9 @@
   border: 1px solid #E8F3FF;
   border-radius: 5px;
   background-color:#E8F3FF;
-  text-align: left;
+  text-align:left;
+  padding: 5px;
+  margin-bottom:15px;
   font-size:20px;
   text-indent: 15px;
   -webkit-column-break-inside: avoid;
@@ -17,6 +19,9 @@
   -moz-columns: 2;
 }
 
+.listButtons a {
+  color: #525B74;
+}
 
 .search {
   display:inline-block;
@@ -47,6 +52,7 @@
   font-size: 25px;
   font-weight: 500;
 } 
+
 
 
 

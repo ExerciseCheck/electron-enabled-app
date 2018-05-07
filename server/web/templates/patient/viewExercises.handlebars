@@ -17,11 +17,9 @@
                <br>    
                <ul id ="ul" class = "ul">
                  {{#each exercises}}
-                   <li style= "padding: 10px">
-                     <div class="listButtons">
-                       <a href= '/userexercise/session/start/{{this._id}}' class="listItem">{{formatName this.exerciseName}}</a>
-                     </div> 
-                  <li>
+                   <li class="listButtons">
+                     <a href= '/userexercise/session/start/{{this._id}}' class="listItem">{{formatName this.exerciseName}}</a>
+                  </li>
                  {{/each}}
              </ul>
         </div>
@@ -32,3 +30,4 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../public/css/styleSheet/viewExercise.css">
 <script type="text/javascript" src="../../public/scripts/patient/viewexercise.js"></script>
+

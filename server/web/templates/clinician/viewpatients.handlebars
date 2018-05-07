@@ -19,11 +19,9 @@
          <br><br>
          <ul id ="ul" class = "ul">
            {{#each patients}}
-             <li style= "padding: 10px">
-               <div class="listButtons">
-                 <a href= '/clinician/patientexercises/{{this.patientId}}' style="color: #525B74;" title='{{this.name}}'>{{this.patientId}}</a>
-              </div>
-            <li>
+             <li class="listButtons">
+               <a href= '/clinician/patientexercises/{{this.patientId}}'" title='{{this.name}}'>{{this.patientId}}</a>
+            </li>
           {{/each}}
          </ul>
        </div>
@@ -34,3 +32,4 @@
 <link rel="stylesheet" href="../public/css/styleSheet/viewPatients.css">
 <link rel="stylesheet" href="../public/css/styleSheet/genericStyles.css">
 <script type="text/javascript" src="../../public/scripts/clinician.js"></script>
+
