@@ -1,16 +1,13 @@
 'use strict';
-const loginSchema = Joi.object({
-  username: Joi.string().lowercase().required(),
-  password: Joi.string().required()
-});
-joiToForm('loginFormFields',loginSchema);
 
 $('#login').click((event) => {
+
   event.preventDefault();
+  const username = $("#username").val();
+  const password = $("#password").val();
   const values = {};
-  $.each($('#loginForm').serializeArray(), (i, field) => {
-    values[field.name] = field.value;
-  });
+  values.username = username;
+  values.password = password;
   $.ajax({
     type: 'POST',
     url: '/api/login',

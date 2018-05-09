@@ -1,0 +1,26 @@
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.btn {
+  width: 110px;
+  cursor: pointer;
+  font-weight: bold;
+  height:40px;
+}
+
+#login {
+  background-color: white;
+  border: #1E89FB solid 2px;
+  color: #1E89FB;
+}
+
+#signup {
+  background-color: #428BCA;
+  color: white;
+  border:none;
+}
+
+ 

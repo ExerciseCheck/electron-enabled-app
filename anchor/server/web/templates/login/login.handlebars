@@ -1,21 +1,25 @@
-<div class="container" style="padding-top: 60px">
-  <div class="row justify-content-center">
-    <div class="col-xl-6 col-lg-6">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Login</h4>
-          <form id="loginForm">
-            <div id="loginFormFields"></div>
-            <button id="login" type="submit" class="btn btn-primary">Login</button>
-          </form>
-        </div>
-      </div>
-    </div>
+<div class="container" style="padding-top:120px;">
+  <div class="row justify-content-center text-center">
+    <div class="col-xl-8 col-lg-4">
+      <h1>Log into your account.</h1>
+     </div>
+  </div>
+  <div class="row justify-content-center text-center">
+    <div class="col-xl-4 col-lg-8">
+       <form id="loginForm" style="padding-top:40px;">
+         <div class="form-group">
+           <label for="email" class="label">Username</label>
+           <input type="email" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Enter username">
+         </div>
+         <div class="form-group style="margin-top:50px;">
+           <label for="password" class="label">Password</label>
+           <input type="password" class="form-control" id="password" aria-describedby="passwordHelp" placeholder="Enter password">
+         </div>
+         <button id="login" type="submit" class="btn btn-primary">Login</button>
+      </form>
+    </div> 
   </div>
 </div>
-<style>
-  body {
-    background-color: #bbb;
-  }
-</style>
+
+<link rel="stylesheet" href="../public/css/styleSheet/login/login.css">
 <script type="text/javascript" src="/public/scripts/login/login.js"></script>
