@@ -8,6 +8,7 @@
   padding: 5px;
   margin-bottom:15px;
   font-size:20px;
+  cursor: pointer;
   text-indent: 15px;
   -webkit-column-break-inside: avoid;
 }
@@ -55,8 +56,6 @@
   color: #428BCA;
   font-size: 25px;
   font-weight: 500;
-} 
-
-
+}
 
 

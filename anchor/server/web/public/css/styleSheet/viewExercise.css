@@ -8,6 +8,7 @@
   text-align: left;
   font-size:25px;
   padding:5px;
+  cursor: pointer;
   margin-bottom: 15px;
  -webkit-column-break-inside: avoid;
   page-break-inside: avoid;

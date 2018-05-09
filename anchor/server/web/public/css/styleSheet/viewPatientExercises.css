@@ -39,6 +39,7 @@ form {
   border-radius: 5px;
   background-color:#E8F3FF;
   padding: 5px;
+  cursor: pointer;
   margin-bottom: 15px;
   color: #525B74;
   text-align: left;
