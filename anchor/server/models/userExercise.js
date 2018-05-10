@@ -44,7 +44,7 @@ UserExercise.schema = Joi.object().keys({
   numSessions: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required(),
   isActive: Joi.boolean().required(),
-  bodyFrames: Joi.array().required(),
+  bodyFrames: Joi.array().items(Joi.array().items(Joi.object())).required(),
   createdAt: Joi.date().required()
 });
 
