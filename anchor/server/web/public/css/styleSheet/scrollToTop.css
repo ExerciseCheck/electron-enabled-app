@@ -1,0 +1,21 @@
+#scrollToTop {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed/sticky position */
+    bottom: 20px; /* Place the button at the bottom of the page */
+    right: 45%;  
+    z-index: 99;  
+    outline: none;  
+    cursor: pointer;  
+    border-radius: 10px;  
+    font-size: 18px;  
+    border: 10px solid #E8F3FF;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    outline: none;  
+    background-color:#E8F3FF; 
+    color:#428BCA;  
+    text-align: center;
+} 
+
+

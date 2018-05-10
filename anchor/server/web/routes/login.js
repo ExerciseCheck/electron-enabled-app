@@ -26,7 +26,7 @@ internals.applyRoutes = function (server, next) {
         if (request.query.returnUrl) {
           return reply.redirect(request.query.returnUrl);
         }
-        return reply.redirect('/');
+        return reply.redirect('/dashboard');
       }
       return reply.view('login/login', {
         projectName: Config.get('/projectName'),

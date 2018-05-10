@@ -2,9 +2,10 @@
     <div class="row h-100">
     {{>dashboardNav}}
       <div class="col-sm-9 col-md-10">
-        <div style="padding: 30px; color: #525B74;">
+        <div style="color: #525B74;">
           <br><br>
           <h1 class= "greeting" >Hello {{formatName user.name}}, select a patient to continue.</h1>
+        </div>
           <br><br>
           <form style= "padding-left: 50px;">
             <div class="form-group">
@@ -24,12 +25,14 @@
             </li>
           {{/each}}
          </ul>
-       </div>
-    </div>
+         <button onclick="topFunction()" id="scrollToTop" title="Go to top"><i class="fa fa-arrow-up"></i></button>
+     </div>
   </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../public/css/styleSheet/viewPatients.css">
+<link rel="stylesheet" href="../public/css/styleSheet/scrollToTop.css">
 <link rel="stylesheet" href="../public/css/styleSheet/genericStyles.css">
+<script type="text/javascript" src="../public/scripts/scrollToTop.js"></script>
 <script type="text/javascript" src="../public/scripts/clinician.js"></script>
 

@@ -1,5 +1,5 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
-  <a class="navbar-brand" href="../">{{projectName}}</a>
+<nav class="navbar navbar-expand-md static-top" style="background:#428BCA;">
+  <a class="navbar-brand" href="../" style="color:white;">{{projectName}}</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
           aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -8,28 +8,28 @@
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/" style="color:white;">HOME</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/dashboard" style="color:white;">DASHBOARD</a>
       </li>
     </ul>
     {{#if user}}
       <ul class="navbar-nav my-2 my-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="/account">My Account</a>
+          <a class="nav-link" href="/account" style="color:white;">My Account</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/logout">Logout</a>
+          <a class="nav-link" href="/logout" style="color:white;">Logout</a>
         </li>
       </ul>
     {{else}}
-      <ul class="navbar-nav my-2 my-lg-0">
+      <ul class="navbar-nav my-2 my-lg-0" style="color:white;">
         <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
+          <a class="nav-link" href="/login" style="color:white;">LOGIN</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/signup">Sign Up</a>
+          <a class="nav-link" href="/signup" style="color:white;">SIGNUP</a>
         </li>
       </ul>
     {{/if}}
