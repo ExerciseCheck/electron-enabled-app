@@ -5,6 +5,7 @@ const Boom = require('boom');
 const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
 const Exercise = require('../../models/exercise');
+const User = require('../../models/user');
 
 internals.applyRoutes = function (server, next) {
 
@@ -132,6 +133,73 @@ internals.applyRoutes = function (server, next) {
           setNumber: results.findNumPractices.length + 1,
           exercise : results.findExercise,
           mode: request.params.mode
+        });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/userexercise/setting/{exerciseId}/{patientId}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+ 
+      let referenceExists = true;
+
+      Async.auto({
+
+        findReference: function (done) {
+
+          const filter = {
+            userId: request.params.patientId,
+            exerciseId: request.params.exerciseId,
+            type:'Reference'
+          };
+
+          const pipeLine = [
+             { '$match': filter},
+             { '$sort': { createdAt: -1 } },
+             { '$limit': 1 }
+           ];
+
+          UserExercise.aggregate(pipeLine, done);  
+           
+        },
+        findPatientName:['findReference', function (results, done) {
+
+           User.findById(request.params.patientId, done);
+        }],
+        findExerciseName:['findPatientName', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findExerciseName || results.findExerciseName === undefined ) {
+          return reply(Boom.notFound('Exercise not found'));
+        }
+   
+        if (!results.findPatientName || results.findPatientName === undefined ) {
+          return reply(Boom.notFound('Patient not found'));
+        }
+
+        if (results.findReference.length === 0 ) {
+          referenceExists = false;
+        }
+         
+        return reply.view('userexercise/setting', {
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName'),
+          exerciseName : results.findExerciseName.exerciseName,
+          patientName : results.findPatientName.name,
+          referenceExists
         });
       });
     }

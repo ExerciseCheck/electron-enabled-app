@@ -1,0 +1,70 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div class="row justify-content-center text-center">
+        <div class="col-xl-10 col-lg-2">
+          <p id="title">Let's review the exercise details.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center text-center">
+        <div class="col-xl-6 ">
+          <div class="row justify-content-center text-center">
+            <div class="col-xl-6 col-lg-3">
+              <form id="loginForm" style="padding-top:40px; padding-left:30px;">
+                <div class="form-group">
+                  <label for="numSets" class="label">Number of Sets</label>
+                  <input type="number" class="form-control" id="numSets" aria-describedby="" placeholder="Enter a number">
+               </div>
+               <div class="form-group">
+                 <label for="numReps" class="label">Number of Repetitions</label>
+                 <input type="number" class="form-control" id="numReps" aria-describedby="" placeholder="Enter a number">
+               </div>
+               <a id="save" onclick="updateSetting()">Update settings</a>
+              </form>
+            </div>
+          </div>   
+        </div>
+        <div class="col-xl-6">
+         <div class="row justify-content-center text-center">
+            <div class="col-xl-8">
+              <div class="row">
+                <div class="col">
+                  <p id ="refExercise">Refrence Exercise <br></p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                   <p id="patientName">{{formatName patientName}} has a reference exercise for</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                   <p id="exerciseName">{{formatName exerciseName}}.</p>
+                </div>
+              </div>
+              <div class="row" style="margin-top:30px;">
+                <div class="col">
+                   <a id="view" onclick="viewReferences()">View reference exercises</a>
+                </div>
+              </div> 
+              <div class="row">
+                <div class="col">
+                   <a id="update" onclick="updateReference()">Update reference exercise</a>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                   <a id="start" onclick="StartSession()">Start exercise session</a>
+                </div>
+              </div>  
+            </div>
+          </div>    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="../../../public/css/styleSheet/setting.css">
+ 
