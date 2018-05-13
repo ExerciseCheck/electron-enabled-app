@@ -45,6 +45,27 @@ function saveReference() {
   window.location = '/userexercise/setting/' + exerciseId +'/' + patientId; 
 }
 
+function savePractice() {
+  
+  const values = {};
+  const parsedURL = parseURL(window.location.pathname);
+  values.userId = parsedURL.patientId;
+  values.exerciseId = parsedURL.exerciseId;
+
+  $.ajax({
+    type: 'POST',
+    url: '/api/userexercise/practice',
+    data: values,
+    success: function (result) {
+       window.location = '/userexercise/session/start/practice/' + 
+                     parsedURL.exerciseId + '/' + parsedURL.patientId;
+    },
+    error: function (result) {
+      errorAlert(result.responseJSON.message);
+    }
+  });
+}
+
  
  
 
