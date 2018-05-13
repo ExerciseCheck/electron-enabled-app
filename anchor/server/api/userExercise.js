@@ -186,6 +186,42 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  //this route finds the a reference document for (exerciseId, patientId) with empty bodyFrames
+  //the purspose of this route is to find out if a reference with specified setting is already
+  //inserted or not
+  server.route({
+    method: 'GET',
+    path: '/userexercise/reference/{exerciseId}/{patientId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root', 'admin','clinician']
+      }
+    },
+    handler: function (request, reply) {
+
+      const query = {
+        userId: request.params.patientId,
+        exerciseId: request.params.exerciseId,
+        type: 'Reference',
+        bodyFrames:[]
+      };
+
+      UserExercise.findOne(query, (err, refExercise) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if ( !refExercise || refExercise === undefined ) {
+          return reply({ settingIsUpdated: false });
+        }
+
+        reply({ settingIsUpdated:true });
+      });
+    }
+  });
+
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
   //this route is used if we don't tag userExercise documents with a referenceId tag 
@@ -265,7 +301,7 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: UserExercise.referencePayload
-      },
+      }
     },
     handler: function (request, reply) {
 
@@ -316,12 +352,12 @@ internals.applyRoutes = function (server, next) {
             type:'Reference'
           };
 
-           const pipeLine = [
-             { '$match': filter},
-             { '$sort': { createdAt: -1 } },
-             { '$limit': 1 }
-           ];
-           UserExercise.aggregate(pipeLine, done);
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          UserExercise.aggregate(pipeLine, done);
         },
         createExercise:['findMostRecentReference', function (results, done) {
 
@@ -338,7 +374,7 @@ internals.applyRoutes = function (server, next) {
         }]
       }, (err, results) => {
 
-       if (err) {
+        if (err) {
           return reply(err);
         }
         if (!results.findMostRecentReference) {
@@ -386,6 +422,63 @@ internals.applyRoutes = function (server, next) {
         }
 
         reply(document);
+      });
+    }
+  });
+
+  //this route updates the settings for most recent reference of a (patientId, exerciseId) pair
+  server.route({
+    method: 'PUT',
+    path: '/userexercise/reference/mostrecent/setting/{exerciseId}/{patientId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: UserExercise.updatePayload
+      }
+    },
+    handler: function (request, reply) {
+
+      Async.auto({
+
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: request.params.patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Reference'
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          UserExercise.aggregate(pipeLine, done);
+        },
+        updateSettings:['findMostRecentReference', function (results, done) {
+
+          const id = results.findMostRecentReference[0]._id.toString();
+          const update = {
+            $set: {
+              numSessions: request.payload.numSessions,
+              numRepetition: request.payload.numRepetition
+            }
+          };
+          UserExercise.findByIdAndUpdate(id, update, done);
+
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference[0]) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(results.updateSettings);
       });
     }
   });

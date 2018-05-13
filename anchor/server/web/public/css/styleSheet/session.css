@@ -30,6 +30,7 @@
 .actionBtn {
   width:250px;
   border:none;
+  font-weight:bold;
 }
 
 #discard {
@@ -42,22 +43,5 @@
 
 .mh1 {
     height: 100vh; /* 100% of viewport height*/
-}
-
-.red:hover {
-  background-color: #FF3860;
-}
-
-.curiousBlue:hover {
-  background-color:#428BCA;
-}
-
-.blueBackground:hover {
-  background-color: #1E89FB;
-}
-
-.actionBtn:hover {
-  box-shadow: 2px 5px #D3D3D3;
-  font-weight: bold;
 }
 

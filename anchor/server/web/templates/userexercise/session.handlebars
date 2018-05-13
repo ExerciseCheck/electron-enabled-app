@@ -1,5 +1,7 @@
 <div class="container-fluid h-100">
   <div style="padding: 30px;">
+    <input hidden id="numSets">
+    <input hidden="numReps">
     <div class="row mh1">
       <div class="col-md-9">
         <canvas id="outputCanvas" class="bodyCanvas"></canvas>
@@ -8,8 +10,14 @@
         <div class="black margin-top-p30">
           <p class="large">Current Exercise</p>
           <div class= "small" style="line-height: 15px;">
-            <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
-            <p>Set {{setNumber}} of {{numSets}}</p>
+            {{#compare type 'practice'}}
+              <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
+              <p>Set {{setNumber}} of {{numSets}}</p>
+            {{/compare}}
+            {{#compare type 'reference'}}
+              <p>{{formatName exercise.exerciseName}}</p>
+              <p>Reference</p>
+            {{/compare}}
           </div>
         </div>
         <div class="curiousBlueColor secondSection">
@@ -28,17 +36,19 @@
         </div>
         <div>
           {{#compare mode 'start'}}
-            <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play')">START</button>
+            <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play','{{type}}')">START</button>
           {{/compare}}
           {{#compare mode 'play'}}
-              <button type="button" class="red white actionBtn btn btn-primary" onclick="action('stop')">STOP</button>
+              <button type="button" class="red white actionBtn btn btn-primary" onclick="action('stop', '{{type}}')">STOP</button>
           {{/compare}}
           {{#compare mode 'stop'}}
-            {{#if user.roles.clinician}}
-              <button class="btn btn-primary curiousBlue white actionBtn" id="updateReference" onclick="updateRef()">UPDATE REFERENCE</button>
-            {{/if}}
-            <button class="btn btn-primary blueBackground white actionBtn" onclick="save()">SAVE SET</button>
-            <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start')">DISCARD & RESTART</button>
+            {{#compare type 'reference'}}
+              <button class="btn btn-primary blueBackground white actionBtn" onclick="saveReference()">SAVE REFERENCE</button>
+            {{/compare}}
+            {{#compare type 'practice'}}
+              <button class="btn btn-primary blueBackground white actionBtn" onclick="save()">SAVE SET</button>
+            {{/compare}}
+            <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}
         </div>
       </div>
