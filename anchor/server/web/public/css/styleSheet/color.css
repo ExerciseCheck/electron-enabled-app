@@ -15,11 +15,23 @@
   background-color: #1E89FB;
 }
 
+.blueBackground:hover {
+  background-color: #1E89FB;
+}
+
 .curiousBlue {
   background-color:#428BCA;
 }
 
+.curiousBlue:hover {
+  background-color:#428BCA;
+}
+
 .red {
+  background-color: #FF3860;
+}
+
+.red:hover {
   background-color: #FF3860;
 }
 

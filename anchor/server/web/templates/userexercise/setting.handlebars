@@ -21,7 +21,7 @@
                  <label for="numReps" class="label">Number of Repetitions</label>
                  <input type="number" class="form-control" id="numReps" aria-describedby="" placeholder="Enter a number" value={{defaultNumReps}}>
                </div>
-               <button type="button"id="save" onclick="changeSetting()">Update settings</button>
+               <a id="save" href="#" onclick="changeSetting()">Update settings</a>
              </form>
             </div>
           </div>   
@@ -57,23 +57,23 @@
               {{#if referenceExists}}
               <div class="row" style="margin-top:30px;">
                 <div class="col">
-                   <button type="button" id="view" onclick="viewReferences()">View reference exercises</button>
+                   <a id="view" href="#" onclick="viewReferences()">View reference exercises</a>
                 </div>
               </div> 
               <div class="row">
                 <div class="col">
-                   <button type="button" id="update" onclick="updateReference()">Update reference exercise</button>
+                   <a id="update" href="#" onclick="updateReference()">Update reference exercise</a>
                 </div>
               </div>
               <div class="row">
                 <div class="col">
-                   <button type="button" id="start" onclick="StartSession()">Start exercise session</button>
+                   <a id="start" href="#" onclick="StartPracticeSession()">Start exercise session</a>
                 </div>
               </div>
              {{else}}
              <div class="row" style="margin-top:30px;">
                 <div class="col">
-                   <button id="createRef" onclick="createRef()">Create reference exercise</button>
+                   <a id="createRef" href="#" onclick="createRef()">Create reference exercise</a>
                 </div>
               </div> 
              {{/if}}  

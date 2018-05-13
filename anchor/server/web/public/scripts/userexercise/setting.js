@@ -1,5 +1,15 @@
 'use strict';
 
+function getExerciseId() {
+
+  return (window.location.pathname.split('/'))[3];
+}
+
+function getPatientId() {
+  
+  return (window.location.pathname.split('/'))[4];
+}
+
 function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
   
   const values = {};
@@ -13,7 +23,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
     url: '/api/userexercise/reference',
     data: values,
     success: function (result) {
-      //window.location = redirectToUrl
+      //window.location = redirectToUrl;
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -32,7 +42,7 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
     url: '/api/userexercise/reference/mostrecent/setting/' + exerciseId +'/' + patientId,
     data: values,
     success: function (result) {
-      //window.location = redirectToUrl
+      //window.location = redirectToUrl;
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -42,35 +52,27 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
 
 function changeSetting() {
   
-  const pathToArray = window.location.pathname.split('/');
-  const exerciseId = pathToArray[3];
-  const patientId = pathToArray[4];
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const url = '/userexercise/setting/' + exerciseId +'/' + patientId; 
+  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId(); 
   
-  $.get('/api/userexercise/reference/' + exerciseId + '/' + patientId, function(data){
+  $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
     
     if ( data.settingIsUpdated ) {
-      updateSetting(numSets, numReps, exerciseId, patientId, url);
-      console.log("here1");
+      updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
     }
 
     else {
-      initialSetting(numSets, numReps, exerciseId, patientId, url);
-      console.log("here2");
+      initialSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
     }     
-  
   });
 }
 
 function createRef() {
-
-  const pathToArray = window.location.pathname.split('/');
-  const exerciseId = pathToArray[3];
-  const patientId = pathToArray[4];
-  const url = '/api/userexercise/reference/' + exerciseId + '/' + patientId;
-  const redirectToUrl = '/userexercise/session/start/reference/' + exerciseId + '/' + patientId;
+   
+  const url = '/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
+  const redirectToUrl = '/userexercise/session/start/reference/' + 
+                            getExerciseId() + '/' + getPatientId();
   
   $.get(url, function(data){
     
@@ -79,20 +81,31 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, exerciseId, patientId, url);
+      initialSetting(1, 1, getExerciseId(), getPatientId(), url);
        window.location = redirectToUrl;
     }     
-  
   });
 }
 
 function viewReferences() {
 
-  const pathToArray = window.location.pathname.split('/');
-  const patientId = pathToArray[4];
-
-  window.location = '/userexercise/reference/' + patientId;
-
+  window.location = '/userexercise/reference/' + getPatientId();
 }
+
+function updateReference() {
+
+  window.location = '/userexercise/session/start/reference/' + 
+                     getExerciseId() + '/' + getPatientId();
+}
+
+function StartPracticeSession() {
+   
+  window.location = '/userexercise/session/start/practice/' + 
+                    getExerciseId() + '/' + getPatientId();
+}
+
+
+
+
 
 
