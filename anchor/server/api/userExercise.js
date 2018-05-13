@@ -574,6 +574,62 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  //this route updates the settings for most recent reference of a (patientId, exerciseId) pair
+  server.route({
+    method: 'PUT',
+    path: '/userexercise/reference/mostrecent/data/{exerciseId}/{patientId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: UserExercise.dataPayload
+      }
+    },
+    handler: function (request, reply) {
+
+      Async.auto({
+
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: request.params.patientId,
+            exerciseId: request.params.exerciseId,
+            type: 'Reference'
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          UserExercise.aggregate(pipeLine, done);
+        },
+        updateSettings:['findMostRecentReference', function (results, done) {
+
+          const id = results.findMostRecentReference[0]._id.toString();
+          const update = {
+            $set: {
+               bodyFrames: request.payload.bodyFrames  
+            }
+          };
+          UserExercise.findByIdAndUpdate(id, update, done);
+
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference[0]) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(results.updateSettings);
+      });
+    }
+  });
+
   server.route({
     method: 'PUT',
     path: '/userexercise/reference/{id}',

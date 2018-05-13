@@ -64,6 +64,10 @@ UserExercise.referencePayload = Joi.object().keys({
   exerciseId: Joi.string().required()
 });
 
+UserExercise.dataPayload = Joi.object().keys({
+  bodyFrames: Joi.array().items(Joi.array().items(Joi.object())).required()
+});
+
 //this is used for validating payload of put requests when updating a reference exercise
 UserExercise.updatePayload = Joi.object().keys({
   //bodyFrames: Joi.array().required(),

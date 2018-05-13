@@ -21,7 +21,11 @@
                  <label for="numReps" class="label">Number of Repetitions</label>
                  <input type="number" class="form-control" id="numReps" aria-describedby="" placeholder="Enter a number" value={{defaultNumReps}}>
                </div>
+               {{#if referenceExists}}
+               <a id="save" href="#" onclick="update()">Update settings</a>
+               {{else}}
                <a id="save" href="#" onclick="changeSetting()">Update settings</a>
+               {{/if}}
              </form>
             </div>
           </div>   

@@ -247,9 +247,9 @@ internals.applyRoutes = function (server, next) {
         else if ( results.findReference.length !== 0 ) {
 
           // even if there is a document, but there's no body frames in it
-          /* if ( results.findReference[0].bodyFrames.length === 0 ) {
+           if ( results.findReference[0].bodyFrames.length === 0 ) {
             referenceExists = false;
-          }*/
+          }
 
           if ( results.findReference[0].numRepetition ) {
             defaultNumReps = results.findReference[0].numRepetition;

@@ -50,6 +50,7 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
   });
 }
 
+//when there's no reference update setting can do both inserting or updating
 function changeSetting() {
   
   const numSets = $("#numSets").val();
@@ -66,6 +67,15 @@ function changeSetting() {
       initialSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
     }     
   });
+}
+
+//when there is a reference meaning a reference is recorded update setting just updates
+function update() {
+  
+  const numSets = $("#numSets").val();
+  const numReps = $("#numReps").val();
+  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId(); 
+  updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
 }
 
 function createRef() {

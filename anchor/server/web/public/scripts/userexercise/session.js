@@ -41,8 +41,26 @@ function saveReference() {
   const pathToArray = window.location.pathname.split('/');
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
+  const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
+  const values = {}; 
+  //this is just a dummy data to make sure after saving reference bodyFrames is not empty anymore
+  const bodyFrames= [{'trackingId': false}];
+  let data = [];
+  data.push(bodyFrames);
+  values.bodyFrames = JSON.stringify(data);
   
-  window.location = '/userexercise/setting/' + exerciseId +'/' + patientId; 
+  $.ajax({
+    type: 'PUT',
+    url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
+    data: values,
+    success: function (result) {
+       window.location = redirectToUrl
+    },
+    error: function (result) {
+      errorAlert(result.responseJSON.message);
+    }
+  });
+   
 }
 
 function savePractice() {
