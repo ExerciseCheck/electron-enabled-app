@@ -79,7 +79,9 @@ internals.applyRoutes = function (server, next) {
 
             const query = {
               userId: request.auth.credentials.user._id.toString(),
-              type: 'Reference'
+              type: 'Reference',
+              // with the current design and workflow, having a referene means having not-empty bodyFrames
+              bodyFrames : { $ne : [] } 
             };
 
             UserExercise.find(query, done);
