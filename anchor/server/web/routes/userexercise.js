@@ -28,6 +28,31 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
+    path: '/userexercise/reference/{userId}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      User.findById(request.params.userId, (err, user) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        return reply.view('clinician/viewReferences', {
+          patientName: user.name,
+          user: request.auth.credentials.user,
+          projectName: Config.get('/projectName')
+        });
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
     path: '/userexercise/create',
     config: {
       auth: {

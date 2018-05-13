@@ -73,6 +73,72 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  server.route({
+    method: 'GET',
+    path: '/table/userexercise/reference/{userId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        query: Joi.any()
+      }
+    },
+    handler: function (request, reply) {
+
+      const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
+      const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
+      const limit = Number(request.query.length);
+      const page = Math.ceil(Number(request.query.start) / limit) + 1;
+      const fields = request.query.fields;
+
+      const query = {
+        userId: request.params.userId,
+        type: 'Reference'
+      };
+
+      UserExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+
+        const userExercises = [];
+        Async.each(results.data, (userExercise, done) => {
+
+          /* User.findById(userExercise.userId, (err, user) => {
+
+            if (err) {
+              done(err);
+            }
+
+            userExercise.name = user.name;
+          });*/
+
+          Exercise.findById(userExercise.exerciseId, (err, exercise) => {
+
+            if (err) {
+              done(err);
+            }
+            userExercise.exerciseName = exercise.exerciseName;
+
+          });
+
+          userExercises.push(userExercise);
+        });
+
+        if (err) {
+          return reply(err);
+        }
+
+        reply({
+          draw: request.query.draw,
+          recordsTotal: results.data.length,
+          recordsFiltered: results.items.total,
+          data: userExercises,
+          error: err
+        });
+      });
+    }
+  });
+
+
 
   server.route({
     method: 'GET',
@@ -262,6 +328,31 @@ internals.applyRoutes = function (server, next) {
         }
 
         reply(results.findPracticeExercises);
+      });
+    }
+  });
+
+  //this route finds the exerciseId of a userExercise with specified referenceId
+  server.route({
+    method: 'GET',
+    path: '/userexercise/exerciseId/{referenceId}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      }
+    },
+    handler: function (request, reply) {
+
+      UserExercise.findById(request.params.referenceId, (err, userExercise) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!userExercise) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+        reply({ exerciseId: userExercise.exerciseId });
       });
     }
   });
@@ -525,7 +616,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
-        scope: ['root','admin']
+        scope: ['root','admin','clinician']
       }
     },
     handler: function (request, reply) {

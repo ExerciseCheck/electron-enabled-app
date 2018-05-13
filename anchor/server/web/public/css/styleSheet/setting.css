@@ -75,6 +75,9 @@
   font-size: 20px;
   float:left;
   margin-bottom:1px;
+  border: none;
+  background: none;
+  padding-top:0; 
 }
 
 #view {
@@ -82,6 +85,9 @@
   font-size: 20px;
   float:left;
   margin-bottom:1px;
+  border: none;
+  background: none;
+  padding-top:0; 
 }
 
 #start {
@@ -89,6 +95,9 @@
   font-size: 20px;
   float:left;
   margin-bottom:1px;
+  border: none;
+  background: none;
+  padding-top:0; 
 }
 
 #createRef {

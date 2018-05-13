@@ -85,3 +85,14 @@ function createRef() {
   
   });
 }
+
+function viewReferences() {
+
+  const pathToArray = window.location.pathname.split('/');
+  const patientId = pathToArray[4];
+
+  window.location = '/userexercise/reference/' + patientId;
+
+}
+
+
