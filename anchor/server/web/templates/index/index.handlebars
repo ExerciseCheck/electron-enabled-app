@@ -11,9 +11,17 @@
   </div>
   <div class="row text-center">
     <div class="col-md-2 col-centered">
-       <button class="btn" id="login" onclick="login()">LOG IN</button>
+       {{#if user}}
+         <button class="btn" id="logout" onclick="logut()">LOGOUT</button>
+       {{else}}
+         <button class="btn" id="login" onclick="login()">LOG IN</button>
+       {{/if}}
        <span style="float:right;">
+         {{#if user}}
+         <button class="btn" id="myAccount" onclick="account()">MY ACCOUNT</button>
+         {{else}}
          <button class="btn" id="signup" onclick="signup()">SIGN UP</button>
+         {{/if}}
        </span>
     </div>
   </div>

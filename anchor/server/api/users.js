@@ -57,11 +57,11 @@ internals.applyRoutes = function (server, next) {
         query.inStudy = true;
       }
       //clinician
-      else if (accessLevel === 2) {
+      /*else if (accessLevel === 2) {
         query._id = {
-          $in: request.auth.credentials.user.roles.clinician.userAccess
+          $in: JSON.parse(request.auth.credentials.user.roles.clinician.userAccess)
         };
-      }
+      }*/
 
       User.pagedFind(query, fields, sort, limit, page, (err, results) => {
 

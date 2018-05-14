@@ -5,13 +5,20 @@
 }
 
 .btn {
-  width: 110px;
+  width: 125px;
   cursor: pointer;
   font-weight: bold;
   height:40px;
+  text-align:center;
 }
 
 #login {
+  background-color: white;
+  border: #1E89FB solid 2px;
+  color: #1E89FB;
+}
+
+#logout {
   background-color: white;
   border: #1E89FB solid 2px;
   color: #1E89FB;
@@ -21,6 +28,13 @@
   background-color: #428BCA;
   color: white;
   border:none;
+}
+
+#myAccount {
+  background-color: #428BCA;
+  color: white;
+  border:none;
+  text-align: center;
 }
 
  
