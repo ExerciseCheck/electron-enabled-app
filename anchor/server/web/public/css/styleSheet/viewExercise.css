@@ -15,10 +15,6 @@
   break-inside: avoid;
 }
 
-.listButtons:hover {
-  font-size:22px;
-}
-
 .ul {
   list-style-type: none;
   columns: 2;
