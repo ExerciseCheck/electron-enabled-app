@@ -44,15 +44,18 @@ internals.applyRoutes = function (server, next) {
 
             User.findById(patientId, (err, user) => {
 
-              const patient = {};
-              patient.patientId = patientId;
+              //we need to add this condition to be able to handle deleted patients
+              if (user) {
+                const patient = {};
+                patient.patientId = patientId;
 
-              if (err) {
-                done(err);
-              }
+                if (err) {
+                  done(err);
+                }
 
-              patient.name = user.name;
-              patients.push(patient);
+                patient.name = user.name;
+                patients.push(patient);
+            }
 
             });
           });
