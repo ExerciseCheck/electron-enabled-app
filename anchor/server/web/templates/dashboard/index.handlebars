@@ -2,18 +2,17 @@
   <div class="row h-100">
     {{>dashboardNav}}
     <div class="col-sm-9 col-md-10">
-      <div style="padding: 30px">
-        <h3>Welcome to Exercise Check!</h3><br>
-        {{#unless user.roles.root}}
-            <a href="../refexercises/play">View your reference exercise</a>
-            <br>
-            <a href="../userexercise/viewexercises">View list of exercises</a>
-        {{else}}
-            Hi there! Welcome to the Exercise Check Admin interface.
-        {{/unless}}
-          <hr>
-          <canvas id="bodyCanvas" width="700" height="700" style="border: 1px solid red;"></canvas>
+      <div style="padding:100px">
+       <div class="row text-center">
+         <div class="col-md-8" style="float: none;margin: 0 auto;">
+           <h3 style="font-size:50px;color:#525B74;">Welcome to ExerciseCheck</h3>
+           <p style="font-size:30px; color:#525B74;">
+             ExerciseCheck is a remote monitoring and evaluation platform for home base physical therapy. 
+             Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do teme cididunti ut labore et dolore magna aliqua enim adores.
+           </p>
+         </div>
       </div>
+     </div>
     </div>
    </div>
 </div>
@@ -22,7 +21,7 @@
 <script src="/public/data.js"></script>
 
 <script>
-$(document).ready(function () {
+/*$(document).ready(function () {
   var canvasSKLT = document.getElementById('bodyCanvas');
   var ctx1 = canvasSKLT.getContext('2d');
   var colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
@@ -132,5 +131,5 @@ $(document).ready(function () {
     },20);
     return TimerID;
   }
-});
+});*/
 </script>

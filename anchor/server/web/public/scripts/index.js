@@ -1,4 +1,4 @@
-(function () {
+/*(function () {
   let processing, canvas, ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
 
@@ -29,4 +29,4 @@
   function isElectron() {
     return 'Bridge' in window;
   }
-})();
+})();*/
