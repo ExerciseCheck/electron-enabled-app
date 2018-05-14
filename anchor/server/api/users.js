@@ -32,7 +32,7 @@ internals.applyRoutes = function (server, next) {
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       let fields = request.query.fields;
 
-      const query = {
+      let query = {
         username: { $regex: request.query['search[value]'].toLowerCase() }
       };
       //no role
@@ -57,11 +57,21 @@ internals.applyRoutes = function (server, next) {
         query.inStudy = true;
       }
       //clinician
-      /*else if (accessLevel === 2) {
-        query._id = {
-          $in: JSON.parse(request.auth.credentials.user.roles.clinician.userAccess)
+      else if (accessLevel === 2) {
+
+        let userAccess=  JSON.parse(request.auth.credentials.user.roles.clinician.userAccess);
+        var patientsObjectIds = [];
+        for (let i = 0; i < userAccess.length; ++i) {
+          console.log(userAccess.length);
+          patientsObjectIds[i] = User.ObjectId(userAccess[i]);
+           
+        }
+        const filter = {
+          _id: { $in: patientsObjectIds }
         };
-      }*/
+        //this is the global query object 
+        query = filter;
+      }
 
       User.pagedFind(query, fields, sort, limit, page, (err, results) => {
 

@@ -43,6 +43,7 @@ internals.applyRoutes = function (server, next) {
             if (err) {
               done(err);
             }
+            //need this check because they might have been deleted
             if (user) {
               userExercise.name = user.name;
             }
@@ -53,7 +54,10 @@ internals.applyRoutes = function (server, next) {
             if (err) {
               done(err);
             }
-            userExercise.exerciseName = exercise.exerciseName;
+            //need this check because they might have been deleted
+            if (exercise) {
+              userExercise.exerciseName = exercise.exerciseName;
+            }
 
           });
 
@@ -104,21 +108,24 @@ internals.applyRoutes = function (server, next) {
         const userExercises = [];
         Async.each(results.data, (userExercise, done) => {
 
-          /* User.findById(userExercise.userId, (err, user) => {
+           User.findById(userExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
             }
-
-            userExercise.name = user.name;
-          });*/
+            if (user) {
+              userExercise.name = user.name;
+            }
+          });
 
           Exercise.findById(userExercise.exerciseId, (err, exercise) => {
 
             if (err) {
               done(err);
             }
-            userExercise.exerciseName = exercise.exerciseName;
+            if (exercise) {
+              userExercise.exerciseName = exercise.exerciseName;
+            }
 
           });
 
