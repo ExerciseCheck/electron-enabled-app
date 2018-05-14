@@ -14,7 +14,7 @@
                 <th>Exercise Name</th>
                 <th>Description</th>
                 <th>Created At</th>
-                {{#role user 'admin'}}
+                {{#role user 'clinician'}}
                   <th>ID</th>
                   <th>Edit</th>
                   <th>Delete</th>
@@ -65,7 +65,7 @@
             return date.toDateString() + ' ' + date.toLocaleTimeString('en-us');
           }
         },
-        {{#role user 'admin'}}
+        {{#role user 'clinician'}}
           {
             data: "_id",
             defaultContent: ""

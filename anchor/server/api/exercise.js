@@ -142,7 +142,8 @@ internals.applyRoutes = function (server, next) {
     path: '/exercise',
     config: {
       auth: {
-        strategies: ['simple', 'jwt', 'session']
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root', 'admin','clinician']
       },
       validate: {
         payload: Exercise.payload
@@ -172,7 +173,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
-        scope: ['root', 'admin']
+        scope: ['root', 'admin','clinician']
       },
       validate: {
         payload: Exercise.payload
@@ -210,7 +211,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
-        scope: ['root', 'admin']
+        scope: ['root', 'admin','clinician']
       }
     },
     handler: function (request, reply) {
