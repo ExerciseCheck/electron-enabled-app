@@ -36,14 +36,16 @@ internals.applyRoutes = function (server, next) {
 
         const userExercises = [];
         Async.each(results.data, (userExercise, done) => {
+         
 
           User.findById(userExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
             }
-
-            userExercise.name = user.name;
+            if (user) {
+              userExercise.name = user.name;
+            }
           });
 
           Exercise.findById(userExercise.exerciseId, (err, exercise) => {

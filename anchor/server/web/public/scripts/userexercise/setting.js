@@ -23,6 +23,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
     url: '/api/userexercise/reference',
     data: values,
     success: function (result) {
+        successAlert('Setting successfully updated');
       //window.location = redirectToUrl;
     },
     error: function (result) {
@@ -42,6 +43,7 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
     url: '/api/userexercise/reference/mostrecent/setting/' + exerciseId +'/' + patientId,
     data: values,
     success: function (result) {
+       successAlert('Setting successfully updated');
       //window.location = redirectToUrl;
     },
     error: function (result) {
