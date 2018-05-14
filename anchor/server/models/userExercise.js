@@ -51,7 +51,6 @@ UserExercise.schema = Joi.object().keys({
 //this is used for validating payload of post requests when creating practice exercise
 UserExercise.practicePayload = Joi.object().keys({
   //bodyFrames: Joi.array().required(),
-  userId: Joi.string().required(),
   exerciseId: Joi.string().required()
 });
 

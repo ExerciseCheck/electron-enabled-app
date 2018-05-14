@@ -112,7 +112,8 @@ internals.applyRoutes = function (server, next) {
       else {
         patientId = request.auth.credentials.user._id.toString();
       }
-
+      let isComplete = false;
+      let setNumber = 0;
 
       Async.auto({
         findReference: function (done) {
@@ -139,9 +140,10 @@ internals.applyRoutes = function (server, next) {
           if ( request.params.type === 'reference') {
             return done();
           }
-          if (!results.findReference || results.findReference === undefined ) {
+          if (!results.findReference[0] || results.findReference[0] === undefined ) {
             return reply(Boom.notFound('Reference exercise not found'));
           }
+          
           const query = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
@@ -163,6 +165,18 @@ internals.applyRoutes = function (server, next) {
         if (!results.findExercise || results.findExercise === undefined) {
           return reply(Boom.notFound('exercise not found'));
         }
+        if (request.params.type === 'practice') {
+          if ( results.findNumPractices.length === results.findReference[0].numSessions ) {
+             isComplete = true;
+          }
+          if ( isComplete ) {
+            setNumber = results.findNumPractices.length;
+          }
+          else if ( !isComplete )  {
+            setNumber = results.findNumPractices.length + 1;
+          }
+        }
+               
         if ( request.params.type === 'reference' ) {
           return reply.view('userexercise/session', {
             user: request.auth.credentials.user,
@@ -177,10 +191,11 @@ internals.applyRoutes = function (server, next) {
           projectName: Config.get('/projectName'),
           numRepetition: results.findReference[0].numRepetition,
           numSets: results.findReference[0].numSessions,
-          setNumber: results.findNumPractices.length + 1,
+          setNumber: setNumber,
           exercise : results.findExercise,
           mode: request.params.mode,
-          type: request.params.type
+          type: request.params.type,
+          isComplete: isComplete
         });
       });
     }

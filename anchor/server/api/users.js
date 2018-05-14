@@ -64,11 +64,12 @@ internals.applyRoutes = function (server, next) {
         for (let i = 0; i < userAccess.length; ++i) {
           console.log(userAccess.length);
           patientsObjectIds[i] = User.ObjectId(userAccess[i]);
-           
         }
+
         const filter = {
           _id: { $in: patientsObjectIds }
         };
+
         //this is the global query object 
         query = filter;
       }

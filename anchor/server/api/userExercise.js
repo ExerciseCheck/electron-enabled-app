@@ -429,7 +429,7 @@ internals.applyRoutes = function (server, next) {
   //could be trrigered by both clinician and patient,  
   server.route({
     method: 'POST',
-    path: '/userexercise/practice',
+    path: '/userexercise/practice/{patientId?}',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -440,6 +440,13 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
+      let patientId = '';
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
       Async.auto({
 
         //first we need to find the referenceId of the exercise
@@ -447,7 +454,7 @@ internals.applyRoutes = function (server, next) {
         findMostRecentReference: function (done) {
 
           const filter = {
-            userId: request.payload.userId,
+            userId: patientId,
             exerciseId: request.payload.exerciseId,
             type:'Reference'
           };
@@ -463,7 +470,7 @@ internals.applyRoutes = function (server, next) {
 
           UserExercise.create(
 
-            request.payload.userId,
+            patientId,
             request.payload.exerciseId,
             results.findMostRecentReference[0]._id.toString(),
             'Practice',
