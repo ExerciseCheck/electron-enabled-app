@@ -8,6 +8,7 @@
     position:fixed;
     background-color:#313131;
     overflow: auto;
+    
   }
 
   div #patientsPopUp {
@@ -23,9 +24,10 @@
     min-height:500px;
     max-height:600px;
     padding:10px 50px;
-    border:2px solid black;
+    border:2px solid #428BCA;
     border-radius:2px;
     background-color:white;
+    border:5px solid black;
     overflow-y: scroll;
    }
    
