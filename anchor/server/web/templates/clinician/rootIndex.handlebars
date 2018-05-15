@@ -4,8 +4,8 @@
     <div class="col-sm-9">
       <form id="form">
         <div class="form-group">
-          <div class ="row">  
-            <div class="col-md-6">   
+          <div class ="row">
+            <div class="col-md-6">
               <label  class="labels" for="clinicians">Select Clinician:</label>
               <select id="clinicians" style="width:100%;"></select>
               <div class="form-group">
@@ -18,39 +18,39 @@
                 </select>
                 <button type="button" class="btn" id="submitPatientsBtn" onclick="updatePatients()">UPDATE</button>
               </div>
-            </div> 
+            </div>
           </div>
         </div>
       </form>
-      <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-          <div class="form-group" id="clinicianList">
-              <div class="search">
-                <span class="fa fa-search"></span>
-                <label id="searchLabel" for="search">Search by Clinician name
-                  <input type="search" class="form-control" id="clinicianSearch" onkeyup="filter('#clinicianSearch','.list-group-item')" placeholder="Search by Clinician name">
-                </label>
-              </div>
-          </div>
-          <ul class="list-group">
-            {{#each clinicians}}
-              <li class="list-group-item">
-                <a>
-                  <span style="float:right;>
-                    <button type="button" class="changeMembersBtn" onclick="showPopUp('{{this._id}}', '{{this.roles.clinician.userAccess}}')" title="Change clinician access to Patients">
-                      <i class="fa fa-user-plus"></i>
-                    </button>
-                  </span> 
-                  <h4 class="list-group-item-heading">{{this.name}}</h4>
-                  <p class="list-group-item-text">
-                    Joined at: {{formatJoinDate this.timeCreated}}
-                  </p>
-                </a>
-              </li>
-            {{/each}}
-          </ul>
-        </div>
-      </div>
+      <!--<div class="row">-->
+        <!--<div class="col-md-6 col-md-offset-3">-->
+          <!--<div class="form-group" id="clinicianList">-->
+              <!--<div class="search">-->
+                <!--<span class="fa fa-search"></span>-->
+                <!--<label id="searchLabel" for="search">Search by Clinician name-->
+                  <!--<input type="search" class="form-control" id="clinicianSearch" onkeyup="filter('#clinicianSearch','.list-group-item')" placeholder="Search by Clinician name">-->
+                <!--</label>-->
+              <!--</div>-->
+          <!--</div>-->
+          <!--<ul class="list-group">-->
+            <!--{{#each clinicians}}-->
+              <!--<li class="list-group-item">-->
+                <!--<a>-->
+                  <!--<span style="float:right;>-->
+                    <!--<button type="button" class="changeMembersBtn" onclick="showPopUp('{{this._id}}', '{{this.roles.clinician.userAccess}}')" title="Change clinician access to Patients">-->
+                      <!--<i class="fa fa-user-plus"></i>-->
+                    <!--</button>-->
+                  <!--</span>-->
+                  <!--<h4 class="list-group-item-heading">{{this.name}}</h4>-->
+                  <!--<p class="list-group-item-text">-->
+                    <!--Joined at: {{formatJoinDate this.timeCreated}}-->
+                  <!--</p>-->
+                <!--</a>-->
+              <!--</li>-->
+            <!--{{/each}}-->
+          <!--</ul>-->
+        <!--</div>-->
+      <!--</div>-->
     </div>
   </div>
 </div>
@@ -59,4 +59,4 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../public/css/styleSheet/rootIndex.css">
 <script type="text/javascript" src="../public/scripts/rootIndex.js"></script>
- 
+
