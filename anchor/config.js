@@ -68,11 +68,11 @@ const config = {
   system: {
     fromAddress: {
       name: 'Anchor',
-      address: 'eugenia@bu.edu'
+      address: 'jedireza@gmail.com'
     },
     toAddress: {
       name: 'Anchor',
-      address: 'eugenia@bu.edu'
+      address: 'jedireza@gmail.com'
     }
   },
   passwordComplexity: {
