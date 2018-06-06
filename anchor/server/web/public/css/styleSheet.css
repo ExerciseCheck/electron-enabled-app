@@ -63,7 +63,8 @@
     font-weight: bold;
 }
 
-.bodyCanvas {
+
+/*.bodyCanvas {
    padding-left: 0;
    padding-right: 0;
    margin-left: auto;
@@ -73,9 +74,56 @@
    display: block;
    height: 500px;
    width: 900px;
+*/
 
+.canvas {
+  display: grid;
+  margin-left: auto;
+  width: 900px;
+  height: 600px;
+  border-radius: 17px;
+  grid-template-rows: auto auto auto;
+  background-color: rgba(195, 195, 195, 0.8)
 }
 
+.canvas-item-1 {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  font-size: 30px;
+  border-top-left-radius: 17px;
+  border-top-right-radius: 17px;
+  text-align: center;
+}
+
+.canvas-item-2 {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.canvas-item-3 {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.canvas-item-4 {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.canvas-item-5 {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  font-size: 30px;
+  border-bottom-left-radius: 17px;
+  border-bottom-right-radius: 17px;
+  text-align: center;
+}
 #cover {
     background-color: rgba(0,0,0,0.5);
     width: 100vw;
