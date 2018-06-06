@@ -16,10 +16,10 @@ function init() {
   // user's computer. E.g. don't directly expose core Electron (even IPC) or node.js modules.
   window.Bridge = {
     eProcessDataFrame,
-    eStartKinect
+    eStartKinect,
+    record : 'no'
   };
 }
-
 function attachIPCListeners() {
   // we get this message from the main process
   ipc.on('startKinect', () => {
@@ -39,7 +39,13 @@ function eStartKinect() {
     //window.Bridge.startKinect();
     kinect.openBodyReader();
     kinect.on('bodyFrame', function(bodyFrame){
-      window.Bridge.aOnBodyFrame(bodyFrame);
+      function testnset(callback) {
+        window.Bridge.record = localStorage.getItem('bool');
+        callback();
+      }
+      testnset(function() {
+        window.Bridge.aOnBodyFrame(bodyFrame);
+      });
     });
   }
 }

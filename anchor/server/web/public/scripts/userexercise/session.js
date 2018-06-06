@@ -5,13 +5,13 @@ function parseURL(url) {
   var exerciseId = null;
   var patientId = null;
   const urlToArray = url.split('/');
-   
+
   //logged-in user is a clinician
   if (urlToArray.length === 7) {
     exerciseId = urlToArray[5];
     patientId = urlToArray[6];
   }
-  
+
   //logged-in user is a patient
   else if (urlToArray.length === 6) {
     exerciseId = urlToArray.pop();
@@ -24,16 +24,24 @@ function parseURL(url) {
   };
 }
 
+var d = new Array();
+const bodyFrames= [{'trackingId': false},{"bodyIndex":0,"tracked":false},{"bodyIndex":1,"tracked":false}];
 
 function action(nextMode, type) {
-  
+  if(nextMode == 'play') {
+    localStorage.setItem('bool', 'yes');
+    document.write(window.Bridge.record);
+  } else {
+    localStorage.setItem('bool', 'no');
+    document.write(window.Bridge.record);
+  }
   const parsedURL = parseURL(window.location.pathname);
   var patientId = parsedURL.patientId;
   var exerciseId = parsedURL.exerciseId;
 
- window.location = (parsedURL.patientId !== null)? 
+ window.location = (parsedURL.patientId !== null)?
  '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/' + patientId:
- '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId;                                                  
+ '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId;
 }
 
 function saveReference() {
@@ -42,29 +50,29 @@ function saveReference() {
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
-  const values = {}; 
+  const values = {};
   //this is just a dummy data to make sure after saving reference bodyFrames is not empty anymore
   const bodyFrames= [{'trackingId': false}];
-  let data = [];
-  data.push(bodyFrames);
+  let data = JSON.parse(localStorage.getItem('data'));
   values.bodyFrames = JSON.stringify(data);
-  
+  //document.write(window.Bridge.record);
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
+       localStorage.removeItem('data');
        window.location = redirectToUrl
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
     }
   });
-   
+
 }
 
 function savePractice() {
-  
+
   const values = {};
   const parsedURL = parseURL(window.location.pathname);
   values.exerciseId = parsedURL.exerciseId;
@@ -76,13 +84,13 @@ function savePractice() {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
     patientId = parsedURL.patientId;
   }
-   
+
   $.ajax({
     type: 'POST',
     url: url,
     data: values,
     success: function (result) {
-       window.location = '/userexercise/session/start/practice/' + 
+       window.location = '/userexercise/session/start/practice/' +
                      parsedURL.exerciseId + '/' + patientId;
     },
     error: function (result) {
@@ -92,7 +100,7 @@ function savePractice() {
 }
 
 function goTodashBoard() {
- 
+
   window.location = '/dashboard';
 }
 
@@ -103,6 +111,6 @@ function goToExercises() {
 }
 
 
- 
- 
+
+
 
