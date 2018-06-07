@@ -57,5 +57,6 @@ function eStartKinect() {
     kinect.openBodyReader();
     kinect.on('bodyFrame', function(bodyFrame){
       window.Bridge.aOnBodyFrame(bodyFrame);
+    });
   }
 }

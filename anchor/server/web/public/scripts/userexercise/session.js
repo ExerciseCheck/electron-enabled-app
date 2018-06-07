@@ -48,11 +48,11 @@ const bodyFrames= [{'trackingId': false},{"bodyIndex":0,"tracked":false},{"bodyI
 function action(nextMode, type) {
   function setFlag(callback) {
     if(nextMode == 'play') {
-      //window.Bridge.record = 'yes';
-      document.write(window.Bridge.record);
+      window.Bridge.record = 'yes';
+      //document.write(window.Bridge.record);
     } else {
-      //window.Bridge.record = 'no';
-      document.write(window.Bridge.record);
+      window.Bridge.record = 'no';
+      //document.write(window.Bridge.record);
     }
     callback();
   }
@@ -75,18 +75,17 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   const values = {};
-
+  //this is just a dummy data to make sure after saving reference bodyFrames is not empty anymore
+  const bodyFrames= [{'trackingId': false}];
   let data = JSON.parse(localStorage.getItem('data'));
   values.bodyFrames = JSON.stringify(data);
-  //document.write(window.Bridge.record);
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
-      //after putting in database, remove the entry from localStorage
-       localStorage.removeItem('data');
-       window.location = redirectToUrl
+      localStorage.removeItem('data');
+      window.location = redirectToUrl
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
