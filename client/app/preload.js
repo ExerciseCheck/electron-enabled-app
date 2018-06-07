@@ -33,19 +33,29 @@ function eProcessDataFrame() {
   }
 }
 
+//function eStartKinect() {
+//  const kinect = new Kinect2();
+//  if(kinect.open()) {
+//    //window.Bridge.startKinect();
+//    kinect.openBodyReader();
+//    kinect.on('bodyFrame', function(bodyFrame){
+//      function testnset(callback) {
+//        //window.Bridge.record = localStorage.getItem('bool');
+//        callback();
+//      }
+//      testnset(function() {
+//        window.Bridge.aOnBodyFrame(bodyFrame);
+//      });
+//    });
+//  }
+//}
+
 function eStartKinect() {
   const kinect = new Kinect2();
   if(kinect.open()) {
     //window.Bridge.startKinect();
     kinect.openBodyReader();
     kinect.on('bodyFrame', function(bodyFrame){
-      function testnset(callback) {
-        window.Bridge.record = localStorage.getItem('bool');
-        callback();
-      }
-      testnset(function() {
-        window.Bridge.aOnBodyFrame(bodyFrame);
-      });
-    });
+      window.Bridge.aOnBodyFrame(bodyFrame);
   }
 }

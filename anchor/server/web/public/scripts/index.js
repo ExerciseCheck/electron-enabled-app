@@ -16,8 +16,9 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let index = 0;
     let frames = new Array();
+
     let d = JSON.parse(localStorage.getItem('data')) || [];
-    var dummy = [{'trackingId': false}];
+
     bodyFrame.bodies.forEach(function (body) {
       if (body.tracked) {
         for (let jointType in body.joints) {
@@ -25,10 +26,7 @@
           ctx.fillStyle = colors[index];
           ctx.fillRect(joint.depthX * 512, joint.depthY * 424, 10, 10);
         }
-        // while(index < 10) {
-        //   d.push(bodyFrame.bodies);
-        //   localStorage.setItem('data', bodyFrame.bodies);
-        // }
+
         index++;
         //document.write(window.Bridge.record);
         if(window.Bridge.record == 'yes') {

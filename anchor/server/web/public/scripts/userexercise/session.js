@@ -27,21 +27,45 @@ function parseURL(url) {
 var d = new Array();
 const bodyFrames= [{'trackingId': false},{"bodyIndex":0,"tracked":false},{"bodyIndex":1,"tracked":false}];
 
-function action(nextMode, type) {
-  if(nextMode == 'play') {
-    localStorage.setItem('bool', 'yes');
-    document.write(window.Bridge.record);
-  } else {
-    localStorage.setItem('bool', 'no');
-    document.write(window.Bridge.record);
-  }
-  const parsedURL = parseURL(window.location.pathname);
-  var patientId = parsedURL.patientId;
-  var exerciseId = parsedURL.exerciseId;
+//function action(nextMode, type) {
+//  if(nextMode == 'play') {
+//    localStorage.setItem('bool', 'yes');
+//    document.write(window.Bridge.record);
+//  } else {
+//    localStorage.setItem('bool', 'no');
+//    document.write(window.Bridge.record);
+//  }
+//  const parsedURL = parseURL(window.location.pathname);
+//  var patientId = parsedURL.patientId;
+//  var exerciseId = parsedURL.exerciseId;
+//
+// window.location = (parsedURL.patientId !== null)?
+// '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/' + patientId:
+// '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId;
+//}
 
- window.location = (parsedURL.patientId !== null)?
- '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/' + patientId:
- '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId;
+//directly sets the bridge.record flag here
+function action(nextMode, type) {
+  function setFlag(callback) {
+    if(nextMode == 'play') {
+      //window.Bridge.record = 'yes';
+      document.write(window.Bridge.record);
+    } else {
+      //window.Bridge.record = 'no';
+      document.write(window.Bridge.record);
+    }
+    callback();
+  }
+
+  setFlag(function(){
+    const parsedURL = parseURL(window.location.pathname);
+    var patientId = parsedURL.patientId;
+    var exerciseId = parsedURL.exerciseId;
+
+    window.location = (parsedURL.patientId !== null)?
+    '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/' + patientId:
+    '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId;
+  });
 }
 
 function saveReference() {
@@ -51,8 +75,7 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   const values = {};
-  //this is just a dummy data to make sure after saving reference bodyFrames is not empty anymore
-  const bodyFrames= [{'trackingId': false}];
+
   let data = JSON.parse(localStorage.getItem('data'));
   values.bodyFrames = JSON.stringify(data);
   //document.write(window.Bridge.record);
@@ -61,6 +84,7 @@ function saveReference() {
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
+      //after putting in database, remove the entry from localStorage
        localStorage.removeItem('data');
        window.location = redirectToUrl
     },
