@@ -27,12 +27,17 @@ function parseURL(url) {
 
 function action(nextMode, type) {
   function setFlag(callback) {
-    if(nextMode == 'play') {
+    if(nextMode === 'play') {
       localStorage.setItem('bool', 'yes');
-      document.write(localStorage.getItem('bool'));
-    } else {
+      console.log("mode is play....value is.."+ localStorage.getItem('bool') );
+      // alert(localStorage.getItem('bool'));
+    }
+    else if(nextMode === 'stop') {
       localStorage.setItem('bool', 'no');
-      document.write(localStorage.getItem('bool'));
+      console.log("value is.." + localStorage.getItem('bool'));
+      // alert((localStorage.getItem('bool')));
+    } else {
+      localStorage.clear();
     }
     callback();
   }
@@ -62,8 +67,7 @@ function saveReference() {
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
-      localStorage.removeItem('data');
-      localStorage.setItem('bool', 'no');
+      localStorage.clear();
       window.location = redirectToUrl
     },
     error: function (result) {
@@ -111,7 +115,6 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
-
 
 
 

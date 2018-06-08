@@ -8,6 +8,7 @@
       canvas = document.getElementById('outputCanvas');
       ctx = canvas.getContext('2d');
       window.Bridge.eStartKinect();
+      // localStorage.clear();
 
     });
   }
@@ -27,11 +28,12 @@ window.Bridge.aOnBodyFrame = (bodyFrame) => {
         }
         index++;
         //document.write(localStorage.getItem('bool'));
-        if(localStorage.getItem('bool') == 'yes') {
-          //document.write("RECORDING");
+        if(localStorage.getItem('bool') === 'yes') {
+          console.log("recording....");
           frames.push(body);
           d.push(frames);
           localStorage.setItem('data', JSON.stringify(d));
+          console.log(localStorage.getItem('bool').length);
         }
       }
     });
