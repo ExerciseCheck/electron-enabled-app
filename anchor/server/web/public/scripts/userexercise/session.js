@@ -37,6 +37,7 @@ function action(nextMode, type) {
       console.log("value is.." + localStorage.getItem('bool'));
       // alert((localStorage.getItem('bool')));
     } else {
+      localStorage.setItem('bool', 'no');
       localStorage.clear();
     }
     callback();
