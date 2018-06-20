@@ -77,7 +77,6 @@ function savePractice() {
   values.exerciseId = parsedURL.exerciseId;
   let url ='/api/userexercise/practice';
   let patientId = '';
-  
   //logged-in user ia clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
@@ -109,6 +108,7 @@ function goToExercises() {
 }
 
 (function () {
+
   let processing, canvas, ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
 
@@ -123,6 +123,7 @@ function goToExercises() {
   }
 
 window.Bridge.aOnBodyFrame = (bodyFrame) => {
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let index = 0;
     let frames = new Array();
