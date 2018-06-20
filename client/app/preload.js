@@ -37,7 +37,6 @@ function eStartKinect() {
   const kinect = new Kinect2();
   if(kinect.open()) {
     //window.Bridge.startKinect();
-
     kinect.openBodyReader();
     kinect.on('bodyFrame', function(bodyFrame){
       window.Bridge.aOnBodyFrame(bodyFrame);
