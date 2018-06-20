@@ -11,13 +11,11 @@ function parseURL(url) {
     exerciseId = urlToArray[5];
     patientId = urlToArray[6];
   }
-
   //logged-in user is a patient
   else if (urlToArray.length === 6) {
     exerciseId = urlToArray.pop();
     patientId = null;
   }
-
   return {
     patientId: patientId,
     exerciseId: exerciseId
@@ -79,7 +77,7 @@ function savePractice() {
   values.exerciseId = parsedURL.exerciseId;
   let url ='/api/userexercise/practice';
   let patientId = '';
-
+  
   //logged-in user ia clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
