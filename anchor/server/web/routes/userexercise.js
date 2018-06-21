@@ -143,7 +143,7 @@ internals.applyRoutes = function (server, next) {
           if (!results.findReference[0] || results.findReference[0] === undefined ) {
             return reply(Boom.notFound('Reference exercise not found'));
           }
-          
+
           const query = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
@@ -167,7 +167,7 @@ internals.applyRoutes = function (server, next) {
         }
         if (request.params.type === 'practice') {
           if ( results.findNumPractices.length === results.findReference[0].numSessions ) {
-             isComplete = true;
+            isComplete = true;
           }
           if ( isComplete ) {
             setNumber = results.findNumPractices.length;
@@ -176,7 +176,7 @@ internals.applyRoutes = function (server, next) {
             setNumber = results.findNumPractices.length + 1;
           }
         }
-               
+
         if ( request.params.type === 'reference' ) {
           return reply.view('userexercise/session', {
             user: request.auth.credentials.user,
@@ -191,11 +191,11 @@ internals.applyRoutes = function (server, next) {
           projectName: Config.get('/projectName'),
           numRepetition: results.findReference[0].numRepetition,
           numSets: results.findReference[0].numSessions,
-          setNumber: setNumber,
+          setNumber,
           exercise : results.findExercise,
           mode: request.params.mode,
           type: request.params.type,
-          isComplete: isComplete
+          isComplete
         });
       });
     }
@@ -262,7 +262,7 @@ internals.applyRoutes = function (server, next) {
         else if ( results.findReference.length !== 0 ) {
 
           // even if there is a document, but there's no body frames in it
-           if ( results.findReference[0].bodyFrames.length === 0 ) {
+          if ( results.findReference[0].bodyFrames.length === 0 ) {
             referenceExists = false;
           }
 
