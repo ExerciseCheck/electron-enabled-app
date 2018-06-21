@@ -36,7 +36,7 @@ internals.applyRoutes = function (server, next) {
 
         const userExercises = [];
         Async.each(results.data, (userExercise, done) => {
-         
+
 
           User.findById(userExercise.userId, (err, user) => {
 
@@ -108,7 +108,7 @@ internals.applyRoutes = function (server, next) {
         const userExercises = [];
         Async.each(results.data, (userExercise, done) => {
 
-           User.findById(userExercise.userId, (err, user) => {
+          User.findById(userExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
@@ -626,7 +626,7 @@ internals.applyRoutes = function (server, next) {
           const id = results.findMostRecentReference[0]._id.toString();
           const update = {
             $set: {
-               bodyFrames: request.payload.bodyFrames  
+              bodyFrames: request.payload.bodyFrames
             }
           };
           UserExercise.findByIdAndUpdate(id, update, done);
