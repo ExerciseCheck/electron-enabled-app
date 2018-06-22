@@ -4,29 +4,8 @@
     <input hidden="numReps">
     <div class="row mh1">
       <div class="col-md-9">
-      <canvas id="outputCanvas" class="bodyCanvas" width="500px" height="500px" style="background: #c1c1c1;"></canvas>
-      <script type="text/javascript" language="javascript">
-      var bw = 500;
-      var bh = 500;
-      var p = -0.5;
-
-      var outputCanvas = document.getElementById("outputCanvas");
-      var context = outputCanvas.getContext("2d");
-      function drawBoard(){
-
-        for (var x = 0; x <= bh; x += 100.3) {
-          context.moveTo(p, x + p);
-          context.lineTo(bw + p, x + p);
-        }
-
-        context.strokeStyle = "gray";
-        context.stroke();
-        }
-
-      drawBoard();
-     </script>
+      <canvas id="outputCanvas" class="bodyCanvas"></canvas>
      </div>
-
       <div class="col-md-3 text-center col-v-centered no-float">
         <div class="black margin-top-p30">
           <p class="large">Current Exercise</p>
@@ -96,6 +75,7 @@
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
 <script src="/public/data.js"></script>
 <script type="text/javascript" src="/public/scripts/index.js"></script>
+
 <!--<script>-->
   <!--$(document).ready(function () {-->
     <!--var canvasSKLT = document.getElementById('bodyCanvas');-->
