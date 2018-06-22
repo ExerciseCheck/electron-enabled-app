@@ -63,18 +63,25 @@
     font-weight: bold;
 }
 
-.bodyCanvas {
+
+ /* .outputCanvas {
    padding-left: 0;
    padding-right: 0;
    margin-left: auto;
    margin-right: auto;
    margin-top: 30px;
-   background: grey;
-   display: block;
-   height: 500px;
-   width: 900px;
+   background: grey; */
+
+
+
+  .bodyCanvas {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  border-radius: 17px;
 
 }
+
 
 #cover {
     background-color: rgba(0,0,0,0.5);
