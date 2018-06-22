@@ -190,7 +190,6 @@ function goToExercises() {
   //only start drawing with a bodyframe is detected
   window.Bridge.aOnBodyFrame = (bodyFrame) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //let index = 0;
     let frames = new Array();
     let data = JSON.parse(localStorage.getItem('data')) || [];
 
