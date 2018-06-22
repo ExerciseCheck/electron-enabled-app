@@ -59,8 +59,8 @@ internals.applyRoutes = function (server, next) {
       //clinician
       else if (accessLevel === 2) {
 
-        let userAccess=  JSON.parse(request.auth.credentials.user.roles.clinician.userAccess);
-        var patientsObjectIds = [];
+        const userAccess =  JSON.parse(request.auth.credentials.user.roles.clinician.userAccess);
+        const patientsObjectIds = [];
         for (let i = 0; i < userAccess.length; ++i) {
           console.log(userAccess.length);
           patientsObjectIds[i] = User.ObjectId(userAccess[i]);

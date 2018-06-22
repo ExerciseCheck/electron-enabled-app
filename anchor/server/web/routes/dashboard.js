@@ -55,7 +55,7 @@ internals.applyRoutes = function (server, next) {
 
                 patient.name = user.name;
                 patients.push(patient);
-            }
+              }
 
             });
           });
@@ -84,7 +84,7 @@ internals.applyRoutes = function (server, next) {
               userId: request.auth.credentials.user._id.toString(),
               type: 'Reference',
               // with the current design and workflow, having a referene means having not-empty bodyFrames
-              bodyFrames : { $ne : [] } 
+              bodyFrames : { $ne : [] }
             };
 
             UserExercise.find(query, done);
