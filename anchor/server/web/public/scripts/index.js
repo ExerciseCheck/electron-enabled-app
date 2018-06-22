@@ -8,7 +8,14 @@
   let radius=4; //radius of joint circle
   let circle_radius = 14//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
+  let bw = 500;
+  let bh = 500;
+  let p = -0.5;
+
+
+
   if (isElectron()) {
+
     document.addEventListener('DOMContentLoaded', function() {
       processing = false;
       canvas = document.getElementById('outputCanvas');
@@ -17,6 +24,7 @@
       width = canvas.width;
       height = canvas.height;
       window.Bridge.eStartKinect();
+      drawBoard();
     });
   }
 
@@ -103,4 +111,16 @@
   function isElectron() {
     return 'Bridge' in window;
   }
+
+  function drawBoard(){
+
+    for (let x = 0; x <= bh; x += 100.3) {
+      ctx.moveTo(p, x + p);
+      ctx.lineTo(bw + p, x + p);
+    }
+
+    ctx.strokeStyle = "gray";
+    ctx.stroke();
+    }
+
 })();
