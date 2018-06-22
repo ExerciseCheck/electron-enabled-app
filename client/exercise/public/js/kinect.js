@@ -93,6 +93,11 @@ $(document).ready(function () {
       ctx1.fillStyle = "yellow";
       ctx1.fill();
   }
+
+  function drawFloor(floor){
+      console.log(floor);
+  }
+
   // Draw Center Circle in ctx1 (canvasSKLT)
   function drawCenterCircle(x, y, r, nx, ny){
     ctx1.beginPath();
@@ -115,6 +120,10 @@ $(document).ready(function () {
     if (tracingID == -1){
       bodyFrame.bodies.some(function(body){
         if(body.tracked){ drawBody(body); return(body.tracked);}
+      });
+
+      bodyFrame.floorClipPlane.some(function(floor){
+        if(body.tracked){ drawFloor(floor); return();}
       });
     }
     else {
