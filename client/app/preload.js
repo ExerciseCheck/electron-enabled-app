@@ -16,7 +16,7 @@ function init() {
   // user's computer. E.g. don't directly expose core Electron (even IPC) or node.js modules.
   window.Bridge = {
     eProcessDataFrame,
-    eStartKinect
+    eStartKinect,
   };
 }
 

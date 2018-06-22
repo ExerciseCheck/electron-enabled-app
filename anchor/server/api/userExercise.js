@@ -299,7 +299,7 @@ internals.applyRoutes = function (server, next) {
 
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
-  //this route is used if we don't tag userExercise documents with a referenceId tag 
+  //this route is used if we don't tag userExercise documents with a referenceId tag
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{referenceId}',
@@ -425,8 +425,8 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route inserts a new exercise of type Practice into userExercise collection, 
-  //could be trrigered by both clinician and patient,  
+  //this route inserts a new exercise of type Practice into userExercise collection,
+  //could be trrigered by both clinician and patient,
   server.route({
     method: 'POST',
     path: '/userexercise/practice/{patientId?}',
@@ -600,7 +600,8 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: UserExercise.dataPayload
-      }
+      },
+      payload:{maxBytes: 1048576*5}
     },
     handler: function (request, reply) {
 

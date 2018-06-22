@@ -5,35 +5,46 @@ function parseURL(url) {
   var exerciseId = null;
   var patientId = null;
   const urlToArray = url.split('/');
-   
+
   //logged-in user is a clinician
   if (urlToArray.length === 7) {
     exerciseId = urlToArray[5];
     patientId = urlToArray[6];
   }
-  
   //logged-in user is a patient
   else if (urlToArray.length === 6) {
     exerciseId = urlToArray.pop();
     patientId = null;
   }
-
   return {
     patientId: patientId,
     exerciseId: exerciseId
   };
 }
 
-
 function action(nextMode, type) {
-  
-  const parsedURL = parseURL(window.location.pathname);
-  var patientId = parsedURL.patientId;
-  var exerciseId = parsedURL.exerciseId;
 
- window.location = (parsedURL.patientId !== null)? 
- '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/' + patientId:
- '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId;                                                  
+  function setFlag(callback) {
+
+    if(nextMode === 'play') {
+      localStorage.setItem('canStartRecording', true);
+    }
+    else if(nextMode === 'stop') {
+      localStorage.setItem('canStartRecording', false);
+    } else {
+      localStorage.clear();
+    }
+    callback();
+  }
+
+  setFlag(function(){
+
+    const parsedURL = parseURL(window.location.pathname);
+    var patientId = parsedURL.patientId;
+    var exerciseId = parsedURL.exerciseId;
+    var url = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+    window.location = (!parsedURL.patientId)? url: url + patientId;
+  });
 }
 
 function saveReference() {
@@ -42,47 +53,41 @@ function saveReference() {
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
-  const values = {}; 
-  //this is just a dummy data to make sure after saving reference bodyFrames is not empty anymore
-  const bodyFrames= [{'trackingId': false}];
-  let data = [];
-  data.push(bodyFrames);
+  const values = {};
+  let data = JSON.parse(localStorage.getItem('data'));
   values.bodyFrames = JSON.stringify(data);
-  
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
-       window.location = redirectToUrl
+      localStorage.clear();
+      window.location = redirectToUrl
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
     }
   });
-   
 }
 
 function savePractice() {
-  
+
   const values = {};
   const parsedURL = parseURL(window.location.pathname);
   values.exerciseId = parsedURL.exerciseId;
   let url ='/api/userexercise/practice';
   let patientId = '';
-
   //logged-in user ia clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
     patientId = parsedURL.patientId;
   }
-   
   $.ajax({
     type: 'POST',
     url: url,
     data: values,
     success: function (result) {
-       window.location = '/userexercise/session/start/practice/' + 
+       window.location = '/userexercise/session/start/practice/' +
                      parsedURL.exerciseId + '/' + patientId;
     },
     error: function (result) {
@@ -92,7 +97,7 @@ function savePractice() {
 }
 
 function goTodashBoard() {
- 
+
   window.location = '/dashboard';
 }
 
@@ -103,6 +108,4 @@ function goToExercises() {
 }
 
 
- 
- 
 

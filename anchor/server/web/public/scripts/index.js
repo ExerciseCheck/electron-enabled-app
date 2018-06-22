@@ -81,11 +81,21 @@
   //only start drawing with a bodyframe is detected
   window.Bridge.aOnBodyFrame = (bodyFrame) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let index = 0;
+    let frames = new Array();
+    let data = JSON.parse(localStorage.getItem('data')) || [];
+
     //draw each joint circles
     bodyFrame.bodies.forEach(function (body) {
       if (body.tracked) {
         //draw the body skeleton
         drawBody(body,ctx)
+      }
+      index++;
+      if(JSON.parse(localStorage.getItem('canStartRecording')) === true) {
+        frames.push(body);
+        data.push(frames);
+        localStorage.setItem('data', JSON.stringify(data));
       }
     });
   };
