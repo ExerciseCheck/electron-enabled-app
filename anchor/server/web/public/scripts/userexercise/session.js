@@ -27,7 +27,8 @@ function action(nextMode, type) {
   function setFlag(callback) {
     if(nextMode === 'stop') {
       localStorage.setItem('canStartRecording', false);
-    } else {
+    }
+    else if (nextMode === 'start') {
       localStorage.clear();
     }
     callback();
@@ -103,6 +104,11 @@ function goToExercises() {
   window.location = '/clinician/patientexercises/' + patientId;
 }
 
+function getReferenceFrames() {
+
+}
+
+
 (function ()
 {
   let processing, canvas, ctx;
@@ -168,14 +174,15 @@ function goToExercises() {
     let r = parameters.r;
     //
     let head_x = parameters.nx;
-    let head_y = parameters.ny; 
+    let head_y = parameters.ny;
     ctx.beginPath();
     //euclidean distance from head to calibration circle
     let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2))
-    if(dist <= r)
+    if(dist <= r){
+      //When person's neck enters green circle, recording will start.
       ctx.strokeStyle="green";
       localStorage.setItem('canStartRecording', true);
-
+    }
     else
       ctx.strokeStyle="red";
 
