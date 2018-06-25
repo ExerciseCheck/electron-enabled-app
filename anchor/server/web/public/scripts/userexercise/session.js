@@ -25,11 +25,7 @@ function parseURL(url) {
 function action(nextMode, type) {
 
   function setFlag(callback) {
-
-    if(nextMode === 'play') {
-      localStorage.setItem('canStartRecording', true);
-    }
-    else if(nextMode === 'stop') {
+    if(nextMode === 'stop') {
       localStorage.setItem('canStartRecording', false);
     } else {
       localStorage.clear();
@@ -172,12 +168,14 @@ function goToExercises() {
     let r = parameters.r;
     //
     let head_x = parameters.nx;
-    let head_y = parameters.ny;
+    let head_y = parameters.ny; 
     ctx.beginPath();
     //euclidean distance from head to calibration circle
     let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2))
     if(dist <= r)
       ctx.strokeStyle="green";
+      localStorage.setItem('canStartRecording', true);
+
     else
       ctx.strokeStyle="red";
 
