@@ -68,6 +68,7 @@ $(document).ready(function () {
 
   function drawBody(body){
     //drawCircle(50, 50, 10, "green");
+    // console.log("Works~!");
     jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19] //re visit and draw in a line
     jointType.forEach(function(jointType){
       drawJoints(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
@@ -94,8 +95,33 @@ $(document).ready(function () {
       ctx1.fill();
   }
 
-  function drawFloor(floor){
-      console.log(floor);
+  function drawFloor(floor, body){
+      tilt = Math.atan( floor.z / floor.y) * (180.0 / Math.PI);
+      // console.log(body.joints[11]);
+      jointType = [3, 8, 9, 10, 11, 16, 17, 18, 19]
+      jointType.forEach(function(jointType){
+        distanceFromFloor(floor, body.joints[jointType]);
+      });
+      // dist = distanceFromFloor(floor, body.joints[11]);
+      // console.log("Kinect-floor dist (0 => view is obstructed)", floor.w, "| tilt is ", tilt, "| dist of right hand from the floor ", dist);
+
+  }
+
+  function distanceFromFloor(floor, joint){
+    numerator = floor.x * joint.cameraX + floor.y * joint.cameraY + floor.z * joint.cameraZ + floor.w;
+    denominator = Math.sqrt(floor.x * floor.x + floor.y * floor.y + floor.z * floor.z);
+    dist = numerator / denominator;
+    console.log(floor.x * width,floor.y * height, joint.depthX * width,joint.depthY * height);
+    ctx1.beginPath();
+    // ctx1.moveTo( (floor.x + joint.depthX) * width, floor.y * height);
+    // ctx1.lineTo(joint.depthX * width, joint.depthY * height);
+    // ctx1.stroke();
+
+    ctx1.font = "14px Arial";
+    ctx1.fillText(dist.toFixed(2) + 'm', joint.depthX * width + 30, joint.depthY * height);
+
+    ctx1.closePath();
+    return dist;
   }
 
   // Draw Center Circle in ctx1 (canvasSKLT)
@@ -119,12 +145,10 @@ $(document).ready(function () {
     //drawCenterCircle(width/2, height/5, 50, body.joints[2].depthX * width, body.joints[2].depthY * height);
     if (tracingID == -1){
       bodyFrame.bodies.some(function(body){
-        if(body.tracked){ drawBody(body); return(body.tracked);}
+        if(body.tracked){ drawBody(body); drawFloor(bodyFrame.floorClipPlane,  body); return(body.tracked);}
       });
 
-      bodyFrame.floorClipPlane.some(function(floor){
-        if(body.tracked){ drawFloor(floor); return();}
-      });
+        // drawFloor(bodyFrame);
     }
     else {
       drawBody(bodyFrame.bodies[tracingID]);
