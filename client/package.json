@@ -11,9 +11,14 @@
   "author": "GitHub",
   "license": "MIT",
   "devDependencies": {
-    "electron": "~1.8.3"
+    "electron": "^1.8.7"
   },
   "dependencies": {
-    "kinect2": "^0.1.5"
+    "express": "^4.16.3",
+    "kinect2": "^0.1.5",
+    "local": "^0.3.3",
+    "socket.io": "^2.1.1",
+    "windows-build-tools": "^3.0.1",
+    "xlsx": "^0.13.1"
   }
 }
