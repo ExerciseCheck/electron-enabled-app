@@ -6,11 +6,11 @@ function parseURL(url) {
 
   var exerciseId = null;
   var patientId = null;
-  var Mode = null;
+  var mode = null;
   var type = null;
   const urlToArray = url.split('/');
 
-  Mode = urlToArray[3];
+  mode = urlToArray[3];
   type = urlToArray[4];
   //logged-in user is a clinician
   if (urlToArray.length === 7) {
@@ -23,7 +23,7 @@ function parseURL(url) {
     patientId = null;
   }
   return {
-    Mode: Mode,
+    mode: mode,
     patientId: patientId,
     exerciseId: exerciseId,
     type: type
