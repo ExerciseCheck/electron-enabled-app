@@ -1,14 +1,16 @@
 'use strict';
 
+var refFrames, recentFrames;
+
 function parseURL(url) {
 
   var exerciseId = null;
   var patientId = null;
-  var nextMode = null;
+  var Mode = null;
   var type = null;
   const urlToArray = url.split('/');
 
-  nextMode = urlToArray[3];
+  Mode = urlToArray[3];
   type = urlToArray[4];
   //logged-in user is a clinician
   if (urlToArray.length === 7) {
@@ -21,7 +23,7 @@ function parseURL(url) {
     patientId = null;
   }
   return {
-    nextMode: nextMode,
+    Mode: Mode,
     patientId: patientId,
     exerciseId: exerciseId,
     type: type
@@ -42,7 +44,7 @@ function action(nextMode, type) {
     redirect();
   }
   else if(nextMode === 'start') {
-    localStorage.clear();
+    localStorage.removeItem('data');
     redirect();
   }
   else {
@@ -132,6 +134,20 @@ function goToExercises() {
       width = canvas.width;
       height = canvas.height;
       window.Bridge.eStartKinect();
+
+      //checks what type of "mode" page is currently on && if reference exists
+      if(localStorage.getItem("refFrames") === null) {
+        //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
+        //when we are doing an updatereference or a practice session
+        alert("No reference frames in localStorage");
+      } else {
+        alert("Reference frames exist");
+        refFrames = JSON.parse(localStorage.getItem('refFrames'));
+        recentFrames = JSON.parse(localStorage.getItem('data'));
+        console.log(refFrames);
+        console.log(recentFrames);
+      }
+
     });
   }
 
@@ -183,9 +199,12 @@ function goToExercises() {
     //euclidean distance from head to calibration circle
     let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2))
     if(dist <= r){
-      //When person's neck enters green circle, recording will start.
+      //When person's neck enters green circle && mode is 'play', recording will start.
       ctx.strokeStyle="green";
-      localStorage.setItem('canStartRecording', true);
+      var parsedURL = parseURL(window.location.pathname);
+      if(parsedURL.mode === 'play') {
+        localStorage.setItem('canStartRecording', true);
+      }
     }
     else
       ctx.strokeStyle="red";
@@ -217,12 +236,6 @@ function goToExercises() {
 
 
   };
-
-  if(localStorage.getItem("refFrames") === null) {
-    alert("No reference frames in localStorage");
-  } else {
-    alert("Reference frames exist");
-  }
 
   function isElectron() {
     return 'Bridge' in window;
