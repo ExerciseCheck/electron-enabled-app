@@ -44,13 +44,13 @@ UserExercise.schema = Joi.object().keys({
   numSessions: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required(),
   isActive: Joi.boolean().required(),
-  bodyFrames: Joi.array().items(Joi.array().items(Joi.object())).required(),
+  bodyFrames: Joi.array().required(),
   createdAt: Joi.date().required()
 });
 
 //this is used for validating payload of post requests when creating practice exercise
 UserExercise.practicePayload = Joi.object().keys({
-  //bodyFrames: Joi.array().required(),
+  bodyFrames: Joi.array().required(),
   exerciseId: Joi.string().required()
 });
 
@@ -64,7 +64,7 @@ UserExercise.referencePayload = Joi.object().keys({
 });
 
 UserExercise.dataPayload = Joi.object().keys({
-  bodyFrames: Joi.array().items(Joi.array().items(Joi.object())).required()
+  bodyFrames: Joi.array().required()
 });
 
 //this is used for validating payload of put requests when updating a reference exercise

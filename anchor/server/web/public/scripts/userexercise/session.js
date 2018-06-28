@@ -4,8 +4,12 @@ function parseURL(url) {
 
   var exerciseId = null;
   var patientId = null;
+  var nextMode = null;
+  var type = null;
   const urlToArray = url.split('/');
 
+  nextMode = urlToArray[3];
+  type = urlToArray[4];
   //logged-in user is a clinician
   if (urlToArray.length === 7) {
     exerciseId = urlToArray[5];
@@ -17,31 +21,44 @@ function parseURL(url) {
     patientId = null;
   }
   return {
+    nextMode: nextMode,
     patientId: patientId,
-    exerciseId: exerciseId
+    exerciseId: exerciseId,
+    type: type
   };
 }
 
 function action(nextMode, type) {
 
-  function setFlag(callback) {
-    if(nextMode === 'stop') {
-      localStorage.setItem('canStartRecording', false);
-    }
-    else if (nextMode === 'start') {
-      localStorage.clear();
-    }
-    callback();
+  const parsedURL = parseURL(window.location.pathname);
+  var patientId = parsedURL.patientId;
+  var exerciseId = parsedURL.exerciseId;
+  function redirect() {
+    var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+    window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
   }
 
-  setFlag(function(){
-
-    const parsedURL = parseURL(window.location.pathname);
-    var patientId = parsedURL.patientId;
-    var exerciseId = parsedURL.exerciseId;
-    var url = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
-    window.location = (!parsedURL.patientId)? url: url + patientId;
-  });
+  if(nextMode === 'play' && parsedURL.patientId) {
+    var url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
+//    if(parsedURL.patientId) {
+//      url = url + patientId;
+//    }
+    $.get(url, function(data){
+      localStorage.setItem("refFrames", JSON.stringify(data));
+      redirect();
+    });
+  }
+  else if(nextMode === 'stop') {
+    localStorage.setItem('canStartRecording', false);
+    redirect();
+  }
+  else if(nextMode === 'start') {
+    localStorage.clear();
+    redirect();
+  }
+  else {
+    redirect();
+  }
 }
 
 function saveReference() {
@@ -50,7 +67,7 @@ function saveReference() {
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
-  const values = {};
+  let values = {};
   let data = JSON.parse(localStorage.getItem('data'));
   values.bodyFrames = JSON.stringify(data);
   $.ajax({
@@ -69,11 +86,13 @@ function saveReference() {
 
 function savePractice() {
 
-  const values = {};
   const parsedURL = parseURL(window.location.pathname);
-  values.exerciseId = parsedURL.exerciseId;
   let url ='/api/userexercise/practice';
   let patientId = '';
+  let values = {};
+  let data = JSON.parse(localStorage.getItem('data'));
+  values.exerciseId = parsedURL.exerciseId;
+  values.bodyFrames = JSON.stringify(data);
   //logged-in user ia clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
@@ -84,6 +103,7 @@ function savePractice() {
     url: url,
     data: values,
     success: function (result) {
+       localStorage.clear();
        window.location = '/userexercise/session/start/practice/' +
                      parsedURL.exerciseId + '/' + patientId;
     },
@@ -94,7 +114,7 @@ function savePractice() {
 }
 
 function goTodashBoard() {
-
+  localStorage.clear();
   window.location = '/dashboard';
 }
 
@@ -103,11 +123,6 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
-
-function getReferenceFrames() {
-
-}
-
 
 (function ()
 {
@@ -194,8 +209,8 @@ function getReferenceFrames() {
 
   //only start drawing with a bodyframe is detected
   window.Bridge.aOnBodyFrame = (bodyFrame) => {
+    const parsedURL = parseURL(window.location.pathname);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let frames = new Array();
     let data = JSON.parse(localStorage.getItem('data')) || [];
 
     //draw each joint circles
@@ -204,13 +219,21 @@ function getReferenceFrames() {
         //draw the body skeleton
         drawBody(body,ctx);
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true) {
-          frames.push(body);
-          data.push(frames);
+          data.push(body);
           localStorage.setItem('data', JSON.stringify(data));
         }
       }
     });
+
+
+
   };
+
+  if(localStorage.getItem("refFrames") === null) {
+    alert("No reference frames in localStorage");
+  } else {
+    alert("Reference frames exist");
+  }
 
   function isElectron() {
     return 'Bridge' in window;

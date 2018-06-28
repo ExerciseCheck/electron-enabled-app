@@ -104,7 +104,7 @@ internals.applyRoutes = function (server, next) {
       }
 
       let patientId = '';
-      //logged-in user is clinician 
+      //logged-in user is clinician
       if (request.params.patientId ) {
         patientId = request.params.patientId;
       }
@@ -114,6 +114,7 @@ internals.applyRoutes = function (server, next) {
       }
       let isComplete = false;
       let setNumber = 0;
+      let bodyFrames = null;
 
       Async.auto({
         findReference: function (done) {
