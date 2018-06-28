@@ -37,18 +37,7 @@ function action(nextMode, type) {
     var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
     window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
   }
-
-  if(nextMode === 'play' && parsedURL.patientId) {
-    var url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
-//    if(parsedURL.patientId) {
-//      url = url + patientId;
-//    }
-    $.get(url, function(data){
-      localStorage.setItem("refFrames", JSON.stringify(data));
-      redirect();
-    });
-  }
-  else if(nextMode === 'stop') {
+  if(nextMode === 'stop') {
     localStorage.setItem('canStartRecording', false);
     redirect();
   }

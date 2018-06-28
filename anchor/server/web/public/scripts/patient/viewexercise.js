@@ -25,7 +25,7 @@ $(".listButtons a").click(function() {
   const url = '/api/userexercise/loadreference/' + exerciseId + '/';
   //alert(url);
   $.get(url, function(data){
-    //console.log("get");
+    console.log("GET from patient side");
     localStorage.setItem("refFrames", JSON.stringify(data));
     window.location = addressValue;
   });

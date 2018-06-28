@@ -6,12 +6,12 @@ function getExerciseId() {
 }
 
 function getPatientId() {
-  
+
   return (window.location.pathname.split('/'))[4];
 }
 
 function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
-  
+
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
@@ -33,7 +33,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
 }
 
 function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
-  
+
   const values = {};
   values.numSessions = numSets;
   values.numRepetition = numReps;
@@ -54,40 +54,40 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
 
 //when there's no reference update setting can do both inserting or updating
 function changeSetting() {
-  
+
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId(); 
-  
+  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
+
   $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
-    
+
     if ( data.settingIsUpdated ) {
       updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
     }
 
     else {
       initialSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
-    }     
+    }
   });
 }
 
 //when there is a reference meaning a reference is recorded update setting just updates
 function update() {
-  
+
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId(); 
+  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
   updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
 }
 
 function createRef() {
-   
+
   const url = '/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/reference/' + 
+  const redirectToUrl = '/userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
-  
+
   $.get(url, function(data){
-    
+
     if ( data.settingIsUpdated ) {
       window.location = redirectToUrl;
     }
@@ -95,7 +95,7 @@ function createRef() {
     else {
       initialSetting(1, 1, getExerciseId(), getPatientId(), url);
        window.location = redirectToUrl;
-    }     
+    }
   });
 }
 
@@ -106,17 +106,31 @@ function viewReferences() {
 
 function updateReference() {
 
-  window.location = '/userexercise/session/start/reference/' + 
-                     getExerciseId() + '/' + getPatientId();
+//  window.location = '/userexercise/session/start/reference/' +
+//                     getExerciseId() + '/' + getPatientId();
+  loadReferenceandStart('reference');
 }
 
 function StartPracticeSession() {
-   
-  window.location = '/userexercise/session/start/practice/' + 
-                    getExerciseId() + '/' + getPatientId();
+   //CHANGE THIS TO REDIREcT()
+//  window.location = '/userexercise/session/start/practice/' +
+//                    getExerciseId() + '/' + getPatientId();
+  loadReferenceandStart('practice');
 }
 
+function loadReferenceandStart(type) {
+  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  $.get(url, function(data){
+    console.log("Get from CLINICIAN side");
+    localStorage.setItem("refFrames", JSON.stringify(data));
+    redirect(type);
+  });
+}
 
+function redirect(type) {
+  window.location = '/userexercise/session/start/' + type + '/' +
+    getExerciseId() + '/' + getPatientId();
+}
 
 
 
