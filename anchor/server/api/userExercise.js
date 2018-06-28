@@ -601,7 +601,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: UserExercise.dataPayload
       },
-      payload:{maxBytes: 1048576*5}
+      payload:{ maxBytes: 1048576 * 5 }
     },
     handler: function (request, reply) {
 
