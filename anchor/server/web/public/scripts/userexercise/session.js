@@ -117,19 +117,23 @@ function goToExercises() {
 
 (function ()
 {
-  let processing, canvas, ctx;
+  let processing, canvas, ctx, ref_canvas, ref_ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
   //canvas dimension
   let width = 0;
   let height = 0;
-  let radius=4; //radius of joint circle
-  let circle_radius = 14//radius of calibration circle
+  let radius=9; //radius of joint circle
+  let circle_radius = 50//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
+  let ref_counter = 0;
+  let inPosition = false;
   if (isElectron()) {
     document.addEventListener('DOMContentLoaded', function() {
       processing = false;
       canvas = document.getElementById('outputCanvas');
       ctx = canvas.getContext('2d');
+      ref_canvas = document.getElementById('refCanvas');
+      ref_ctx = ref_canvas.getContext('2d');
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
@@ -139,9 +143,9 @@ function goToExercises() {
       if(localStorage.getItem("refFrames") === null) {
         //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
         //when we are doing an updatereference or a practice session
-        alert("No reference frames in localStorage");
+        // alert("No reference frames in localStorage");
       } else {
-        alert("Reference frames exist");
+        // alert("Reference frames exist");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         recentFrames = JSON.parse(localStorage.getItem('data'));
         console.log(refFrames);
@@ -152,15 +156,17 @@ function goToExercises() {
   }
 
   //function that draws the body skeleton
-  function drawBody(parameters, ctx){
+  function drawBody(parameters, ctx, drawCircle = true){
     let body = parameters;
     jointType.forEach(function(jointType){
       drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx);
     });
-    drawCenterCircle({
-      x: width / 2, y: height / 5, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
-    },ctx);
-
+    if(drawCircle)
+    {
+      drawCenterCircle({
+        x: width / 2, y: height / 5, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
+      },ctx);
+    }
     //connect all the joints with the order defined in jointType
     ctx.beginPath();
     ctx.moveTo(body.joints[7].depthX * width, body.joints[7].depthY * height);
@@ -168,7 +174,7 @@ function goToExercises() {
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
     });
-    ctx.lineWidth=2;
+    ctx.lineWidth=8;
     ctx.strokeStyle='blue';
     ctx.stroke();
     ctx.closePath();
@@ -197,7 +203,7 @@ function goToExercises() {
     let head_y = parameters.ny;
     ctx.beginPath();
     //euclidean distance from head to calibration circle
-    let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2))
+    let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2));
     if(dist <= r){
       //When person's neck enters green circle && mode is 'play', recording will start.
       ctx.strokeStyle="green";
@@ -216,25 +222,43 @@ function goToExercises() {
   }
 
   //only start drawing with a bodyframe is detected
-  window.Bridge.aOnBodyFrame = (bodyFrame) => {
+  window.Bridge.aOnBodyFrame = (bodyFrame) =>
+  {
     const parsedURL = parseURL(window.location.pathname);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let data = JSON.parse(localStorage.getItem('data')) || [];
 
     //draw each joint circles
-    bodyFrame.bodies.forEach(function (body) {
-      if (body.tracked) {
+    bodyFrame.bodies.forEach(function (body)
+    {
+      if (body.tracked)
+      {
         //draw the body skeleton
         drawBody(body,ctx);
-        if(JSON.parse(localStorage.getItem('canStartRecording')) === true) {
+        //location of the neck
+        let neck_x = body.joints[2].depthX;
+        let neck_y = body.joints[2].depthY;
+
+        // check inposition status whenever kinect captures a body
+        if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
+          inPosition = true;
+        }
+        if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
+        {
           data.push(body);
           localStorage.setItem('data', JSON.stringify(data));
         }
       }
+      if(inPosition)
+      {
+        let parsedURL = parseURL(window.location.pathname);
+        if(parsedURL.type == 'practice')
+        {
+          drawBody(refFrames[ref_counter], ref_ctx, false);
+          ref_counter = (ref_counter + 2) % refFrames.length;
+        }
+      }
     });
-
-
-
   };
 
   function isElectron() {
