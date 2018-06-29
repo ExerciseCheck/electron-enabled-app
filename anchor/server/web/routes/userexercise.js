@@ -114,7 +114,6 @@ internals.applyRoutes = function (server, next) {
       }
       let isComplete = false;
       let setNumber = 0;
-      let bodyFrames = null;
 
       Async.auto({
         findReference: function (done) {

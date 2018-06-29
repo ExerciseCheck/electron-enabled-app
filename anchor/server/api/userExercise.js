@@ -299,43 +299,44 @@ internals.applyRoutes = function (server, next) {
 
   //Route for loading reference frames into exercise session
   server.route({
-      method: 'GET',
-      path: '/userexercise/loadreference/{exerciseId}/{patientId?}',
-      config: {
-        auth: {
-          strategies: ['simple', 'jwt', 'session'],
-        }
-      },
-      handler: function (request, reply) {
-        let patientId = '';
-        //logged-in user is clinician
-        if (request.params.patientId) {
-          patientId = request.params.patientId;
-        }
-        //logged-in user is patient
-        else {
-          patientId = request.auth.credentials.user._id.toString();
-        }
-        const query = {
-          userId: patientId,
-          exerciseId: request.params.exerciseId,
-          type: 'Reference',
-        };
-
-        UserExercise.findOne(query, (err, refExercise) => {
-
-          if (err) {
-            return reply(err);
-          }
-
-          if ( !refExercise || refExercise === undefined ) {
-            return reply("Cannot find reference exercise");
-          }
-
-          return reply(refExercise.bodyFrames);
-        });
+    method: 'GET',
+    path: '/userexercise/loadreference/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
       }
-   });
+    },
+    handler: function (request, reply) {
+
+      let patientId = '';
+      //logged-in user is clinician
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      //logged-in user is patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+      const query = {
+        userId: patientId,
+        exerciseId: request.params.exerciseId,
+        type: 'Reference'
+      };
+
+      UserExercise.findOne(query, (err, refExercise) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if ( !refExercise || refExercise === undefined ) {
+          return reply('Cannot find reference exercise');
+        }
+
+        return reply(refExercise.bodyFrames);
+      });
+    }
+  });
 
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
@@ -477,7 +478,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: UserExercise.practicePayload
       },
-      payload:{maxBytes: 1048576*5}
+      payload:{ maxBytes: 1048576 * 5 }
     },
     handler: function (request, reply) {
 
