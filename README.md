@@ -18,7 +18,11 @@ Make sure to follow the installation instructions on the website.
 ### Nodejs
 
 Nodejs should be installed. Run `npm install` under \anchor and \client directory in your local copy of this directory. 
-For WIndows users, if you encounter errors when running 'npm install' under \client directory, you will have to run cmd as administrator and run the command 'npm install --global --production windows-build-tools' and then run 'npm install' again under \client.
+For WIndows users, if you encounter errors when running `npm install` under \client directory, you will have to run cmd as administrator and run the command:
+```
+npm install --global --production windows-build-tools
+``` 
+and then run `npm install` again under \client.
 
 ## Running the Application
 
