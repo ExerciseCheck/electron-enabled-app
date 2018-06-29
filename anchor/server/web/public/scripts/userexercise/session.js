@@ -122,8 +122,8 @@ function goToExercises() {
   //canvas dimension
   let width = 0;
   let height = 0;
-  let radius=4; //radius of joint circle
-  let circle_radius = 14//radius of calibration circle
+  let radius=9; //radius of joint circle
+  let circle_radius = 50//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   if (isElectron()) {
     document.addEventListener('DOMContentLoaded', function() {
@@ -168,7 +168,7 @@ function goToExercises() {
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
     });
-    ctx.lineWidth=2;
+    ctx.lineWidth=10;
     ctx.strokeStyle='blue';
     ctx.stroke();
     ctx.closePath();
