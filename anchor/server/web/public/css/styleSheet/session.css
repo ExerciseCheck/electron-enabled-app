@@ -4,8 +4,7 @@
   left: 100px;
   margin-left: auto;
   margin-right: auto;
-  background: #c1c1c1;
-  border-radius: 17px;
+  background: grey;
   display: block;
   height: 85%;
   width: 97%;
@@ -45,3 +44,4 @@
 .mh1 {
     height: 100vh; /* 100% of viewport height*/
 }
+
