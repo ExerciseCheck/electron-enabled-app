@@ -5,7 +5,7 @@
   margin-left: auto;
   margin-right: auto;
   background: grey;
-  display: inline;
+  display: none;
   height: 500px;
   width: 500px;
 }

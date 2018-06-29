@@ -127,6 +127,9 @@ function goToExercises() {
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   let ref_counter = 0;
   let inPosition = false;
+  let parsedURL = parseURL(window.location.pathname);
+
+  showCanvas();
   if (isElectron()) {
     document.addEventListener('DOMContentLoaded', function() {
       processing = false;
@@ -153,6 +156,20 @@ function goToExercises() {
       }
 
     });
+  }
+
+  function showCanvas() {
+    if(parsedURL.mode === 'start') {
+      document.getElementById("refCanvas").style.display = "block";
+    }
+    else if(parsedURL.mode === 'play' && parsedURL.type === 'reference') {
+      document.getElementById("outputCanvas").style.display = "block";
+    }
+    else {
+      document.getElementById("refCanvas").style.display = "inline";
+      document.getElementById("outputCanvas").style.display = "inline";
+
+    }
   }
 
   //function that draws the body skeleton
@@ -251,7 +268,6 @@ function goToExercises() {
       }
       if(inPosition)
       {
-        let parsedURL = parseURL(window.location.pathname);
         if(parsedURL.type == 'practice')
         {
           drawBody(refFrames[ref_counter], ref_ctx, false);
