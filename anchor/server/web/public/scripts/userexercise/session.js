@@ -272,7 +272,7 @@ function goToExercises() {
         if(parsedURL.type == 'practice')
         {
           drawBody(refFrames[ref_counter], ref_ctx, false);
-          ref_counter = (ref_counter) % refFrames.length;
+          ref_counter = (ref_counter + 1) % refFrames.length;
         }
       }
     });
