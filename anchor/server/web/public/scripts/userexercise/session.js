@@ -151,13 +151,12 @@ function goToExercises() {
         // alert("Reference frames exist");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         recentFrames = JSON.parse(localStorage.getItem('data'));
-        console.log(refFrames);
-        console.log(recentFrames);
       }
 
     });
   }
 
+  // the function that controls the canvas hiding/displaying logic
   function showCanvas() {
     if(parsedURL.mode === 'start') {
       document.getElementById("refCanvas").style.display = "block";
@@ -242,7 +241,9 @@ function goToExercises() {
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
+    //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ref_ctx.clearRect(0, 0, canvas.width, canvas.height);
     let data = JSON.parse(localStorage.getItem('data')) || [];
 
     //draw each joint circles
@@ -271,7 +272,7 @@ function goToExercises() {
         if(parsedURL.type == 'practice')
         {
           drawBody(refFrames[ref_counter], ref_ctx, false);
-          ref_counter = (ref_counter + 2) % refFrames.length;
+          ref_counter = (ref_counter) % refFrames.length;
         }
       }
     });
