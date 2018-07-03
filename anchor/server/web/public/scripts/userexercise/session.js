@@ -125,7 +125,10 @@ function goToExercises() {
   let radius=9; //radius of joint circle
   let circle_radius = 50//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
+  // index of reference frame
   let ref_counter = 0;
+  // number of live frame captured from kinect
+  let live_counter = 0;
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
 
@@ -237,13 +240,23 @@ function goToExercises() {
     ctx.strokeStyle="black";
   }
 
-  //only start drawing with a bodyframe is detected
+  //only start drawing with a body frame is detected
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ref_ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //tag the canvas
+    ctx.font="30px Comic Sans MS";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "center";
+    ctx.fillText("Live", canvas.width/2, canvas.height/20);
+    ref_ctx.font="30px Comic Sans MS";
+    ref_ctx.fillStyle = "red";
+    ref_ctx.textAlign = "center";
+    ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
+
     let data = JSON.parse(localStorage.getItem('data')) || [];
 
     //draw each joint circles
@@ -251,8 +264,10 @@ function goToExercises() {
     {
       if (body.tracked)
       {
-        //draw the body skeleton
-        drawBody(body,ctx);
+        //draw the body skeleton in live canvas
+        drawBody(body,ctx,);
+        //increment the live counter
+        live_counter = live_counter + 1;
         //location of the neck
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
@@ -267,13 +282,20 @@ function goToExercises() {
           localStorage.setItem('data', JSON.stringify(data));
         }
       }
-      if(inPosition)
+      //if the patient is in position and doing a practice session
+      if(inPosition && (parsedURL.type === 'practice'))
       {
-        if(parsedURL.type == 'practice')
-        {
+          //draw in the reference canvas
           drawBody(refFrames[ref_counter], ref_ctx, false);
-          ref_counter = (ref_counter + 1) % refFrames.length;
-        }
+          //display one frame of reference every 2 frames of live frame captured
+          //we can manipulate the number to control the display speed
+          if (live_counter >= 1)
+          {
+            ref_counter = (ref_counter + 2) % refFrames.length;
+            live_counter = 0;
+            console.log("run!");
+          }
+          console.log(live_counter);
       }
     });
   };
