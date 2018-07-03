@@ -6,12 +6,12 @@ function getExerciseId() {
 }
 
 function getPatientId() {
-  
+
   return (window.location.pathname.split('/'))[4];
 }
 
 function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
-  
+
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
@@ -23,8 +23,10 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
     url: '/api/userexercise/reference',
     data: values,
     success: function (result) {
-        successAlert('Setting successfully updated');
-      //window.location = redirectToUrl;
+      successAlert('Setting successfully updated');
+      if(redirectToUrl !== undefined) {
+        window.location = redirectToUrl;
+      }
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -33,7 +35,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
 }
 
 function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
-  
+
   const values = {};
   values.numSessions = numSets;
   values.numRepetition = numReps;
@@ -54,48 +56,50 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
 
 //when there's no reference update setting can do both inserting or updating
 function changeSetting() {
-  
+
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId(); 
-  
+  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
+
   $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
-    
+
     if ( data.settingIsUpdated ) {
       updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
     }
 
     else {
-      initialSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
-    }     
+      initialSetting(numSets, numReps, getExerciseId(), getPatientId());
+    }
   });
 }
 
 //when there is a reference meaning a reference is recorded update setting just updates
 function update() {
-  
+
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId(); 
+  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
   updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
 }
 
 function createRef() {
-   
+
   const url = '/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/reference/' + 
+  const redirectToUrl = '/userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
-  
+
   $.get(url, function(data){
-    
+
     if ( data.settingIsUpdated ) {
-      window.location = redirectToUrl;
+      console.log("Setting exists");
+      //window.location = redirectToUrl;
     }
 
     else {
-      initialSetting(1, 1, getExerciseId(), getPatientId(), url);
-       window.location = redirectToUrl;
-    }     
+      console.log("New reference object created");
+      initialSetting(1, 1, getExerciseId(), getPatientId(), redirectToUrl);
+      //window.location = redirectToUrl;
+    }
   });
 }
 
@@ -106,13 +110,13 @@ function viewReferences() {
 
 function updateReference() {
 
-  window.location = '/userexercise/session/start/reference/' + 
+  window.location = '/userexercise/session/start/reference/' +
                      getExerciseId() + '/' + getPatientId();
 }
 
 function StartPracticeSession() {
-   
-  window.location = '/userexercise/session/start/practice/' + 
+
+  window.location = '/userexercise/session/start/practice/' +
                     getExerciseId() + '/' + getPatientId();
 }
 
