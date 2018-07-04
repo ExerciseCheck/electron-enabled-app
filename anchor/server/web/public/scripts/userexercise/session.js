@@ -2,7 +2,8 @@
 
 var refFrames, recentFrames;
 
-function parseURL(url) {
+function parseURL(url)
+{
 
   var exerciseId = null;
   var patientId = null;
@@ -30,7 +31,8 @@ function parseURL(url) {
   };
 }
 
-function action(nextMode, type) {
+function action(nextMode, type)
+{
 
   const parsedURL = parseURL(window.location.pathname);
   var patientId = parsedURL.patientId;
@@ -105,6 +107,7 @@ function savePractice() {
 }
 
 function goTodashBoard() {
+
   localStorage.clear();
   window.location = '/dashboard';
 }
@@ -117,7 +120,8 @@ function goToExercises() {
 
 (function ()
 {
-  let processing, canvas, ctx, ref_canvas, ref_ctx;
+
+  let processing, canvas, ctx, ref_canvas, ref_ctx, exe_canvas, exe_ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
   //canvas dimension
   let width = 0;
@@ -127,19 +131,26 @@ function goToExercises() {
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   // index of reference frame
   let ref_counter = 0;
+  // index of exercise frame
+  let exe_counter = 0;
   // number of live frame captured from kinect
   let live_counter = 0;
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
 
-  showCanvas();
-  if (isElectron()) {
+  if (isElectron())
+  {
     document.addEventListener('DOMContentLoaded', function() {
       processing = false;
+      //live canvas
       canvas = document.getElementById('outputCanvas');
       ctx = canvas.getContext('2d');
+      //reference canvas
       ref_canvas = document.getElementById('refCanvas');
       ref_ctx = ref_canvas.getContext('2d');
+      //exercise canvas
+      exe_canvas = document.getElementById('exeCanvas');
+      exe_ctx = exe_canvas.getContext('2d');
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
@@ -159,23 +170,88 @@ function goToExercises() {
     });
   }
 
+  showCanvas();
+
   // the function that controls the canvas hiding/displaying logic
-  function showCanvas() {
-    if(parsedURL.mode === 'start') {
-      document.getElementById("refCanvas").style.display = "block";
+  // we determine the state of the website by parsing URL
+  // we also reset the reference counter whenever we transit to a new state
+  function showCanvas()
+  {
+
+    // WARNING: I'M NOT SURE IF this is the safest way to do it
+    //TODO: find the proper way to differ the two start states
+    //start of creating reference
+    if(parsedURL.mode === 'start' && refFrames === undefined)
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      //nothing should be shwon
+      document.getElementById("refCanvas").style.display = "none";
+      document.getElementById("exeCanvas").style.display = "none";
+      document.getElementById("outputCanvas").style.display = "none";
     }
-    else if(parsedURL.mode === 'play' && parsedURL.type === 'reference') {
+    // start of updating reference and practice
+    else if(parsedURL.mode === 'start' && refFrames !== undefined )
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      //show reference canvas only
+      document.getElementById("refCanvas").style.display = "block";
+      document.getElementById("exeCanvas").style.display = "none";
+      document.getElementById("outputCanvas").style.display = "none";
+    }
+    //play state for updating reference and creating reference
+    else if(parsedURL.mode === 'play' && parsedURL.type === 'reference')
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      //show live canvas only
+      document.getElementById("refCanvas").style.display = "none";
+      document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "block";
     }
-    else {
+    //play state for practice
+    else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      //show live canvas and reference canvas
       document.getElementById("refCanvas").style.display = "inline";
+      document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "inline";
-
+    }
+    //stop state for updating reference and creating reference
+    else if(parsedURL.mode === 'stop' && parsedURL.type === 'reference')
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      //show reference canvas
+      document.getElementById("refCanvas").style.display = "block";
+      document.getElementById("exeCanvas").style.display = "none";
+      document.getElementById("outputCanvas").style.display = "none";
+    }
+    //stop state for exercise
+    else if(parsedURL.mode === 'stop' && parsedURL.type === 'practice')
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      //show reference and exercise canvas
+      document.getElementById("refCanvas").style.display = "inline";
+      document.getElementById("exeCanvas").style.display = "inline";
+      document.getElementById("outputCanvas").style.display = "none";
+    }
+    //this case is used for error safety, should not be called normally
+    else
+    {
+      ref_counter = 0;
+      exe_counter = 0;
+      console.log("State error occurs!");
     }
   }
 
   //function that draws the body skeleton
   function drawBody(parameters, ctx, drawCircle = true){
+
     let body = parameters;
     jointType.forEach(function(jointType){
       drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx);
@@ -201,6 +277,7 @@ function goToExercises() {
 
   //function that draws each joint as a yellow round dot
   function drawJoints(parameters, ctx){
+
     let cx = parameters.cx;
     let cy = parameters.cy;
     ctx.beginPath();
@@ -212,6 +289,7 @@ function goToExercises() {
 
   // Draw the red Center Circle in ctx1 (canvasSKLT)
   function drawCenterCircle(parameters, ctx){
+
     //coordinate of the red circle
     let x = parameters.x;
     let y = parameters.y;
@@ -241,38 +319,46 @@ function goToExercises() {
   }
 
   //only start drawing with a body frame is detected
+  //even though
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
+
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ref_ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
+    exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
     //tag the canvas
     ctx.font="30px Comic Sans MS";
     ctx.fillStyle = "red";
     ctx.textAlign = "center";
     ctx.fillText("Live", canvas.width/2, canvas.height/20);
+
     ref_ctx.font="30px Comic Sans MS";
     ref_ctx.fillStyle = "red";
     ref_ctx.textAlign = "center";
     ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
 
-    let data = JSON.parse(localStorage.getItem('data')) || [];
+    exe_ctx.font="30px Comic Sans MS";
+    exe_ctx.fillStyle = "red";
+    exe_ctx.textAlign = "center";
+    exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
 
-    //draw each joint circles
+    //recording storage
+    let data = JSON.parse(localStorage.getItem('data')) || [];
+    //draw each joint circles when a body is tracked
     bodyFrame.bodies.forEach(function (body)
     {
       if (body.tracked)
       {
         //draw the body skeleton in live canvas
-        drawBody(body,ctx,);
+        drawBody(body,ctx);
         //increment the live counter
-        live_counter = live_counter + 1;
         //location of the neck
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
-        // check inposition status whenever kinect captures a body
+        // check in-position status whenever kinect captures a body
         if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
           inPosition = true;
         }
@@ -283,24 +369,54 @@ function goToExercises() {
         }
       }
       //if the patient is in position and doing a practice session
-      if(inPosition && (parsedURL.type === 'practice'))
+      if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
       {
           //draw in the reference canvas
           drawBody(refFrames[ref_counter], ref_ctx, false);
           //display one frame of reference every 2 frames of live frame captured
           //we can manipulate the number to control the display speed
-          if (live_counter >= 1)
+          if (live_counter >= 3)
           {
-            ref_counter = (ref_counter + 2) % refFrames.length;
+            ref_counter = (ref_counter + 1) % refFrames.length;
             live_counter = 0;
-            console.log("run!");
           }
-          console.log(live_counter);
       }
+      live_counter = live_counter + 1;
     });
+    //check if it is in the state of displaying reference, if reference exists
+    //1. end of creating reference and end of updating
+    //2. start of updating  TODO: need to differ from start of creating
+    //3. start of practice
+    //4. end of practice
+    //in theses cases, the in-position will not be checked
+    if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start')) ||
+      ((parsedURL.type === 'practice') && (parsedURL.mode === 'start')) ||
+      ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
+    )
+    {
+      //draw in the reference canvas
+      drawBody(refFrames[ref_counter], ref_ctx, false);
+      //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
+      if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
+      {
+        //TODO: pull latest exercise and display
+        //drawBody(exeFrames[exe_counter], exe_ctx, false);
+      }
+      //display one frame of reference every 2 frames of live frame captured
+      //we can manipulate the number to control the display speed
+      if (live_counter >= 3)
+      {
+        ref_counter = (ref_counter + 1) % refFrames.length;
+        //TODO: latest exercise
+        //exe_counter = (exe_counter + 1) % exeFrames.length;
+        live_counter = 0;
+      }
+    }
   };
 
   function isElectron() {
+
     return 'Bridge' in window;
   }
 })();
