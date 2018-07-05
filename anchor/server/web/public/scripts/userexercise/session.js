@@ -158,6 +158,8 @@ function goToExercises() {
   let live_counter = 0;
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
+  //recording storage
+  let data = [];
 
   if (isElectron())
   {
@@ -198,8 +200,6 @@ function goToExercises() {
   function showCanvas()
   {
 
-    // WARNING: I'M NOT SURE IF this is the safest way to do it
-    //TODO: find the proper way to differ the two start states
     //start of creating reference
     if(parsedURL.mode === 'start' && refFrames === undefined)
     {
@@ -364,8 +364,6 @@ function goToExercises() {
     exe_ctx.textAlign = "center";
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
 
-    //recording storage
-    let data = [];
     //draw each joint circles when a body is tracked
     bodyFrame.bodies.forEach(function (body)
     {
@@ -385,6 +383,7 @@ function goToExercises() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           data.push(body);
+          console.log(data);
           localStorage.setItem('data', JSON.stringify(data));
         }
       }
@@ -405,12 +404,12 @@ function goToExercises() {
     });
     //check if it is in the state of displaying reference, if reference exists
     //1. end of creating reference and end of updating
-    //2. start of updating  TODO: need to differ from start of creating
+    //2. start of updating
     //3. start of practice
     //4. end of practice
     //in theses cases, the in-position will not be checked
     if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
-      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start')) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'start')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
@@ -420,16 +419,14 @@ function goToExercises() {
       //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
       if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
       {
-        //TODO: pull latest exercise and display
-        //drawBody(exeFrames[exe_counter], exe_ctx, false);
+        drawBody(recentFrames[exe_counter], exe_ctx, false);
       }
       //display one frame of reference every 2 frames of live frame captured
       //we can manipulate the number to control the display speed
       if (live_counter >= 3)
       {
         ref_counter = (ref_counter + 1) % refFrames.length;
-        //TODO: latest exercise
-        //exe_counter = (exe_counter + 1) % exeFrames.length;
+        exe_counter = (exe_counter + 1) % recentFrames.length;
         live_counter = 0;
       }
     }
