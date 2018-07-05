@@ -365,7 +365,7 @@ function goToExercises() {
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
 
     //recording storage
-    let data = JSON.parse(localStorage.getItem('data')) || [];
+    let data = [];
     //draw each joint circles when a body is tracked
     bodyFrame.bodies.forEach(function (body)
     {
