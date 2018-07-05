@@ -289,6 +289,7 @@ function goToExercises() {
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
     });
+
     ctx.lineWidth=8;
     ctx.strokeStyle='blue';
     ctx.stroke();
