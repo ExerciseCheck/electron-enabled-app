@@ -37,20 +37,35 @@ function action(nextMode, type)
   const parsedURL = parseURL(window.location.pathname);
   var patientId = parsedURL.patientId;
   var exerciseId = parsedURL.exerciseId;
+
   function redirect() {
     var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
     window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
   }
+
+  //Because current functionality is set such that each step of session ("play", stop, review)
+  //opens on a new url, we must load reference bodyFrame data from database accordingly.
+  function loadReferenceandRedirect() {
+    const url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
+    $.get(url, function(data){
+      console.log("Get from CLINICIAN side");
+      localStorage.setItem("refFrames", JSON.stringify(data));
+      redirect();
+    });
+  }
+
   if(nextMode === 'stop') {
     localStorage.setItem('canStartRecording', false);
-    redirect();
-  }
-  else if(nextMode === 'start') {
-    localStorage.removeItem('data');
-    redirect();
+    if(type === 'reference' && localStorage.getItem('data')) {
+      localStorage.setItem("refFrames", localStorage.getItem('data'));
+      redirect();
+    }
+    else {
+      loadReferenceandRedirect();
+    }
   }
   else {
-    redirect();
+    loadReferenceandRedirect();
   }
 }
 
@@ -96,9 +111,17 @@ function savePractice() {
     url: url,
     data: values,
     success: function (result) {
-       localStorage.clear();
-       window.location = '/userexercise/session/start/practice/' +
-                     parsedURL.exerciseId + '/' + patientId;
+      let url = '/api/userexercise/loadreference/' + values.exerciseId + '/';
+      if(parsedURL.patientId) {
+        url = url + parsedURL.patientId;
+      }
+        $.get(url, function(data){
+          console.log("Get from CLINICIAN side");
+          localStorage.setItem("refFrames", JSON.stringify(data));
+
+         window.location = '/userexercise/session/start/practice/' +
+            parsedURL.exerciseId + '/' + patientId;
+        });
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -107,8 +130,6 @@ function savePractice() {
 }
 
 function goTodashBoard() {
-
-  localStorage.clear();
   window.location = '/dashboard';
 }
 
@@ -160,17 +181,16 @@ function goToExercises() {
       if(localStorage.getItem("refFrames") === null) {
         //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
         //when we are doing an updatereference or a practice session
-        // alert("No reference frames in localStorage");
+        alert("No reference frames in localStorage");
       } else {
-        // alert("Reference frames exist");
+        alert("Reference frames exist");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         recentFrames = JSON.parse(localStorage.getItem('data'));
+        localStorage.removeItem('refFrames');
       }
-
+    showCanvas();
     });
   }
-
-  showCanvas();
 
   // the function that controls the canvas hiding/displaying logic
   // we determine the state of the website by parsing URL
@@ -191,7 +211,7 @@ function goToExercises() {
       document.getElementById("outputCanvas").style.display = "none";
     }
     // start of updating reference and practice
-    else if(parsedURL.mode === 'start' && refFrames !== undefined )
+    else if(parsedURL.mode === 'start' && refFrames)
     {
       ref_counter = 0;
       exe_counter = 0;
