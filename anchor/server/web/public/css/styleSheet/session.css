@@ -5,9 +5,9 @@
   margin-left: auto;
   margin-right: auto;
   background: grey;
-  display: block;
-  height: 85%;
-  width: 97%;
+  display: none;
+  height: 500px;
+  width: 500px;
 }
 
 .small {
