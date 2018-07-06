@@ -47,7 +47,7 @@ function action(nextMode, type)
   //opens on a new url, we must load reference bodyFrame data from database accordingly.
   function loadReferenceandRedirect() {
     let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-    (!parsedURL.patientId) ? url = url: url = url + patientid;
+    (!parsedURL.patientId) ? url = url: url = url + patientId;
     $.get(url, function(data){
       localStorage.setItem("refFrames", JSON.stringify(data));
       redirect();

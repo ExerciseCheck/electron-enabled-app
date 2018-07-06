@@ -308,10 +308,10 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      let patientId = '';
+      //let patientId = '';
 
       const query = {
-        userId: (request.params.patientId) ? patientId = request.params.patientId : patientId = request.auth.credentials.user._id.toString(),
+        userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
         exerciseId: request.params.exerciseId,
         type: 'Reference'
       };
