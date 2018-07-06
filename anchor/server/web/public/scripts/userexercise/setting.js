@@ -90,7 +90,7 @@ function createRef() {
 
     if ( data.settingIsUpdated ) {
       console.log("Setting exists");
-      //window.location = redirectToUrl;
+      window.location = redirectToUrl;
     }
 
     else {

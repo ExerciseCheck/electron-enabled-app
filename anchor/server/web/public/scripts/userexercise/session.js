@@ -46,16 +46,15 @@ function action(nextMode, type)
   //Because current functionality is set such that each step of session ("play", stop, review)
   //opens on a new url, we must load reference bodyFrame data from database accordingly.
   function loadReferenceandRedirect() {
-    const url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
+    let url = '/api/userexercise/loadreference/' + exerciseId + '/';
+    (!parsedURL.patientId) ? url = url: url = url + patientid;
     $.get(url, function(data){
       console.log("Get from CLINICIAN side");
       localStorage.setItem("refFrames", JSON.stringify(data));
       redirect();
     });
   }
-
   if(nextMode === 'stop') {
-    localStorage.setItem('canStartRecording', false);
     if(type === 'reference' && localStorage.getItem('data')) {
       localStorage.setItem("refFrames", localStorage.getItem('data'));
       redirect();
@@ -177,20 +176,19 @@ function goToExercises() {
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
-      window.Bridge.eStartKinect();
-
-      //checks what type of "mode" page is currently on && if reference exists
-      if(localStorage.getItem("refFrames") === null) {
+      localStorage.setItem('canStartRecording', false);
+      if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
         //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
         //when we are doing an updatereference or a practice session
         //alert("No reference frames in localStorage");
-      } else {
-        //alert("Reference frames exist");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         recentFrames = JSON.parse(localStorage.getItem('data'));
         localStorage.removeItem('refFrames');
       }
-    showCanvas();
+
+      window.Bridge.eStartKinect();
+      showCanvas();
+      //checks what type of "mode" page is currently on && if reference exist
     });
   }
 
@@ -343,7 +341,7 @@ function goToExercises() {
   //even though
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
-
+    console.log(localStorage.getItem('canStartRecording'));
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -400,6 +398,7 @@ function goToExercises() {
             ref_index = (ref_index + 1) % refFrames.length;
             live_counter = 0;
           }
+        console.log("I am in position with frames" + data.length);
       }
       live_counter = live_counter + 1;
     });
