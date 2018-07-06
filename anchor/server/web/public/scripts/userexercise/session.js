@@ -1,6 +1,6 @@
 'use strict';
 
-var refFrames, recentFrames;
+let refFrames, recentFrames;
 
 function parseURL(url)
 {
