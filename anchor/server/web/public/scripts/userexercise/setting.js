@@ -24,7 +24,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
-      //window.location = redirectToUrl;
+      window.location = redirectToUrl;
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -66,7 +66,7 @@ function changeSetting() {
     }
 
     else {
-      initialSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
+      initialSetting(numSets, numReps, getExerciseId(), getPatientId());
     }
   });
 }
@@ -89,12 +89,14 @@ function createRef() {
   $.get(url, function(data){
 
     if ( data.settingIsUpdated ) {
-      window.location = redirectToUrl;
+      console.log("Setting exists");
+      //window.location = redirectToUrl;
     }
 
     else {
-      initialSetting(1, 1, getExerciseId(), getPatientId(), url);
-       window.location = redirectToUrl;
+      console.log("New reference object created");
+      initialSetting(1, 1, getExerciseId(), getPatientId(), redirectToUrl);
+      //window.location = redirectToUrl;
     }
   });
 }

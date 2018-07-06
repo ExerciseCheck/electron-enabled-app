@@ -183,9 +183,9 @@ function goToExercises() {
       if(localStorage.getItem("refFrames") === null) {
         //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
         //when we are doing an updatereference or a practice session
-        alert("No reference frames in localStorage");
+        //alert("No reference frames in localStorage");
       } else {
-        alert("Reference frames exist");
+        //alert("Reference frames exist");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         recentFrames = JSON.parse(localStorage.getItem('data'));
         localStorage.removeItem('refFrames');
@@ -384,7 +384,7 @@ function goToExercises() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           data.push(body);
-          console.log(data);
+          //console.log(data);
           localStorage.setItem('data', JSON.stringify(data));
         }
       }
