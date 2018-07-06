@@ -105,16 +105,10 @@ function viewReferences() {
 }
 
 function updateReference() {
-
-//  window.location = '/userexercise/session/start/reference/' +
-//                     getExerciseId() + '/' + getPatientId();
   loadReferenceandStart('reference');
 }
 
 function StartPracticeSession() {
-   //CHANGE THIS TO REDIREcT()
-//  window.location = '/userexercise/session/start/practice/' +
-//                    getExerciseId() + '/' + getPatientId();
   loadReferenceandStart('practice');
 }
 

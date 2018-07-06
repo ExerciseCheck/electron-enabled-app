@@ -18,12 +18,12 @@ function filter() {
 
 
 $(".listButtons a").click(function() {
+
   event.preventDefault();
   const addressValue = $(this).attr("href");
   const addressToArray = addressValue.split('/');
   const exerciseId = addressToArray[5];
   const url = '/api/userexercise/loadreference/' + exerciseId + '/';
-  //alert(url);
   $.get(url, function(data){
     console.log("GET from patient side");
     localStorage.setItem("refFrames", JSON.stringify(data));

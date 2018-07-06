@@ -309,16 +309,9 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       let patientId = '';
-      //logged-in user is clinician
-      if (request.params.patientId) {
-        patientId = request.params.patientId;
-      }
-      //logged-in user is patient
-      else {
-        patientId = request.auth.credentials.user._id.toString();
-      }
+
       const query = {
-        userId: patientId,
+        userId: (request.params.patientId) ? patientId = request.params.patientId : patientId = request.auth.credentials.user._id.toString(),
         exerciseId: request.params.exerciseId,
         type: 'Reference'
       };
@@ -518,7 +511,6 @@ internals.applyRoutes = function (server, next) {
             'Practice',
             results.findMostRecentReference[0].numSessions,
             results.findMostRecentReference[0].numRepetition,
-            //[], //should add bodyframes to this;
             request.payload.bodyFrames,
             done);
         }]
