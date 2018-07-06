@@ -49,7 +49,6 @@ function action(nextMode, type)
     let url = '/api/userexercise/loadreference/' + exerciseId + '/';
     (!parsedURL.patientId) ? url = url: url = url + patientid;
     $.get(url, function(data){
-      console.log("Get from CLINICIAN side");
       localStorage.setItem("refFrames", JSON.stringify(data));
       redirect();
     });
@@ -115,7 +114,7 @@ function savePractice() {
         url = url + parsedURL.patientId;
       }
         $.get(url, function(data){
-          console.log("Get from CLINICIAN side");
+          //.log("Get from CLINICIAN side");
           localStorage.setItem("refFrames", JSON.stringify(data));
 
          window.location = '/userexercise/session/start/practice/' +
@@ -180,7 +179,6 @@ function goToExercises() {
       if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
         //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
         //when we are doing an updatereference or a practice session
-        //alert("No reference frames in localStorage");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         recentFrames = JSON.parse(localStorage.getItem('data'));
         localStorage.removeItem('refFrames');
@@ -341,7 +339,6 @@ function goToExercises() {
   //even though
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
-    console.log(localStorage.getItem('canStartRecording'));
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -382,7 +379,6 @@ function goToExercises() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           data.push(body);
-          //console.log(data);
           localStorage.setItem('data', JSON.stringify(data));
         }
       }
@@ -398,7 +394,6 @@ function goToExercises() {
             ref_index = (ref_index + 1) % refFrames.length;
             live_counter = 0;
           }
-        console.log("I am in position with frames" + data.length);
       }
       live_counter = live_counter + 1;
     });
