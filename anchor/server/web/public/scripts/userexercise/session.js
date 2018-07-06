@@ -151,11 +151,11 @@ function goToExercises() {
   let circle_radius = 50//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   // index of reference frame
-  let ref_index = 0;
+  let ref_counter = 0;
   // index of exercise frame
-  let exe_index = 0;
+  let exe_counter = 0;
   // number of live frame captured from kinect
-  let live_index = 0;
+  let live_counter = 0;
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
   //recording storage
@@ -203,8 +203,8 @@ function goToExercises() {
     //start of creating reference
     if(parsedURL.mode === 'start' && refFrames === undefined)
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       //nothing should be shwon
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
@@ -213,8 +213,8 @@ function goToExercises() {
     // start of updating reference and practice
     else if(parsedURL.mode === 'start' && refFrames)
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       //show reference canvas only
       document.getElementById("refCanvas").style.display = "block";
       document.getElementById("exeCanvas").style.display = "none";
@@ -223,8 +223,8 @@ function goToExercises() {
     //play state for updating reference and creating reference
     else if(parsedURL.mode === 'play' && parsedURL.type === 'reference')
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       //show live canvas only
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
@@ -233,8 +233,8 @@ function goToExercises() {
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       //show live canvas and reference canvas
       document.getElementById("refCanvas").style.display = "inline";
       document.getElementById("exeCanvas").style.display = "none";
@@ -243,8 +243,8 @@ function goToExercises() {
     //stop state for updating reference and creating reference
     else if(parsedURL.mode === 'stop' && parsedURL.type === 'reference')
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       //show reference canvas
       document.getElementById("refCanvas").style.display = "block";
       document.getElementById("exeCanvas").style.display = "none";
@@ -253,8 +253,8 @@ function goToExercises() {
     //stop state for exercise
     else if(parsedURL.mode === 'stop' && parsedURL.type === 'practice')
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       //show reference and exercise canvas
       document.getElementById("refCanvas").style.display = "inline";
       document.getElementById("exeCanvas").style.display = "inline";
@@ -263,8 +263,8 @@ function goToExercises() {
     //this case is used for error safety, should not be called normally
     else
     {
-      ref_index = 0;
-      exe_index = 0;
+      ref_counter = 0;
+      exe_counter = 0;
       console.log("State error occurs!");
     }
   }
@@ -350,17 +350,17 @@ function goToExercises() {
     ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
     exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
     //tag the canvas
-    ctx.font="30px MS";
+    ctx.font="30px Comic Sans MS";
     ctx.fillStyle = "red";
     ctx.textAlign = "center";
     ctx.fillText("Live", canvas.width/2, canvas.height/20);
 
-    ref_ctx.font="30px MS";
+    ref_ctx.font="30px Comic Sans MS";
     ref_ctx.fillStyle = "red";
     ref_ctx.textAlign = "center";
     ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
 
-    exe_ctx.font="30px MS";
+    exe_ctx.font="30px Comic Sans MS";
     exe_ctx.fillStyle = "red";
     exe_ctx.textAlign = "center";
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
@@ -392,16 +392,16 @@ function goToExercises() {
       if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
       {
           //draw in the reference canvas
-          drawBody(refFrames[ref_index], ref_ctx, false);
+          drawBody(refFrames[ref_counter], ref_ctx, false);
           //display one frame of reference every 2 frames of live frame captured
           //we can manipulate the number to control the display speed
-          if (live_index >= 3)
+          if (live_counter >= 3)
           {
-            ref_index = (ref_index + 1) % refFrames.length;
-            live_index = 0;
+            ref_counter = (ref_counter + 1) % refFrames.length;
+            live_counter = 0;
           }
       }
-      live_index = live_index + 1;
+      live_counter = live_counter + 1;
     });
     //check if it is in the state of displaying reference, if reference exists
     //1. end of creating reference and end of updating
@@ -416,19 +416,19 @@ function goToExercises() {
     )
     {
       //draw in the reference canvas
-      drawBody(refFrames[ref_index], ref_ctx, false);
+      drawBody(refFrames[ref_counter], ref_ctx, false);
       //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
       if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
       {
-        drawBody(recentFrames[exe_index], exe_ctx, false);
+        drawBody(recentFrames[exe_counter], exe_ctx, false);
       }
       //display one frame of reference every 2 frames of live frame captured
       //we can manipulate the number to control the display speed
-      if (live_index >= 3)
+      if (live_counter >= 3)
       {
-        ref_index = (ref_index + 1) % refFrames.length;
-        exe_index = (exe_index + 1) % recentFrames.length;
-        live_index = 0;
+        ref_counter = (ref_counter + 1) % refFrames.length;
+        exe_counter = (exe_counter + 1) % recentFrames.length;
+        live_counter = 0;
       }
     }
   };
