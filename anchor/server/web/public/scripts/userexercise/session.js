@@ -53,14 +53,11 @@ function action(nextMode, type)
       redirect();
     });
   }
-  if(nextMode === 'stop') {
-    if(type === 'reference' && localStorage.getItem('data')) {
-      localStorage.setItem("refFrames", localStorage.getItem('data'));
-      redirect();
-    }
-    else {
-      loadReferenceandRedirect();
-    }
+  //This condition describes the end of an update or create reference.
+  //The refFrames data in local storage gets set to the most recent frames.
+  if(nextMode === 'stop' && type === 'reference' && localStorage.getItem('data')) {
+    localStorage.setItem("refFrames", localStorage.getItem('data'));
+    redirect();
   }
   else {
     loadReferenceandRedirect();
@@ -114,7 +111,6 @@ function savePractice() {
         url = url + parsedURL.patientId;
       }
         $.get(url, function(data){
-          //.log("Get from CLINICIAN side");
           localStorage.setItem("refFrames", JSON.stringify(data));
 
          window.location = '/userexercise/session/start/practice/' +
@@ -176,14 +172,16 @@ function goToExercises() {
       width = canvas.width;
       height = canvas.height;
       localStorage.setItem('canStartRecording', false);
+
+      // because a 'create reference' will still load essentially empty reference data from the
+      // database, we should disregard such incomplete data and only access reference bodyframes when they
+      // actually exist, i.e. length !== 0.
       if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
-        //This only happens if we are creating a new frame, since we only grab refFrames and put into localstorage
-        //when we are doing an updatereference or a practice session
+        //alert("No reference frames in localStorage");
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
-        recentFrames = JSON.parse(localStorage.getItem('data'));
         localStorage.removeItem('refFrames');
       }
-
+      recentFrames = JSON.parse(localStorage.getItem('data'));
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
