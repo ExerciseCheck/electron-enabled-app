@@ -1,6 +1,6 @@
 'use strict';
 
-let refFrames, recentFrames;
+let liveFrames, refFrames, recentFrames;
 
 function parseURL(url)
 {
@@ -55,11 +55,14 @@ function action(nextMode, type)
   }
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent frames.
-  if(nextMode === 'stop' && type === 'reference' && localStorage.getItem('data')) {
-    localStorage.setItem("refFrames", localStorage.getItem('data'));
+  if(nextMode === 'stop' && type === 'reference' && localStorage.getItem('liveFrames')) {
+    localStorage.setItem("refFrames", localStorage.getItem('liveFrames'));
     redirect();
   }
   else {
+    if(nextMode === 'stop') {
+      localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+    }
     loadReferenceandRedirect();
   }
 }
@@ -149,8 +152,6 @@ function goToExercises() {
   let live_counter = 0;
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
-  //recording storage
-  let data = [];
 
   if (isElectron())
   {
@@ -178,8 +179,9 @@ function goToExercises() {
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         localStorage.removeItem('refFrames');
       }
-      recentFrames = JSON.parse(localStorage.getItem('data'));
-      localStorage.removeItem('data');
+      liveFrames = [];
+      recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
+      localStorage.removeItem('liveFrames');
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
@@ -369,37 +371,41 @@ function goToExercises() {
         let neck_y = body.joints[2].depthY;
 
         // check in-position status whenever kinect captures a body
-        if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
-          inPosition = true;
+        if(!inPosition) {
+          if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
+            inPosition = true;
+          }
         }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
-          data.push(body);
-          localStorage.setItem('data', JSON.stringify(data));
+          liveFrames.push(body);
+          //localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
         }
-      }
-      //if the patient is in position and doing a practice session
-      if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
-      {
-          //draw in the reference canvas
-          drawBody(refFrames[ref_index], ref_ctx, false);
-          //display one frame of reference every 2 frames of live frame captured
-          //we can manipulate the number to control the display speed
-          if (live_counter >= 3)
-          {
-            ref_index = (ref_index + 1) % refFrames.length;
-            live_counter = 0;
-          }
       }
       live_counter = live_counter + 1;
     });
+
+    //if the patient is in position and doing a practice session
+    if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
+    {
+        //draw in the reference canvas
+        drawBody(refFrames[ref_index], ref_ctx, false);
+        //display one frame of reference every 2 frames of live frame captured
+        //we can manipulate the number to control the display speed
+        if (live_counter >= 3)
+        {
+          ref_index = (ref_index + 1) % refFrames.length;
+          live_counter = 0;
+        }
+    }
+
     //check if it is in the state of displaying reference, if reference exists
     //1. end of creating reference and end of updating
     //2. start of updating
     //3. start of practice
     //4. end of practice
     //in theses cases, the in-position will not be checked
-    if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
+    else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
       ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'start')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
