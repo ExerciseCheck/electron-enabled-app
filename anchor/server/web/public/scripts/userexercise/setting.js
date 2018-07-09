@@ -34,7 +34,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
   });
 }
 
-function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
+function updateSetting(numSets, numReps, exerciseId, patientId) {
 
   const values = {};
   values.numSessions = numSets;
@@ -63,7 +63,7 @@ function changeSetting() {
   $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
-      updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
+      updateSetting(numSets, numReps, getExerciseId(), getPatientId());
     }
 
     else {
@@ -90,12 +90,10 @@ function createRef() {
   $.get(url, function(data){
 
     if ( data.settingIsUpdated ) {
-      console.log("Setting exists");
       window.location = redirectToUrl;
     }
 
     else {
-      console.log("New reference object created");
       initialSetting(1, 1, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
