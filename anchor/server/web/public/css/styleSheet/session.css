@@ -7,7 +7,7 @@
   background: grey;
   display: none;
   height: 500px;
-  width: 500px;
+  width: 700px;
 }
 
 .small {
@@ -44,4 +44,3 @@
 .mh1 {
     height: 100vh; /* 100% of viewport height*/
 }
-

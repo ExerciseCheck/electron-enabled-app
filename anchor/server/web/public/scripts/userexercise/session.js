@@ -181,10 +181,14 @@ function goToExercises() {
         refFrames = JSON.parse(localStorage.getItem('refFrames'));
         localStorage.removeItem('refFrames');
       }
+
+      //Clears out 'data'/recentFrames object before each new record session
+      else if(parsedURL.mode === 'start') {
+        localStorage.removeItem('data');
+      }
       recentFrames = JSON.parse(localStorage.getItem('data'));
       window.Bridge.eStartKinect();
       showCanvas();
-      //checks what type of "mode" page is currently on && if reference exist
     });
   }
 
@@ -230,6 +234,7 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show live canvas and reference canvas
+      document.getElementsByClassName('bodyCanvas').style.width = "500px";
       document.getElementById("refCanvas").style.display = "inline";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "inline";
