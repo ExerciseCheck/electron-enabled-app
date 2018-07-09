@@ -104,7 +104,7 @@ internals.applyRoutes = function (server, next) {
       }
 
       let patientId = '';
-      //logged-in user is clinician 
+      //logged-in user is clinician
       if (request.params.patientId ) {
         patientId = request.params.patientId;
       }

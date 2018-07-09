@@ -297,6 +297,38 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  //Route for loading reference frames into exercise session
+  server.route({
+    method: 'GET',
+    path: '/userexercise/loadreference/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      }
+    },
+    handler: function (request, reply) {
+
+      const query = {
+        userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
+        exerciseId: request.params.exerciseId,
+        type: 'Reference'
+      };
+
+      UserExercise.findOne(query, (err, refExercise) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if ( !refExercise || refExercise === undefined ) {
+          return reply('Cannot find reference exercise');
+        }
+
+        return reply(refExercise.bodyFrames);
+      });
+    }
+  });
+
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
   //this route is used if we don't tag userExercise documents with a referenceId tag
@@ -436,7 +468,8 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: UserExercise.practicePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 5 }
     },
     handler: function (request, reply) {
 
@@ -471,12 +504,12 @@ internals.applyRoutes = function (server, next) {
           UserExercise.create(
 
             patientId,
-            request.payload.exerciseId,
+            request.payload.exerciseId, //taken directly from values.patientId in savePractice
             results.findMostRecentReference[0]._id.toString(),
             'Practice',
             results.findMostRecentReference[0].numSessions,
             results.findMostRecentReference[0].numRepetition,
-            [],
+            request.payload.bodyFrames,
             done);
         }]
       }, (err, results) => {
@@ -601,7 +634,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: UserExercise.dataPayload
       },
-      payload:{maxBytes: 1048576*5}
+      payload:{ maxBytes: 1048576 * 5 }
     },
     handler: function (request, reply) {
 
@@ -724,4 +757,3 @@ exports.register = function (server, options, next) {
 exports.register.attributes = {
   name: 'userExercises'
 };
-
