@@ -71,14 +71,12 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
-  let data = JSON.parse(localStorage.getItem('data'));
-  values.bodyFrames = JSON.stringify(data);
+  values.bodyFrames = JSON.stringify(refFrames);
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
-      localStorage.clear();
       window.location = redirectToUrl
     },
     error: function (result) {
@@ -93,9 +91,8 @@ function savePractice() {
   let url ='/api/userexercise/practice';
   let patientId = '';
   let values = {};
-  let data = JSON.parse(localStorage.getItem('data'));
   values.exerciseId = parsedURL.exerciseId;
-  values.bodyFrames = JSON.stringify(data);
+  values.bodyFrames = JSON.stringify(recentFrames);
   //logged-in user ia clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
