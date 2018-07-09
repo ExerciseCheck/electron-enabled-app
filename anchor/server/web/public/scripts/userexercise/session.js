@@ -55,8 +55,8 @@ function action(nextMode, type)
   }
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent frames.
-  if(nextMode === 'stop' && type === 'reference' && localStorage.getItem('liveFrames')) {
-    localStorage.setItem("refFrames", localStorage.getItem('liveFrames'));
+  if(nextMode === 'stop' && type === 'reference') {
+    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
     redirect();
   }
   else {
