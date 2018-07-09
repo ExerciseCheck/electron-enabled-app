@@ -24,7 +24,9 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
-      window.location = redirectToUrl;
+        if(redirectToUrl) {
+          window.location = redirectToUrl;
+        }
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -44,7 +46,6 @@ function updateSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
     data: values,
     success: function (result) {
        successAlert('Setting successfully updated');
-      //window.location = redirectToUrl;
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -96,7 +97,6 @@ function createRef() {
     else {
       console.log("New reference object created");
       initialSetting(1, 1, getExerciseId(), getPatientId(), redirectToUrl);
-      //window.location = redirectToUrl;
     }
   });
 }
@@ -127,7 +127,3 @@ function redirect(type) {
   window.location = '/userexercise/session/start/' + type + '/' +
     getExerciseId() + '/' + getPatientId();
 }
-
-
-
-

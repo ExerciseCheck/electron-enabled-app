@@ -182,6 +182,7 @@ function goToExercises() {
         localStorage.removeItem('refFrames');
       }
       recentFrames = JSON.parse(localStorage.getItem('data'));
+      localStorage.removeItem('data');
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
