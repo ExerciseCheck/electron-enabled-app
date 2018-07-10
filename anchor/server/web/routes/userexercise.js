@@ -4,6 +4,8 @@ const Async = require('async');
 const Boom = require('boom');
 const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
+const ReferenceExercise = require('../../models/referenceExercise');
+//const PracticeExercise = require('../../models/PracticeExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
 
