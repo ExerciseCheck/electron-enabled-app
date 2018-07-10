@@ -51,9 +51,9 @@ Exercise.payload = Joi.object().keys({
   description: Joi.string().required(),
   joint: Joi.number().integer().required(),
   axis: Joi.number().required(),
-  direction: Joi.string().required(),
+  direction: Joi.string().valid('up','down').required(),
   refLowerJoint: Joi.number().integer().required(),
-  refUpperJoint: Joi.number().integer().required(),
+  refUpperJoint: Joi.number().integer().required()
 });
 
 
