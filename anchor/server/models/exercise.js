@@ -28,15 +28,6 @@ class Exercise extends MongoModels {
     });
   }
 }
-/*
-joint: most important joint
-axis: most important axis for exercise. depthy or depthx.
-direction: starting direction. 'up' or 'down'.
-refLowerJoint: lower joint for exercise. jointID.
-refUpperJoint: upperjoint for exercise. jointID.
-
-
-*/
 
 Exercise.collection = 'exercises';
 
