@@ -16,6 +16,12 @@ class ReferenceExercise extends MongoModels {
       bottomThresh,
       isActive: true, //default value
       bodyFrames,
+      neckX: -1,
+      neckY: -1,
+      refMin: -1,
+      refMax: -1,
+      refLowerJoint: -1,
+      refUpperJoint: -1,
       createdAt: new Date()
     };
 
@@ -45,6 +51,13 @@ ReferenceExercise.schema = Joi.object().keys({
   topThresh: Joi.number().min(0).max(1).required(),
   bottomThresh: Joi.number().min(0).max(1).required(),
 
+  neckX: Joi.number().required(),
+  neckY: Joi.number().required(),
+  refMin: Joi.number().required(),
+  refMax: Joi.number().required(),
+  refLowerJoint: Joi.number().required(),
+  refUpperJoint: Joi.number().required(),
+
   isActive: Joi.boolean().required(),
   bodyFrames: Joi.array().required(),
   createdAt: Joi.date().required()
@@ -61,11 +74,19 @@ ReferenceExercise.referencePayload = Joi.object().keys({
   bottomThresh: Joi.number().min(0).max(1).required()
 });
 
+// This is for validating new bodyFrames data and its associated parameters
 ReferenceExercise.dataPayload = Joi.object().keys({
-  bodyFrames: Joi.array().required()
+  bodyFrames: Joi.array().required(),
+
+  neckX: Joi.number().required(),
+  neckY: Joi.number().required(),
+  refMin: Joi.number().required(),
+  refMax: Joi.number().required(),
+  refLowerJoint: Joi.number().required(),
+  refUpperJoint: Joi.number().required(),
 });
 
-//this is used for validating payload of put requests when updating a reference exercise
+//This is for validating reference settings update
 ReferenceExercise.updatePayload = Joi.object().keys({
   //bodyFrames: Joi.array().required(),
   numSets: Joi.number().integer().required(),

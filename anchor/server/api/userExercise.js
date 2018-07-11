@@ -658,7 +658,14 @@ internals.applyRoutes = function (server, next) {
           const id = results.findMostRecentReference[0]._id.toString();
           const update = {
             $set: {
-              bodyFrames: request.payload.bodyFrames
+              //include new parameters here
+              bodyFrames: request.payload.bodyFrames,
+              neckX: request.payload.neckX,
+              neckY: request.payload.neckY,
+              refMin: request.payload.refMin,
+              refMax: request.payload.refMax,
+              refLowerJoint: request.payload.refLowerJoint,
+              refUpperJoint: request.payload.refUpperJoint
             }
           };
           ReferenceExercise.findByIdAndUpdate(id, update, done);

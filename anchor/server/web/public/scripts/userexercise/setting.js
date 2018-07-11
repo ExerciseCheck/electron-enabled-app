@@ -76,7 +76,6 @@ function changeSetting() {
     }
 
     else {
-      alert('no reference found');
       initialSetting(numSets, numReps, getExerciseId(), getPatientId());
     }
   });
