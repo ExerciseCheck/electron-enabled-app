@@ -127,7 +127,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
-            type:'Reference'
           };
 
           const pipeLine = [
@@ -135,7 +134,7 @@ internals.applyRoutes = function (server, next) {
             { '$sort': { createdAt: -1 } },
             { '$limit': 1 }
           ];
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
         },
         findNumPractices:['findReference', function (results, done) {
 

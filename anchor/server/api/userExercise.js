@@ -101,10 +101,10 @@ internals.applyRoutes = function (server, next) {
       const fields = request.query.fields;
 
       const query = {
-        referenceId: request.params.userId,
+        userId: request.params.userId,
       };
 
-      UserExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+      ReferenceExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
 
         const referenceExercises = [];
         Async.each(results.data, (referenceExercise, done) => {
@@ -494,7 +494,7 @@ internals.applyRoutes = function (server, next) {
             { '$sort': { createdAt: -1 } },
             { '$limit': 1 }
           ];
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
         },
         createExercise:['findMostRecentReference', function (results, done) {
 
