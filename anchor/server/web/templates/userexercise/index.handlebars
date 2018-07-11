@@ -3,7 +3,7 @@
       {{>dashboardNav}}
         <div class="col-sm-9 col-md-10">
             <div style="padding: 30px">
-                <h3>User Exercises</h3>
+                <h3>Reference Exercises</h3>
                 <br>
                 <div class="card">
                     <div style="padding: 20px">
@@ -16,7 +16,9 @@
                                 <th>ExerciseId</th>
                                 <th>numSets</th>
                                 <th>numRepetition</th>
-                                <th>type</th>
+                                <th>rangeScale</th>
+                                <th>topThresh</th>
+                                <th>bottomThresh</th>
                                 <th>createdAt</th>
                               {{#role user 'admin'}}
                                   <th>Edit</th>
@@ -46,9 +48,9 @@
                 'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
             ],
             ajax: {
-                url: "../api/table/userexercise",
+                url: "../api/table/refexercise",
                 data: function (d) {
-                    d.fields = "userId exerciseId numSets createdAt type name exerciseName numRepetition";
+                    d.fields = "userId exerciseId numSets createdAt rangeScale topThresh bottomThresh name exerciseName numRepetition";
                 }
             },
             columns: [
@@ -79,7 +81,15 @@
                     defaultContent: ""
                 },
                 {
-                    data: "type",
+                    data: "rangeScale",
+                    defaultContent: ""
+                },
+                {
+                    data: "topThresh",
+                    defaultContent: ""
+                },
+                {
+                    data: "bottomThresh",
                     defaultContent: ""
                 },
                 {

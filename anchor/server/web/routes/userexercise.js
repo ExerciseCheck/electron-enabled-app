@@ -13,7 +13,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise',
+    path: '/refexercise',
     config: {
       auth: {
         strategy: 'session'
