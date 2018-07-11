@@ -12,7 +12,7 @@
                             <tr>
                                 <th>exerciseName</th>
                                 <th>ExerciseId</th>
-                                <th>numSessions</th>
+                                <th>numSets</th>
                                 <th>numRepetition</th>
                                 <th>type</th>
                                 <th>createdAt</th>
@@ -46,7 +46,7 @@
             ajax: {
                 url: "/api/table/userexercise/reference/" + userId,
                 data: function (d) {
-                    d.fields = "exerciseId numSessions createdAt type name exerciseName numRepetition";
+                    d.fields = "exerciseId numSets createdAt type name exerciseName numRepetition";
                 }
             },
             columns: [
@@ -60,7 +60,7 @@
                     defaultContent: ""
                 },
                 {
-                    data: "numSessions",
+                    data: "numSets",
                     defaultContent: ""
                 },
                 {

@@ -168,7 +168,7 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices.length === results.findReference[0].numSessions ) {
+          if ( results.findNumPractices.length === results.findReference[0].numSets ) {
             isComplete = true;
           }
           if ( isComplete ) {
@@ -192,7 +192,7 @@ internals.applyRoutes = function (server, next) {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           numRepetition: results.findReference[0].numRepetition,
-          numSets: results.findReference[0].numSessions,
+          numSets: results.findReference[0].numSets,
           setNumber,
           exercise : results.findExercise,
           mode: request.params.mode,
@@ -224,7 +224,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: request.params.patientId,
             exerciseId: request.params.exerciseId,
-            type:'Reference'
           };
 
           const pipeLine = [
@@ -233,7 +232,7 @@ internals.applyRoutes = function (server, next) {
             { '$limit': 1 }
           ];
 
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
 
         },
         findPatientName:['findReference', function (results, done) {
@@ -272,8 +271,8 @@ internals.applyRoutes = function (server, next) {
             defaultNumReps = results.findReference[0].numRepetition;
           }
 
-          if ( results.findReference[0].numSessions ) {
-            defaultNumSets = results.findReference[0].numSessions;
+          if ( results.findReference[0].numSets ) {
+            defaultNumSets = results.findReference[0].numSets;
           }
         }
 

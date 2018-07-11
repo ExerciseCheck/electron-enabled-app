@@ -154,11 +154,16 @@ internals.applyRoutes = function (server, next) {
       Exercise.create(
         request.payload.exerciseName,
         request.payload.description,
-        request.payload.joint,
-        request.payload.axis,
-        request.payload.direction,
-        request.payload.refLowerJoint,
-        request.payload.refUpperJoint,
+        // request.payload.joint,
+        // request.payload.axis,
+        // request.payload.direction,
+        // request.payload.refLowerJoint,
+        // request.payload.refUpperJoint,
+        -1,
+        -1,
+        'up',
+        -1,
+        -1,
         request.auth.credentials.user._id.toString(),
         (err, document) => {
 

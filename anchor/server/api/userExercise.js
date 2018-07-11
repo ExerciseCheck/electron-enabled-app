@@ -10,9 +10,11 @@ const internals = {};
 internals.applyRoutes = function (server, next) {
 
   const UserExercise = server.plugins['hicsail-hapi-mongo-models'].UserExercise;
+  const ReferenceExercise = server.plugins['hicsail-hapi-mongo-models'].ReferenceExercise;
   const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
   const User = server.plugins['hicsail-hapi-mongo-models'].User;
 
+//Will eventually get rid of because no longer need user exercises page but this should now load REF EX
   server.route({
     method: 'GET',
     path: '/table/userexercise',
@@ -32,36 +34,36 @@ internals.applyRoutes = function (server, next) {
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
 
-      UserExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+      ReferenceExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
-        const userExercises = [];
-        Async.each(results.data, (userExercise, done) => {
+        const referenceExercises = [];
+        Async.each(results.data, (referenceExercise, done) => {
 
 
-          User.findById(userExercise.userId, (err, user) => {
+          User.findById(referenceExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
             }
             //need this check because they might have been deleted
             if (user) {
-              userExercise.name = user.name;
+              referenceExercise.name = user.name;
             }
           });
 
-          Exercise.findById(userExercise.exerciseId, (err, exercise) => {
+          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
 
             if (err) {
               done(err);
             }
             //need this check because they might have been deleted
             if (exercise) {
-              userExercise.exerciseName = exercise.exerciseName;
+              referenceExercise.exerciseName = exercise.exerciseName;
             }
 
           });
 
-          userExercises.push(userExercise);
+          referenceExercises.push(referenceExercise);
         });
 
         if (err) {
@@ -72,7 +74,7 @@ internals.applyRoutes = function (server, next) {
           draw: request.query.draw,
           recordsTotal: results.data.length,
           recordsFiltered: results.items.total,
-          data: userExercises,
+          data: referenceExercises,
           error: err
         });
       });
@@ -99,37 +101,36 @@ internals.applyRoutes = function (server, next) {
       const fields = request.query.fields;
 
       const query = {
-        userId: request.params.userId,
-        type: 'Reference'
+        referenceId: request.params.userId,
       };
 
       UserExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
 
-        const userExercises = [];
-        Async.each(results.data, (userExercise, done) => {
+        const referenceExercises = [];
+        Async.each(results.data, (referenceExercise, done) => {
 
-          User.findById(userExercise.userId, (err, user) => {
+          User.findById(referenceExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
             }
             if (user) {
-              userExercise.name = user.name;
+              referenceExercise.name = user.name;
             }
           });
 
-          Exercise.findById(userExercise.exerciseId, (err, exercise) => {
+          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
 
             if (err) {
               done(err);
             }
             if (exercise) {
-              userExercise.exerciseName = exercise.exerciseName;
+              referenceExercise.exerciseName = exercise.exerciseName;
             }
 
           });
 
-          userExercises.push(userExercise);
+          referenceExercises.push(referenceExercise);
         });
 
         if (err) {
@@ -140,7 +141,7 @@ internals.applyRoutes = function (server, next) {
           draw: request.query.draw,
           recordsTotal: results.data.length,
           recordsFiltered: results.items.total,
-          data: userExercises,
+          data: referenceExercises,
           error: err
         });
       });
@@ -174,7 +175,7 @@ internals.applyRoutes = function (server, next) {
       const limit = request.query.limit;
       const page = request.query.page;
 
-      UserExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+      ReferenceExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
 
         if (err) {
           return reply(err);
@@ -199,10 +200,9 @@ internals.applyRoutes = function (server, next) {
 
       const query = {
         userId: request.auth.credentials.user._id.toString(),
-        type: 'Reference'
       };
 
-      UserExercise.find(query, (err, refExercises) => {
+      ReferenceExercise.find(query, (err, refExercises) => {
 
         if (err) {
           return reply(err);
@@ -234,7 +234,6 @@ internals.applyRoutes = function (server, next) {
 
       const query = {
         userId: request.auth.credentials.user._id.toString(),
-        type: 'Reference'
       };
 
       const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
@@ -244,7 +243,7 @@ internals.applyRoutes = function (server, next) {
       const fields = request.query.fields;
 
 
-      UserExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+      ReferenceExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
 
         if (err) {
           return reply(err);
@@ -278,11 +277,10 @@ internals.applyRoutes = function (server, next) {
       const query = {
         userId: request.params.patientId,
         exerciseId: request.params.exerciseId,
-        type: 'Reference',
         bodyFrames:[]
       };
 
-      UserExercise.findOne(query, (err, refExercise) => {
+      ReferenceExercise.findOne(query, (err, refExercise) => {
 
         if (err) {
           return reply(err);
@@ -311,10 +309,9 @@ internals.applyRoutes = function (server, next) {
       const query = {
         userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
         exerciseId: request.params.exerciseId,
-        type: 'Reference'
       };
 
-      UserExercise.findOne(query, (err, refExercise) => {
+      ReferenceExercise.findOne(query, (err, refExercise) => {
 
         if (err) {
           return reply(err);
@@ -408,7 +405,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      UserExercise.findById(request.params.id, (err, document) => {
+      ReferenceExercise.findById(request.params.id, (err, document) => {
 
         if (err) {
           return reply(err);
@@ -432,18 +429,19 @@ internals.applyRoutes = function (server, next) {
         scope: ['root','admin','clinician']
       },
       validate: {
-        payload: UserExercise.referencePayload
+        payload: ReferenceExercise.referencePayload
       }
     },
     handler: function (request, reply) {
 
-      UserExercise.create(
+      ReferenceExercise.create(
         request.payload.userId,
         request.payload.exerciseId,
-        -1,
-        'Reference',
-        request.payload.numSessions,
+        request.payload.numSets,
         request.payload.numRepetition,
+        request.payload.rangeScale,
+        request.payload.topThresh,
+        request.payload.bottomThresh,
         [],
         (err, document) => {
 
@@ -454,8 +452,8 @@ internals.applyRoutes = function (server, next) {
           reply(document);
 
         });
-    }
-  });
+      }
+    });
 
   //this route inserts a new exercise of type Practice into userExercise collection,
   //could be trrigered by both clinician and patient,
@@ -489,7 +487,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: patientId,
             exerciseId: request.payload.exerciseId,
-            type:'Reference'
           };
 
           const pipeLine = [
@@ -507,7 +504,7 @@ internals.applyRoutes = function (server, next) {
             request.payload.exerciseId, //taken directly from values.patientId in savePractice
             results.findMostRecentReference[0]._id.toString(),
             'Practice',
-            results.findMostRecentReference[0].numSessions,
+            results.findMostRecentReference[0].numSets,
             results.findMostRecentReference[0].numRepetition,
             request.payload.bodyFrames,
             done);
@@ -543,15 +540,15 @@ internals.applyRoutes = function (server, next) {
       const query = {
         userId: request.params.userId,
         exerciseId: request.params.exerciseId,
-        type: 'Reference'
       };
+      //ADD IN THE NEW CALCULATED STUFF FOR A REFERENCE "UPDATE"
       const update = {
         $set: {
           bodyFrames: request.payload.bodyFrames
         }
       };
 
-      UserExercise.findAndUpdate(query, update, (err, document) => {
+      ReferenceExercise.findAndUpdate(query, update, (err, document) => {
 
         if (err) {
           return reply(err);
@@ -575,7 +572,7 @@ internals.applyRoutes = function (server, next) {
         strategies: ['simple', 'jwt', 'session']
       },
       validate: {
-        payload: UserExercise.updatePayload
+        payload: ReferenceExercise.updatePayload
       }
     },
     handler: function (request, reply) {
@@ -587,7 +584,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: request.params.patientId,
             exerciseId: request.params.exerciseId,
-            type: 'Reference'
           };
 
           const pipeLine = [
@@ -595,18 +591,21 @@ internals.applyRoutes = function (server, next) {
             { '$sort': { createdAt: -1 } },
             { '$limit': 1 }
           ];
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
         },
         updateSettings:['findMostRecentReference', function (results, done) {
 
           const id = results.findMostRecentReference[0]._id.toString();
           const update = {
             $set: {
-              numSessions: request.payload.numSessions,
-              numRepetition: request.payload.numRepetition
+              numSets: request.payload.numSets,
+              numRepetition: request.payload.numRepetition,
+              rangeScale: request.payload.rangeScale,
+              topThresh: request.payload.topThresh,
+              bottomThresh: request.payload.bottomThresh
             }
           };
-          UserExercise.findByIdAndUpdate(id, update, done);
+          ReferenceExercise.findByIdAndUpdate(id, update, done);
 
         }]
       }, (err, results) => {
@@ -623,7 +622,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route updates the settings for most recent reference of a (patientId, exerciseId) pair
+  //this route updates the bodyframes data for most recent reference of a (patientId, exerciseId) pair
   server.route({
     method: 'PUT',
     path: '/userexercise/reference/mostrecent/data/{exerciseId}/{patientId}',
@@ -632,7 +631,7 @@ internals.applyRoutes = function (server, next) {
         strategies: ['simple', 'jwt', 'session']
       },
       validate: {
-        payload: UserExercise.dataPayload
+        payload: ReferenceExercise.dataPayload
       },
       payload:{ maxBytes: 1048576 * 5 }
     },
@@ -645,7 +644,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: request.params.patientId,
             exerciseId: request.params.exerciseId,
-            type: 'Reference'
           };
 
           const pipeLine = [
@@ -653,7 +651,7 @@ internals.applyRoutes = function (server, next) {
             { '$sort': { createdAt: -1 } },
             { '$limit': 1 }
           ];
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
         },
         updateSettings:['findMostRecentReference', function (results, done) {
 
@@ -663,7 +661,7 @@ internals.applyRoutes = function (server, next) {
               bodyFrames: request.payload.bodyFrames
             }
           };
-          UserExercise.findByIdAndUpdate(id, update, done);
+          ReferenceExercise.findByIdAndUpdate(id, update, done);
 
         }]
       }, (err, results) => {
@@ -688,19 +686,19 @@ internals.applyRoutes = function (server, next) {
         strategies: ['simple', 'jwt', 'session']
       },
       validate: {
-        payload: UserExercise.updatePayload
+        payload: ReferenceExercise.updatePayload
       }
     },
     handler: function (request, reply) {
 
       const update = {
         $set: {
-          numSessions: request.payload.numSessions,
+          numSets: request.payload.numSets,
           numRepetition: request.payload.numRepetition
         }
       };
 
-      UserExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
+      ReferenceExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
 
         if (err) {
           return reply(err);

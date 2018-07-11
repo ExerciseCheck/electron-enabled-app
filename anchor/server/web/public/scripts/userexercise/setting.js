@@ -15,8 +15,11 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
-  values.numSessions = numSets;
+  values.numSets = numSets;
   values.numRepetition = numReps;
+  values.rangeScale = 0.7; // default
+  values.topThresh = 0.25; // values
+  values.bottomThresh = 0.75;
 
   $.ajax({
     type: 'POST',
@@ -37,8 +40,14 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
 function updateSetting(numSets, numReps, exerciseId, patientId) {
 
   const values = {};
-  values.numSessions = numSets;
+  values.numSets = numSets;
   values.numRepetition = numReps;
+  values.numSets = numSets;
+  values.numRepetition = numReps;
+  values.rangeScale = 0.5; //dummy
+  values.topThresh = 0.5; // dummy
+  values.bottomThresh = 0.5;//dummy values
+
 
   $.ajax({
     type: 'PUT',
@@ -67,6 +76,7 @@ function changeSetting() {
     }
 
     else {
+      alert('no reference found');
       initialSetting(numSets, numReps, getExerciseId(), getPatientId());
     }
   });
