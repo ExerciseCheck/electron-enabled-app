@@ -30,7 +30,9 @@ class Exercise extends MongoModels {
 }
 
 
-Exercise.collection = 'refexercises';
+//Exercise.collection = 'refexercises';
+// Exercise.collection = 'referenceExercises';
+Exercise.collection = 'exercises';
 
 
 Exercise.schema = Joi.object().keys({

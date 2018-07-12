@@ -77,7 +77,8 @@ function savePractice() {
   values.exerciseId = parsedURL.exerciseId;
   let url ='/api/userexercise/practice';
   let patientId = '';
-  //logged-in user ia clinician
+  //logged-in user is
+  // clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
     patientId = parsedURL.patientId;
@@ -157,6 +158,8 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
     return [reps, threshold_flag]
   }
 }
+
+var cntRep = 100;
 
 //TODO: Shall be a db call
 // Get info from JSON about a given exercise
