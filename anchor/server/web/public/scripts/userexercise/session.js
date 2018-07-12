@@ -229,11 +229,11 @@ function getExerciseInfo(exerciseId){
     //radius
     let r = parameters.r;
     //
-    let head_x = parameters.nx;
-    let head_y = parameters.ny;
+    let neck_x = parameters.nx;
+    let neck_y = parameters.ny;
     ctx.beginPath();
-    //euclidean distance from head to calibration circle
-    let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2))
+    //euclidean distance from neck to calibration circle
+    let dist = Math.sqrt(Math.pow((neck_x - x),2) + Math.pow((neck_y - y), 2))
     if(dist <= r)
       ctx.strokeStyle="green";
     else
