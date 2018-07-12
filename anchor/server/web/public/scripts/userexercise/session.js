@@ -107,6 +107,64 @@ function goToExercises() {
   window.location = '/clinician/patientexercises/' + patientId;
 }
 
+//@params:
+// range_scale:
+//      how much to scale the distance between spine and foot, TODO: spine==SpineBase==0? why?
+// top_thresh, bottom_thresh:
+//      the thresholds the patient should reach when the signal has been
+//      scaled to a range between 0 and 1, for a repetition to count
+function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, bottom_thresh=0.75) {
+
+  //TODO: This should eventually be a db call
+
+  const parsedURL = parseURL(window.location.pathname);
+  var patientId = parsedURL.patientId;
+  var exerciseId = parsedURL.exerciseId;
+  var exInfo = getExerciseInfo(exerciseId);
+
+  var reps = 0;
+  var norm;
+
+  var joint = exInfo['joint'];
+  var coordinate = exInfo['axis'];
+
+  // This is set when user is correctly positioned in circle
+  if (coordinate == 'depthY') {
+    norm = neck_y;
+  } else if (coordinate == 'depthX') {
+    norm = neck_x;
+  }
+
+  // Normalize reference points to neck
+  var ref_norm = exInfo['ref_neck'];
+  var ref_max = exInfo['ref_max'] - ref_norm;
+  var ref_min = exInfo['ref_min'] - ref_norm;
+
+  // Range is based on distance between foot and spine
+  var ref_lower_joint = exInfo['ref_lower_joint'];
+  var ref_upper_joint = exInfo['ref_upper_joint'];
+  var range = (ref_lower_joint - ref_norm - ref_upper_joint) * range_scale;
+
+  // Normalize current point by range and current neck value
+  var current_pt = (body.joints[joint][coordinate] - norm - ref_max) / range;
+
+  if ((threshold_flag == 'down') && (current_pt < top_thresh)) {
+    reps++;
+    return [reps, 'up'];
+  } else if ((threshold_flag == 'up') && (current_pt > bottom_thresh)) {
+    return [reps, 'down'];
+  } else {
+    return [reps, threshold_flag]
+  }
+}
+
+//TODO: Shall be a db call
+// Get info from JSON about a given exercise
+// This info should be patient-specific
+function getExerciseInfo(exerciseId){
+
+}
+
 (function ()
 {
   let processing, canvas, ctx;
