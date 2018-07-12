@@ -75,14 +75,6 @@ function saveReference() {
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(refFrames);
-
-  //the following are dummy variables
-  values.neckX = 10;
-  values.neckY = 10;
-  values.refMin = 10;
-  values.refMax = -10;
-  values.refLowerJoint = -10;
-  values.refUpperJoint = -10;
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,

@@ -77,7 +77,6 @@ ReferenceExercise.referencePayload = Joi.object().keys({
 // This is for validating new bodyFrames data and its associated parameters
 ReferenceExercise.dataPayload = Joi.object().keys({
   bodyFrames: Joi.array().required(),
-
   neckX: Joi.number().required(),
   neckY: Joi.number().required(),
   refMin: Joi.number().required(),

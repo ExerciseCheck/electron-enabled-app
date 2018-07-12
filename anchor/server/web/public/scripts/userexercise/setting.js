@@ -10,6 +10,14 @@ function getPatientId() {
   return (window.location.pathname.split('/'))[4];
 }
 
+Date.prototype.getWeekNumber = function(){
+  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+};
+
 function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
 
   const values = {};
@@ -30,6 +38,25 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
         if(redirectToUrl) {
           window.location = redirectToUrl;
         }
+    },
+    error: function (result) {
+      errorAlert(result.responseJSON.message);
+    }
+  });
+}
+
+function initializePractice() {
+
+  const values = {};
+  values.exerciseId = getExerciseId();
+  values.weekStart = 30;
+  $.ajax({
+    type: 'POST',
+    url: '/api/userexercise/practice/' + getPatientId(),
+    data: values,
+    success: function (result) {
+        successAlert('Practice successfully updated');
+        loadReferenceandStart('practice');
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -118,7 +145,16 @@ function updateReference() {
 }
 
 function StartPracticeSession() {
-  loadReferenceandStart('practice');
+
+  const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
+  $.get(url, function(data) {
+    if (data.practiceExists) {
+      loadReferenceandStart('practice');
+    }
+    else {
+      initializePractice();
+    }
+  });
 }
 
 function loadReferenceandStart(type) {

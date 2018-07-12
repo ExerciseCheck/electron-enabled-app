@@ -3,7 +3,7 @@ const internals = {};
 const Async = require('async');
 const Boom = require('boom');
 const Config = require('../../../config');
-const UserExercise = require('../../models/userExercise');
+const PracticeExercise = require('../../models/practiceExercise');
 const ReferenceExercise = require('../../models/referenceExercise');
 //const PracticeExercise = require('../../models/PracticeExercise');
 const Exercise = require('../../models/exercise');
@@ -149,10 +149,9 @@ internals.applyRoutes = function (server, next) {
             userId: patientId,
             exerciseId: request.params.exerciseId,
             referenceId: results.findReference[0]._id.toString(),
-            type: 'Practice'
           };
 
-          UserExercise.find(query, done);
+          PracticeExercise.find(query, done);
         }],
         findExercise:['findNumPractices', function (results, done) {
 
@@ -427,7 +426,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      UserExercise.findOne({ 'auth.user._id':request.params.id }, (err, document) => {
+      ReferenceExercise.findOne({ 'auth.user._id':request.params.id }, (err, document) => {
 
         if (err) {
           return reply(err);
@@ -453,7 +452,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      UserExercise.findOne({}, (err, document) => {
+      ReferenceExercise.findOne({}, (err, document) => {
 
         if (err) {
           return reply(err);

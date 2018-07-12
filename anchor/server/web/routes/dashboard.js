@@ -3,7 +3,8 @@ const internals = {};
 const Async = require('async');
 const Boom = require('boom');
 const Config = require('../../../config');
-const UserExercise = require('../../models/userExercise');
+const PracticeExercise = require('../../models/practiceExercise');
+const ReferenceExercise = require('../../models/referenceExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
 
@@ -82,12 +83,11 @@ internals.applyRoutes = function (server, next) {
 
             const query = {
               userId: request.auth.credentials.user._id.toString(),
-              type: 'Reference',
               // with the current design and workflow, having a referene means having not-empty bodyFrames
               bodyFrames : { $ne : [] }
             };
 
-            UserExercise.find(query, done);
+            ReferenceExercise.find(query, done);
           },
           exercises:['findRefExercises', function (results, done) {
 
@@ -130,7 +130,7 @@ internals.applyRoutes = function (server, next) {
               }
             ];
 
-            UserExercise.aggregate(pipeLine, done);
+            PracticeExercise.aggregate(pipeLine, done);
           }]
         }, (err, results) => {
 
@@ -147,7 +147,7 @@ internals.applyRoutes = function (server, next) {
             projectName: Config.get('/projectName'),
             title: 'Dashboard',
             exercises: results.exercises,
-            lastSession: results.findLatestSession[0].latestSession,
+            //lastSession: results.findLatestSession[0].latestSession,
             baseUrl: Config.get('/baseUrl')
           });
         });
@@ -170,4 +170,3 @@ exports.register.attributes = {
   name: 'dashboard',
   dependencies: 'visionary'
 };
-
