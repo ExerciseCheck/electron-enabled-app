@@ -15,6 +15,11 @@ class Exercise extends MongoModels {
       refLowerJoint,
       refUpperJoint,
       userId,
+      joint,
+      axis,
+      direction,
+      ref_lower_joint,
+      ref_upper_joint,
       createdAt: new Date()
     };
 
@@ -31,7 +36,6 @@ class Exercise extends MongoModels {
 
 Exercise.collection = 'exercises';
 
-
 Exercise.schema = Joi.object().keys({
   _id: Joi.object(),
   exerciseName: Joi.string().required(),
@@ -41,8 +45,6 @@ Exercise.schema = Joi.object().keys({
   direction: Joi.string().required(),
   refLowerJoint: Joi.number().integer().required(),
   refUpperJoint: Joi.number().integer().required(),
-  //this is the userId of the person creating the exercise
-  userId: Joi.string().required(),
   createdAt: Joi.date().required()
 });
 
