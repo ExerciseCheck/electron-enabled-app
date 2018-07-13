@@ -743,7 +743,7 @@ internals.applyRoutes = function (server, next) {
         findMostRecentReference: function (done) {
 
           const filter = {
-            userId: request.params.patientId,
+            userId: patientId,
             exerciseId: request.params.exerciseId,
           };
 
@@ -766,8 +766,12 @@ internals.applyRoutes = function (server, next) {
               sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
             },
             $inc: {
-              numSetsCompleted: 1
+              numSetsCompleted: 1,
+              numRepsCompleted: 1
             },
+            $set: {
+              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
+            }
           };
           PracticeExercise.findOneAndUpdate(query, update, done);
         }]

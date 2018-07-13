@@ -31,6 +31,14 @@ function parseURL(url)
   };
 }
 
+Date.prototype.getWeekNumber = function(){
+  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+};
+
 function action(nextMode, type)
 {
 
@@ -75,6 +83,12 @@ function saveReference() {
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(refFrames);
+  values.neckX = 2;
+  values.neckY = 2;
+  values.refMin = 2;
+  values.refMax = 2;
+  values.refLowerJoint = 2;
+  values.refUpperJoint = 2;
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
@@ -91,12 +105,16 @@ function saveReference() {
 function savePractice() {
 
   const parsedURL = parseURL(window.location.pathname);
-  let url ='/api/userexercise/practice/mostrecent/data' + parsedURL.exerciseId;
+  let url ='/api/userexercise/practice/mostrecent/data/' + parsedURL.exerciseId + '/';
+  let patientId = parsedURL.patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
   //logged-in user ia clinician
-  if (parsedURL.patientId) {
-    url = '/api/userexercise/practice/' + parsedURL.patientId;
+  if (patientId) {
+    url = url + patientId;
+  }
+  if(setNumber === numSets) {
+    values.weekEnd = new Date().getWeekNumber();
   }
   $.ajax({
     type: 'PUT',
@@ -104,16 +122,16 @@ function savePractice() {
     data: values,
     success: function (result) {
 
-      let url = '/api/userexercise/loadreference/' + values.exerciseId + '/';
-      if(parsedURL.patientId) {
-        url = url + parsedURL.patientId;
+      let url = '/api/userexercise/loadreference/' + parsedURL.exerciseId + '/';
+      if(patientId) {
+        url = url + patientId;
       }
-        $.get(url, function(data){
-          localStorage.setItem("refFrames", JSON.stringify(data));
+      $.get(url, function(data){
+        localStorage.setItem("refFrames", JSON.stringify(data));
 
-         window.location = '/userexercise/session/start/practice/' +
-            parsedURL.exerciseId + '/' + patientId;
-        });
+        window.location = '/userexercise/session/start/practice/' +
+        parsedURL.exerciseId + '/' + patientId;
+      });
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -377,7 +395,6 @@ function goToExercises() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
-          //localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
         }
       }
       live_counter = live_counter + 1;

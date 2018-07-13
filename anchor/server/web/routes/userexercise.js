@@ -166,14 +166,14 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices[0].sets.length === results.findReference[0].numSets ) {
+          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
             isComplete = true;
           }
           if ( isComplete ) {
-            setNumber = results.findNumPractices.length;
+            setNumber = results.findNumPractices[0].numSetsCompleted;
           }
           else if ( !isComplete )  {
-            setNumber = results.findNumPractices.length + 1;
+            setNumber = results.findNumPractices[0].numSetsCompleted + 1;
           }
         }
 

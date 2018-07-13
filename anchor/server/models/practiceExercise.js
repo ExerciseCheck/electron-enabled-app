@@ -58,6 +58,7 @@ PracticeExercise.practicePayload = Joi.object().keys({
 //this is used for validating payload of put requests when updating a practice
 PracticeExercise.dataPayload = Joi.object().keys({
   bodyFrames: Joi.array().required(),
+  weekEnd: Joi.number()
   //not sure how to validate updating an item inside sets
 });
 
