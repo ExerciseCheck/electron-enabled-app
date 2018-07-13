@@ -135,37 +135,55 @@ function goToExercises() {
 // top_thresh, bottom_thresh:
 //      the thresholds the patient should reach when the signal has been
 //      scaled to a range between 0 and 1, for a repetition to count
+//TODO: body is one frame?
+//var body = bodyFrame.bodies[tracingID];
 function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, bottom_thresh=0.75) {
-
-  //TODO: This should eventually be a db call
 
   const parsedURL = parseURL(window.location.pathname);
   var patientId = parsedURL.patientId;
   var exerciseId = parsedURL.exerciseId;
-  var exInfo = getExerciseInfo(exerciseId);
+  var exInfo = getExerciseInfo(exerciseId); //TODO: How to query?
+  var ref_exData = getRefExerciseInfo(exerciseId, patientId);
+  var prac_exData = getFrmLocalStorage;  //TODO: prac_data from localstorage? not saved to
+  //var ref_exData = getExerciseData(exerciseId, patientId).ref_exData;
+  //var prac_exData = getExerciseData(exerciseId, patientId).prac_exData;
 
   var reps = 0;
-  var norm;
+  var norm, ref_norm;
 
-  var joint = exInfo['joint'];
+  var joint = exInfo['joint'];  // a number
   var coordinate = exInfo['axis'];
 
   // This is set when user is correctly positioned in circle
+  // neck: 2
   if (coordinate == 'depthY') {
-    norm = neck_y;
+    ref_norm = ref_exData.neckY;
+    norm = prac_exData.bodyFrames[0].joints[2].depthY; //TODO: only frame1 ??
   } else if (coordinate == 'depthX') {
-    norm = neck_x;
+    ref_norm = ref_exData.neckX;
+    norm = prac_exData.bodyFrames[0].joints[2].depthX; //TODO: only frame1 ??
   }
 
+  /*
   // Normalize reference points to neck
-  var ref_norm = exInfo['ref_neck'];
-  var ref_max = exInfo['ref_max'] - ref_norm;
-  var ref_min = exInfo['ref_min'] - ref_norm;
+  // var ref_max = ref_exData['refMax'] - ref_norm;
+  // var ref_min = ref_exData['refMin'] - ref_norm;
 
   // Range is based on distance between foot and spine
-  var ref_lower_joint = exInfo['ref_lower_joint'];
-  var ref_upper_joint = exInfo['ref_upper_joint'];
-  var range = (ref_lower_joint - ref_norm - ref_upper_joint) * range_scale;
+  var ref_lower_joint = ref_exData['refLowerJoint'];
+  var ref_upper_joint = ref_exData['refUpperJoint'];
+  var range = (ref_lower_joint - ref_norm - ref_upper_joint) * range_scale; //TODO: why -ref_norm??
+  */
+
+  var ref_max = ref_exData['refMax'];
+  var ref_min = ref_exData['refMin'];
+
+  var ref_lower_joint_pos = ref_exData['refLowerJoint'][coordinate];  // ~
+
+  // ref_max?
+  var ref_upper_joint_pos = ref_exData['refUpperJoint'][coordinate];  // ~ref_min?
+  var range = (ref_lower_joint_pos - ref_norm - ref_upper_joint_pos) * range_scale; //TODO: why -ref_norm??
+
 
   // Normalize current point by range and current neck value
   var current_pt = (body.joints[joint][coordinate] - norm - ref_max) / range;
@@ -187,7 +205,33 @@ var cntRep = 100;
 // This info should be patient-specific
 function getExerciseInfo(exerciseId){
 
+  return exInfo;
 }
+
+function getRefExerciseInfo(exerciseId, patientId, joint, coordinate){
+  //TODO: change here. noSQL
+  const query = 'select * from referenceExercise WHERE exerciseId == exerciseId AND userId = patientId'
+  var ref_exData = queryResult; //TODO
+  var ref_max = ref_exData.bodyFrames.joints[joint][coordinate].max();
+  return {
+    ref_exData: ref_exData,
+    ref_max: ref_max,
+    ref_min: ref_min
+  };
+}
+// function getExerciseData(exerciseId, patientId){
+//   var ref_exData = null;
+//   var prac_exData = null;
+//   const query = "";
+//   var exData = query_result;
+//   if (mode = ref) {}
+//   else {}
+//
+//   return {
+//     ref_exData: ref_exData,
+//     prac_exData: prac_exData
+//   };
+// }
 
 (function ()
 {
