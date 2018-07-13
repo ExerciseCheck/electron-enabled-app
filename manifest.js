@@ -214,9 +214,7 @@ const manifest = {
       plugin: './server/web/routes/clinician'
     },
     {
-
       plugin: './server/web/routes/charts'
-
     },
     {
       plugin: './server/web/routes/dashboard'
