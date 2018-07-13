@@ -21,13 +21,13 @@ function initializePractice(exerciseId) {
 
   const values = {};
   values.exerciseId = exerciseId;
-  values.weekStart = 50;
+  values.weekStart = new Date().getWeekNumber();
   $.ajax({
     type: 'POST',
     url: '/api/userexercise/practice/',
     data: values,
     success: function (result) {
-        successAlert('Practice successfully updated');
+        successAlert('Starting first practice session!');
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -46,7 +46,6 @@ $(".listButtons a").click(function() {
 
   $.get(checkPrac, function(data) {
      if(!data.practiceExists) {
-       alert("Nooo");
        initializePractice(exerciseId);
      }
   });

@@ -166,7 +166,7 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices.length === results.findReference[0].numSets ) {
+          if ( results.findNumPractices[0].sets.length === results.findReference[0].numSets ) {
             isComplete = true;
           }
           if ( isComplete ) {

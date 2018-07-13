@@ -91,21 +91,19 @@ function saveReference() {
 function savePractice() {
 
   const parsedURL = parseURL(window.location.pathname);
-  let url ='/api/userexercise/practice';
-  let patientId = '';
+  let url ='/api/userexercise/practice/mostrecent/data' + parsedURL.exerciseId;
   let values = {};
-  values.exerciseId = parsedURL.exerciseId;
   values.bodyFrames = JSON.stringify(recentFrames);
   //logged-in user ia clinician
   if (parsedURL.patientId) {
     url = '/api/userexercise/practice/' + parsedURL.patientId;
-    patientId = parsedURL.patientId;
   }
   $.ajax({
-    type: 'POST',
+    type: 'PUT',
     url: url,
     data: values,
     success: function (result) {
+
       let url = '/api/userexercise/loadreference/' + values.exerciseId + '/';
       if(parsedURL.patientId) {
         url = url + parsedURL.patientId;
