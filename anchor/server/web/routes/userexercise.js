@@ -212,10 +212,17 @@ internals.applyRoutes = function (server, next) {
       }
     },
     handler: function (request, reply) {
-
+      // FIX-ME: Must default values for impJoint, impAxis, direction,
+      // lowerJoint, upperJoint be defined here for certain known exercises like
+      // squats and hand-raise?
       let referenceExists = true;
       let defaultNumReps = 1;
       let defaultNumSets = 1;
+      let defaultImpJoint = 0; // Spine base
+      let defaultImpAxis = 'depthY';
+      let direction = 'up';
+      let lowerJoint = 0; // Spine base
+      let upperJoint = 20; // Spine shoulder
 
       Async.auto({
 

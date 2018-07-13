@@ -10,13 +10,18 @@ function getPatientId() {
   return (window.location.pathname.split('/'))[4];
 }
 
-function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
+function initialSetting(numSets, numReps, impJoint, impAxis, direction, lowerJoint, upperJoint, exerciseId, patientId, redirectToUrl) {
 
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
   values.numSessions = numSets;
   values.numRepetition = numReps;
+  values.impJoint = impJoint;
+  values.impAxis = impAxis;
+  values.direction = direction;
+  values.lowerJoint = lowerJoint;
+  values.upperJoint = upperJoint;
 
   $.ajax({
     type: 'POST',
@@ -34,11 +39,16 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
   });
 }
 
-function updateSetting(numSets, numReps, exerciseId, patientId) {
+function updateSetting(numSets, numReps, impJoint, impAxis, direction, lowerJoint, upperJoint, exerciseId, patientId) {
 
   const values = {};
   values.numSessions = numSets;
   values.numRepetition = numReps;
+  values.impJoint = impJoint;
+  values.impAxis = impAxis;
+  values.direction = direction;
+  values.lowerJoint = lowerJoint;
+  values.upperJoint = upperJoint;
 
   $.ajax({
     type: 'PUT',
@@ -58,16 +68,21 @@ function changeSetting() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
+  const impJoint = $("#impJoint").val();
+  const impAxis = $("#impAxis").val();
+  const direction = $("#direction").val();
+  const lowerJoint = $("#lowerJoint").val();
+  const upperJoint = $("#upperJoint").val();
   const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
   $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
-      updateSetting(numSets, numReps, getExerciseId(), getPatientId());
+      updateSetting(numSets, numReps, impJoint, impAxis, direction, lowerJoint, upperJoint, getExerciseId(), getPatientId());
     }
 
     else {
-      initialSetting(numSets, numReps, getExerciseId(), getPatientId());
+      initialSetting(numSets, numReps, impJoint, impAxis, direction, lowerJoint, upperJoint, getExerciseId(), getPatientId());
     }
   });
 }
@@ -77,8 +92,13 @@ function update() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
+  const impJoint = $("#impJoint").val();
+  const impAxis = $("#impAxis").val();
+  const direction = $("#direction").val();
+  const lowerJoint = $("#lowerJoint").val();
+  const upperJoint = $("#upperJoint").val();
   const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
-  updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
+  updateSetting(numSets, numReps, impJoint, impAxis, direction, lowerJoint, upperJoint, getExerciseId(), getPatientId(), url);
 }
 
 function createRef() {
@@ -94,7 +114,8 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, getExerciseId(), getPatientId(), redirectToUrl);
+      // FIX-ME: Are these hard-coded values correct? Why are these hard-coded?
+      initialSetting(1, 1, 20, 'depthY', 'down', 0, 20, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
 }
