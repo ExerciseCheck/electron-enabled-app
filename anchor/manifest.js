@@ -60,7 +60,7 @@ const manifest = {
         register: 'hicsail-hapi-mongo-models',
         options: {
           mongodb: Config.get('/hapiMongoModels/mongodb'),
-          models: {
+          models: { //Add models here
             AuthAttempt: './server/models/auth-attempt',
             Backup: './server/models/backup',
             Event: './server/models/event',
@@ -69,6 +69,8 @@ const manifest = {
             Session: './server/models/session',
             Template: './server/models/template',
             UserExercise: './server/models/userExercise',
+            ReferenceExercise: './server/models/ReferenceExercise',
+            // PracticeExercise: './server/models/PracticeExercise',
             Exercise: './server/models/exercise',
             Token: './server/models/token',
             User: './server/models/user'
