@@ -16,18 +16,25 @@ function filter() {
   })
 }
 
+Date.prototype.getWeekNumber = function(){
+  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+};
 
 function initializePractice(exerciseId) {
 
   const values = {};
   values.exerciseId = exerciseId;
-  values.weekStart = 50;
+  values.weekStart = new Date().getWeekNumber();
   $.ajax({
     type: 'POST',
     url: '/api/userexercise/practice/',
     data: values,
     success: function (result) {
-        successAlert('Practice successfully updated');
+        successAlert('Starting first practice session!');
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -45,8 +52,8 @@ $(".listButtons a").click(function() {
   const checkPrac = '/api/userexercise/practice/' + exerciseId + '/';
 
   $.get(checkPrac, function(data) {
+    //alert(!data.practiceExists);
      if(!data.practiceExists) {
-       alert("Nooo");
        initializePractice(exerciseId);
      }
   });

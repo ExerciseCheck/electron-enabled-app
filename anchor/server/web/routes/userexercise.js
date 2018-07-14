@@ -5,7 +5,6 @@ const Boom = require('boom');
 const Config = require('../../../config');
 const PracticeExercise = require('../../models/practiceExercise');
 const ReferenceExercise = require('../../models/referenceExercise');
-//const PracticeExercise = require('../../models/PracticeExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
 
@@ -157,6 +156,32 @@ internals.applyRoutes = function (server, next) {
 
           Exercise.findById(request.params.exerciseId, done);
         }]
+
+        getDataForCntReps: ['findExercise', function(results, done) {
+          let reference = results.findReference();
+          let exercise = results.findExercise();
+          let dataForCntReps = {};
+
+          dataForCntReps['joint'] = exercise.joint;
+          dataForCntReps['axis'] = exercise.axis;
+          dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
+          dataForCntReps['refUpperJointID'] = exercise.refUpperJoint;
+          // position values below, not jointID, initially null(?)
+          dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
+          dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
+          dataForCntReps['refMin'] = reference.refMin;
+          dataForCntReps['refMax'] = reference.refMax;
+          dataForCntReps['neckX'] = reference.neckX;
+          dataForCntReps['neckY'] = reference.neckY;
+          // numbers between [0,1]
+          dataForCntReps['topThresh'] = reference.topThresh;
+          dataForCntReps['topThresh'] = reference.topThresh;
+          dataForCntReps['rangeScale'] = reference.rangeScale;
+
+          done(dataForCntReps);
+        }]
+
+
       }, (err, results) => {
 
         if (err) {
@@ -166,14 +191,14 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices.length === results.findReference[0].numSets ) {
+          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
             isComplete = true;
           }
           if ( isComplete ) {
-            setNumber = results.findNumPractices.length;
+            setNumber = results.findNumPractices[0].numSetsCompleted;
           }
           else if ( !isComplete )  {
-            setNumber = results.findNumPractices.length + 1;
+            setNumber = results.findNumPractices[0].numSetsCompleted + 1;
           }
         }
 
@@ -193,6 +218,7 @@ internals.applyRoutes = function (server, next) {
           numSets: results.findReference[0].numSets,
           setNumber,
           exercise : results.findExercise,
+          dataForCntReps: results.getDataForCntReps,
           mode: request.params.mode,
           type: request.params.type,
           isComplete

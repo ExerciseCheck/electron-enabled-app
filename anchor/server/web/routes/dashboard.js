@@ -119,35 +119,47 @@ internals.applyRoutes = function (server, next) {
 
             Exercise.find(query, done);
           }],
-          findLatestSession:['exercises', function (results, done) {
+          getLatestPracticeSession:['exercises', function (results, done) {
 
-            const pipeLine = [
-              { '$match': { 'userId' : request.auth.credentials.user._id.toString() } },
-              { '$group': {
-                '_id': null,
-                'latestSession': { '$last': '$createdAt' }
-              }
-              }
-            ];
-
-            PracticeExercise.aggregate(pipeLine, done);
-          }]
-        }, (err, results) => {
-
+           const pipeLine = [
+             { '$match': { 'userId' : request.auth.credentials.user._id.toString() } },
+             { '$group': {
+               '_id': null,
+               'latestSession': { '$last': '$createdAt' }
+             }
+             }
+           ];
+           PracticeExercise.aggregate(pipeLine, done);
+         }],
+         getLatestReferenceSession:['getLatestPracticeSession', function (results, done) {
+           const pipeLine = [
+             { '$match': { 'userId' : request.auth.credentials.user._id.toString() } },
+             { '$group': {
+               '_id': null,
+               'latestSession': { '$last': '$createdAt' }
+             }
+             }
+           ];
+           ReferenceExercise.aggregate(pipeLine, done);
+         }]
+       }, (err, results) => {
+          let latestSesh = null;
           if (err) {
             return reply(err);
           }
 
-          if (!results.exercises || !results.findLatestSession) {
+          if (!results.exercises || !results.getLatestReferenceSession) {
             return reply(Boom.notFound('Document not found.'));
           }
-
+          //return reply(results.findLatestSession);
           return reply.view('patient/viewExercises', {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             title: 'Dashboard',
             exercises: results.exercises,
-            //lastSession: results.findLatestSession[0].latestSession,
+            lastSession: (results.getLatestPracticeSession.length === 0) ?
+              results.getLatestReferenceSession[0].latestSession :
+              results.getLatestPracticeSession[0].latestSession,
             baseUrl: Config.get('/baseUrl')
           });
         });

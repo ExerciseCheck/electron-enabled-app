@@ -49,7 +49,7 @@ function initializePractice() {
 
   const values = {};
   values.exerciseId = getExerciseId();
-  values.weekStart = 30;
+  values.weekStart = new Date().getWeekNumber();
   $.ajax({
     type: 'POST',
     url: '/api/userexercise/practice/' + getPatientId(),

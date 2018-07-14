@@ -552,73 +552,6 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  // server.route({
-  //   method: 'POST',
-  //   path: '/userexercise/practice/{patientId?}',
-  //   config: {
-  //     auth: {
-  //       strategies: ['simple', 'jwt', 'session']
-  //     },
-  //     validate: {
-  //       payload: PracticeExercise.practicePayload
-  //     },
-  //     payload:{ maxBytes: 1048576 * 5 }
-  //   },
-  //   handler: function (request, reply) {
-  //
-  //     let patientId = '';
-  //     //logged in user is a clinician
-  //     if (request.params.patientId) {
-  //       patientId = request.params.patientId;
-  //     }
-  //     //Logged in user is a patient
-  //     else {
-  //       patientId = request.auth.credentials.user._id.toString();
-  //     }
-  //     Async.auto({
-  //
-  //       //first we need to find the referenceId of the exercise
-  //       //finding one document matching the query is enough
-  //       findMostRecentReference: function (done) {
-  //
-  //         const filter = {
-  //           userId: patientId,
-  //           exerciseId: request.payload.exerciseId,
-  //         };
-  //
-  //         const pipeLine = [
-  //           { '$match': filter },
-  //           { '$sort': { createdAt: -1 } },
-  //           { '$limit': 1 }
-  //         ];
-  //         ReferenceExercise.aggregate(pipeLine, done);
-  //       },
-  //       createExercise:['findMostRecentReference', function (results, done) {
-  //
-  //         PracticeExercise.create(
-  //
-  //           patientId,
-  //           request.payload.exerciseId, //taken directly from values.patientId in savePractice
-  //           results.findMostRecentReference[0]._id.toString(),
-  //           results.findMostRecentReference[0].numSets,
-  //           results.findMostRecentReference[0].numRepetition,
-  //           request.payload.bodyFrames,
-  //           done);
-  //       }]
-  //     }, (err, results) => {
-  //
-  //       if (err) {
-  //         return reply(err);
-  //       }
-  //       if (!results.findMostRecentReference) {
-  //         return reply(Boom.notFound('Document not found.'));
-  //       }
-  //
-  //       reply(results.createExercise);
-  //     });
-  //   }
-  // });
-
   //this route updates the reference for a (userId, exerciseId) pair
   // not used
   server.route({
@@ -776,6 +709,81 @@ internals.applyRoutes = function (server, next) {
         }
 
         reply(results.updateSettings);
+      });
+    }
+  });
+
+//updates practice document with new set information
+  server.route({
+    method: 'PUT',
+    path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      },
+      validate: {
+        payload: PracticeExercise.dataPayload
+      },
+      payload:{ maxBytes: 1048576 * 5 }
+    },
+    handler: function (request, reply) {
+
+      let patientId = '';
+      //logged-in user is clinician
+      if (request.params.patientId ) {
+        patientId = request.params.patientId;
+      }
+      //logged-in user is patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+
+      Async.auto({
+
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findPracticeandUpdate: ['findMostRecentReference', function(results, done) {
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            referenceId: results.findMostRecentReference[0]._id.toString()
+          };
+
+          const update = {
+            $addToSet: {
+              sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+            },
+            $inc: {
+              numSetsCompleted: 1,
+              numRepsCompleted: 1
+            },
+            $set: {
+              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
+            }
+          };
+          PracticeExercise.findOneAndUpdate(query, update, done);
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference[0]) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+        reply(results.findPracticeandUpdate);
       });
     }
   });
