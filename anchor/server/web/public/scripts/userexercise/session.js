@@ -98,7 +98,6 @@ function saveReference() {
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(refFrames);
-<<<<<<< HEAD
   values.neckX = values.bodyFrames[0].joints[2].depthX;
   values.neckY = values.bodyFrames[0].joints[2].depthY;
   var mm = getMinMax_joint(joint, values.bodyFrames, coordinate);
@@ -107,14 +106,12 @@ function saveReference() {
   values.refLowerJoint = values.bodyFrames[0].joints[dataForCntReps.refLowerJointID].coordinate;
   values.refUpperJoint = values.bodyFrames[0].joints[dataForCntReps.refUpperJointID].coordinate;
 
-=======
-  values.neckX = 2;
-  values.neckY = 2;
-  values.refMin = 2;
-  values.refMax = 2;
-  values.refLowerJoint = 2;
-  values.refUpperJoint = 2;
->>>>>>> 80_shirene_ref-prac-model
+  //values.neckX = 2;
+  //values.neckY = 2;
+  //values.refMin = 2;
+  //values.refMax = 2;
+  //values.refLowerJoint = 2;
+  //values.refUpperJoint = 2;
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
@@ -135,17 +132,13 @@ function savePractice() {
   let patientId = parsedURL.patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
-<<<<<<< HEAD
   //logged-in user is clinician
-=======
-  //logged-in user ia clinician
   if (patientId) {
     url = url + patientId;
   }
   if(setNumber === numSets) {
     values.weekEnd = new Date().getWeekNumber();
   }
->>>>>>> 80_shirene_ref-prac-model
   $.ajax({
     type: 'PUT',
     url: url,
