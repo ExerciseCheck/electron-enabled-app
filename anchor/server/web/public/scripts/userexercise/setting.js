@@ -55,7 +55,7 @@ function initializePractice() {
     url: '/api/userexercise/practice/' + getPatientId(),
     data: values,
     success: function (result) {
-        successAlert('Starting practice session');
+        successAlert('Starting new practice session');
         loadReferenceandStart('practice');
     },
     error: function (result) {

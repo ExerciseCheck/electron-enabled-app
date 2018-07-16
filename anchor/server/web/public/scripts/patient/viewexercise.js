@@ -36,7 +36,7 @@ function initializePractice(exerciseId, addressValue) {
     url: '/api/userexercise/practice/',
     data: values,
     success: function (result) {
-        successAlert('Starting first practice session!');
+        successAlert('Starting new practice session!');
         $.get(url, function(data){
           console.log("GET from patient side");
           localStorage.setItem("refFrames", JSON.stringify(data));
