@@ -17,7 +17,7 @@ class PracticeExercise extends MongoModels {
       sets: [], //[] of {date: 00, reps: [], bodyframes: []}
       //isActive is set to true by default
       isActive: true,
-      //body frames now go into sets
+      isComplete: false, //sets to true if
       createdAt: new Date()
     };
 
@@ -46,6 +46,7 @@ PracticeExercise.schema = Joi.object().keys({
   weekEnd: Joi.number().required(),
   sets: Joi.array().required(), //make it more specific later
   isActive: Joi.boolean().required(),
+  isComplete: Joi.boolean().required(),
   createdAt: Joi.date().required()
 });
 

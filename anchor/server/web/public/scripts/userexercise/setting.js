@@ -55,7 +55,7 @@ function initializePractice() {
     url: '/api/userexercise/practice/' + getPatientId(),
     data: values,
     success: function (result) {
-        successAlert('Practice successfully updated');
+        successAlert('Starting practice session');
         loadReferenceandStart('practice');
     },
     error: function (result) {
@@ -67,26 +67,38 @@ function initializePractice() {
 function updateSetting(numSets, numReps, exerciseId, patientId) {
 
   const values = {};
-  values.numSets = numSets;
-  values.numRepetition = numReps;
+  values.exerciseId = exerciseId;
+  values.userId = patientId;
   values.numSets = numSets;
   values.numRepetition = numReps;
   values.rangeScale = 0.5; //dummy
   values.topThresh = 0.5; // dummy
   values.bottomThresh = 0.5;//dummy values
 
-
+  //updating settings creates a new reference document with the latest reference bodyframes
   $.ajax({
-    type: 'PUT',
-    url: '/api/userexercise/reference/mostrecent/setting/' + exerciseId +'/' + patientId,
+    type: 'POST',
+    url: '/api/userexercise/reference',
     data: values,
     success: function (result) {
-       successAlert('Setting successfully updated');
+        successAlert('Setting successfully updated');
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
     }
   });
+
+  // $.ajax({
+  //   type: 'PUT',
+  //   url: '/api/userexercise/reference/mostrecent/setting/' + exerciseId +'/' + patientId,
+  //   data: values,
+  //   success: function (result) {
+  //      successAlert('Setting successfully updated');
+  //   },
+  //   error: function (result) {
+  //     errorAlert(result.responseJSON.message);
+  //   }
+  // });
 }
 
 //when there's no reference update setting can do both inserting or updating
@@ -108,7 +120,6 @@ function changeSetting() {
   });
 }
 
-//when there is a reference meaning a reference is recorded update setting just updates
 function update() {
 
   const numSets = $("#numSets").val();
@@ -148,10 +159,11 @@ function StartPracticeSession() {
 
   const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data) {
-    if (data.practiceExists) {
+    if (data === true) {
       loadReferenceandStart('practice');
     }
     else {
+      alert(data);
       initializePractice();
     }
   });

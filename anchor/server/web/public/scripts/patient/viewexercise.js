@@ -52,8 +52,7 @@ $(".listButtons a").click(function() {
   const checkPrac = '/api/userexercise/practice/' + exerciseId + '/';
 
   $.get(checkPrac, function(data) {
-    //alert(!data.practiceExists);
-     if(!data.practiceExists) {
+     if(data === false) {
        initializePractice(exerciseId);
      }
   });
