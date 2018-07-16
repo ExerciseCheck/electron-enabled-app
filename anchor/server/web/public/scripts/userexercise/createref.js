@@ -1,7 +1,7 @@
 'use strict';
 
 const schema = Joi.object({
-  numSessions: Joi.number().integer().required(),
+  numSets: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required()
 });
 
@@ -29,7 +29,7 @@ $('#create').click((event) => {
 });
 
 $(document).ready(function() {
-   
+
     $('#exerciseId').select2({
     ajax: {
       delay: 250,
@@ -74,6 +74,3 @@ $(document).ready(function() {
     minimumInputLength: 1,
   });
 });
-
-
-
