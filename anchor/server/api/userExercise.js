@@ -327,6 +327,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  // this route checks to see if there is a practice session completed for the latest reference 
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{exerciseId}/{patientId?}',
@@ -338,22 +339,43 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const query = {
-        userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-        exerciseId: request.params.exerciseId,
-      };
+      Async.auto({
+        //if there is a previous reference, we must find it so we can
+        // re-use its bodyFrames
+        findMostRecentReference: function (done) {
 
-      PracticeExercise.findOne(query, {sort: {$natural: -1}}, (err, pracExercise) => {
+          const filter = {
+            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findPracticeExercise: ['findMostRecentReference', function (results, done) {
+          const query = {
+            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+            referenceId: results.findMostRecentReference[0]._id.toString()
+          };
+          PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
+        }]
+      }, (err, results) => {
 
         if (err) {
           return reply(err);
         }
-
-        if ( !pracExercise || pracExercise === undefined ) {
-          return reply("No practice record found");
+        if (!results.findMostRecentReference) {
+          return reply(Boom.notFound('Document not found.'));
         }
-
-        reply(pracExercise.isComplete);
+        if(results.findPracticeExercise) {
+          return reply(results.findPracticeExercise.isComplete);
+        }
+        reply(false);
       });
     }
   });

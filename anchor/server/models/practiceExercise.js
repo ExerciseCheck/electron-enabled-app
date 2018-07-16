@@ -17,7 +17,7 @@ class PracticeExercise extends MongoModels {
       sets: [], //[] of {date: 00, reps: [], bodyframes: []}
       //isActive is set to true by default
       isActive: true,
-      isComplete: false, //sets to true if
+      isComplete: false, //sets to true if a session completes all sets
       createdAt: new Date()
     };
 

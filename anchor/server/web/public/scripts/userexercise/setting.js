@@ -163,7 +163,6 @@ function StartPracticeSession() {
       loadReferenceandStart('practice');
     }
     else {
-      alert(data);
       initializePractice();
     }
   });

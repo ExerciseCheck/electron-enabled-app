@@ -161,6 +161,11 @@ internals.applyRoutes = function (server, next) {
           if ( request.params.type === 'reference') {
             return done();
           }
+
+          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
+            isComplete = true;
+          }
+
           const query = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
@@ -169,7 +174,7 @@ internals.applyRoutes = function (server, next) {
 
           const update = {
             $set: {
-              isComplete: true
+              isComplete: isComplete
             }
           }
 
@@ -184,10 +189,6 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
-            isComplete = true;
-            results.setComplete;
-          }
           if ( isComplete ) {
             setNumber = results.findNumPractices[0].numSetsCompleted;
           }
