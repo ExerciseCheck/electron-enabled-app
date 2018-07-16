@@ -106,6 +106,3 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
-
-
-

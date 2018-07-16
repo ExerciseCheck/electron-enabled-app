@@ -6,6 +6,7 @@ const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
+const Info = require('../../web/templates/userexercise/exerciseInfo')
 
 internals.applyRoutes = function (server, next) {
 
@@ -104,7 +105,7 @@ internals.applyRoutes = function (server, next) {
       }
 
       let patientId = '';
-      //logged-in user is clinician 
+      //logged-in user is clinician
       if (request.params.patientId ) {
         patientId = request.params.patientId;
       }
@@ -466,8 +467,29 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  server.route({
+    method: 'GET',
+    path: '/userexercise/info/{exerciseName}',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+      console.log(Info)
+      return reply.view('/userexercise/info/{exerciseName}', {
+        user: request.auth.credentials.user,
+        projectName: Config.get('/projectName'),
+        title: '{exerciseName} Information',
+      //  instructions:
+
+      });
+    }
+  });
+
   next();
 };
+
 
 
 exports.register = function (server, options, next) {
