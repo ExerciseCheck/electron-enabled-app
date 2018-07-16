@@ -327,7 +327,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  // this route checks to see if there is a practice session completed for the latest reference 
+  // this route checks to see if there is a practice session completed for the latest reference
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{exerciseId}/{patientId?}',

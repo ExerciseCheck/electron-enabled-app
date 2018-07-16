@@ -152,7 +152,17 @@ function viewReferences() {
 }
 
 function updateReference() {
-  loadReferenceandStart('reference');
+  const numSets = $("#numSets").val();
+  const numReps = $("#numReps").val();
+
+  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +
+    getExerciseId() + '/' + getPatientId();
+
+  $.get(url, function(data){
+    localStorage.setItem("refFrames", JSON.stringify(data));
+    initialSetting(numSets, numReps, getExerciseId(), getPatientId(), redirectToUrl);
+  });
 }
 
 function StartPracticeSession() {
@@ -171,7 +181,6 @@ function StartPracticeSession() {
 function loadReferenceandStart(type) {
   const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data){
-    console.log("Get from CLINICIAN side");
     localStorage.setItem("refFrames", JSON.stringify(data));
     redirect(type);
   });
