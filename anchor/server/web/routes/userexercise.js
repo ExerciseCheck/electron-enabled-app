@@ -155,7 +155,7 @@ internals.applyRoutes = function (server, next) {
         findExercise:['findNumPractices', function (results, done) {
 
           Exercise.findById(request.params.exerciseId, done);
-        }]
+        }],
 
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findReference();

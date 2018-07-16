@@ -14,12 +14,6 @@ class Exercise extends MongoModels {
       direction,
       refLowerJoint,
       refUpperJoint,
-      userId,
-      joint,
-      axis,
-      direction,
-      ref_lower_joint,
-      ref_upper_joint,
       createdAt: new Date()
     };
 
@@ -51,11 +45,11 @@ Exercise.schema = Joi.object().keys({
 Exercise.payload = Joi.object().keys({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
-  // joint: Joi.number().integer().required(),
-  // axis: Joi.number().required(),
-  // direction: Joi.string().valid('up','down').required(),
-  // refLowerJoint: Joi.number().integer().required(),
-  // refUpperJoint: Joi.number().integer().required()
+  joint: Joi.number().integer().required(),
+  axis: Joi.string().valid('depthX','depthY').required(),
+  direction: Joi.string().valid('up','down').required(),
+  refLowerJoint: Joi.number().integer().required(),
+  refUpperJoint: Joi.number().integer().required()
 });
 
 

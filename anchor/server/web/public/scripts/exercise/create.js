@@ -2,8 +2,15 @@
 
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
-  description: Joi.string().required()
+  description: Joi.string().required(),
+  joint: Joi.number().integer().required(),
+  axis: Joi.string().required(),
+  direction: Joi.string().required(),
+  refLowerJoint: Joi.number().integer().required(),
+  refUpperJoint: Joi.number().integer().required(),
 });
+
+
 
 joiToForm('formFields',schema);
 
