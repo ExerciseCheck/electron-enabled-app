@@ -87,18 +87,6 @@ function updateSetting(numSets, numReps, exerciseId, patientId) {
       errorAlert(result.responseJSON.message);
     }
   });
-
-  // $.ajax({
-  //   type: 'PUT',
-  //   url: '/api/userexercise/reference/mostrecent/setting/' + exerciseId +'/' + patientId,
-  //   data: values,
-  //   success: function (result) {
-  //      successAlert('Setting successfully updated');
-  //   },
-  //   error: function (result) {
-  //     errorAlert(result.responseJSON.message);
-  //   }
-  // });
 }
 
 //when there's no reference update setting can do both inserting or updating
