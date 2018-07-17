@@ -161,17 +161,13 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-        if (!results.findExercise || results.findExercise === undefined) {
+        if (!results.findExercise) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
           isComplete = results.findNumPractices[0].isComplete;
-          if ( isComplete ) {
-            setNumber = results.findNumPractices[0].numSetsCompleted;
-          }
-          else if ( !isComplete )  {
+          (isComplete) ? setNumber = results.findNumPractices[0].numSetsCompleted :
             setNumber = results.findNumPractices[0].numSetsCompleted + 1;
-          }
         }
 
         if ( request.params.type === 'reference' ) {
