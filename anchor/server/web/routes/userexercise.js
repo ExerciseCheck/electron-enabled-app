@@ -150,7 +150,7 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findReference[0]._id.toString(),
           };
 
-          PracticeExercise.find(query, done);
+          PracticeExercise.find(query, {sort: {$natural: -1}}, done);
         }],
         findExercise:['findNumPractices', function (results, done) {
 
@@ -182,6 +182,30 @@ internals.applyRoutes = function (server, next) {
           }
 
           done(dataForCntReps);
+        }],
+        setComplete:['getDataForCntReps', function (results, done) {
+
+          if ( request.params.type === 'reference') {
+            return done();
+          }
+
+          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
+            isComplete = true;
+          }
+
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            referenceId: results.findReference[0]._id.toString(),
+          };
+
+          const update = {
+            $set: {
+              isComplete: isComplete
+            }
+          }
+
+          PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
         }]
 
 
@@ -194,9 +218,6 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
-            isComplete = true;
-          }
           if ( isComplete ) {
             setNumber = results.findNumPractices[0].numSetsCompleted;
           }

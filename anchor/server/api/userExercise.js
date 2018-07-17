@@ -312,7 +312,7 @@ internals.applyRoutes = function (server, next) {
         exerciseId: request.params.exerciseId,
       };
 
-      ReferenceExercise.findOne(query, (err, refExercise) => {
+      ReferenceExercise.findOne(query, {sort: {$natural: -1}}, (err, refExercise) => {
 
         if (err) {
           return reply(err);
@@ -327,6 +327,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  // this route checks to see if there is a practice session completed for the latest reference
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{exerciseId}/{patientId?}',
@@ -338,22 +339,43 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const query = {
-        userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-        exerciseId: request.params.exerciseId,
-      };
+      Async.auto({
+        //if there is a previous reference, we must find it so we can
+        // re-use its bodyFrames
+        findMostRecentReference: function (done) {
 
-      PracticeExercise.findOne(query, (err, pracExercise) => {
+          const filter = {
+            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findPracticeExercise: ['findMostRecentReference', function (results, done) {
+          const query = {
+            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+            referenceId: results.findMostRecentReference[0]._id.toString()
+          };
+          PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
+        }]
+      }, (err, results) => {
 
         if (err) {
           return reply(err);
         }
-
-        if ( !pracExercise || pracExercise === undefined ) {
-          return reply({ practiceExists: false });
+        if (!results.findMostRecentReference) {
+          return reply(Boom.notFound('Document not found.'));
         }
-
-        reply({ practiceExists:true });
+        if(results.findPracticeExercise) {
+          return reply(results.findPracticeExercise.isComplete);
+        }
+        reply(false);
       });
     }
   });
@@ -465,23 +487,51 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      ReferenceExercise.create(
-        request.payload.userId,
-        request.payload.exerciseId,
-        request.payload.numSets,
-        request.payload.numRepetition,
-        request.payload.rangeScale,
-        request.payload.topThresh,
-        request.payload.bottomThresh,
-        [],
-        (err, document) => {
+      let bodyFrames = [];
+
+      Async.auto({
+
+        //if there is a previous reference, we must find it so we can
+        // re-use its bodyFrames
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: request.payload.userId,
+            exerciseId: request.payload.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        createReference:['findMostRecentReference', function (results, done) {
+
+          if(results.findMostRecentReference.length > 0 ) {
+            if(results.findMostRecentReference[0].bodyFrames.length > 0) {
+              bodyFrames = results.findMostRecentReference[0].bodyFrames;
+            }
+          }
+
+          ReferenceExercise.create(
+            request.payload.userId,
+            request.payload.exerciseId,
+            request.payload.numSets,
+            request.payload.numRepetition,
+            request.payload.rangeScale,
+            request.payload.topThresh,
+            request.payload.bottomThresh,
+            bodyFrames,
+            done);
+          }]
+        }, (err, results) => {
 
           if (err) {
             return reply(err);
           }
-
-          reply(document);
-
+          reply(results.createReference);
         });
       }
     });
@@ -593,6 +643,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //this route updates the settings for most recent reference of a (patientId, exerciseId) pair
+  //no longer used as new settings create a new reference document
   server.route({
     method: 'PUT',
     path: '/userexercise/reference/mostrecent/setting/{exerciseId}/{patientId}',
@@ -755,6 +806,7 @@ internals.applyRoutes = function (server, next) {
           ReferenceExercise.aggregate(pipeLine, done);
         },
         findPracticeandUpdate: ['findMostRecentReference', function(results, done) {
+
           const query = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
@@ -773,7 +825,7 @@ internals.applyRoutes = function (server, next) {
               weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
             }
           };
-          PracticeExercise.findOneAndUpdate(query, update, done);
+          PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
         }]
       }, (err, results) => {
 
