@@ -61,5 +61,8 @@ $(".listButtons a").click(function() {
      if(data === false) {
        initializePractice(exerciseId, addressValue);
      }
+     else {
+       window.location = addressValue;
+     }
   });
 });

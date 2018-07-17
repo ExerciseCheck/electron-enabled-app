@@ -9,6 +9,21 @@ var coordinate = dataForCntReps.axis;
 var threshold_flag = dataForCntReps.direction; // initialize
 var repCnt = 0;
 
+window.actionBtn = false;
+
+// window.addEventListener('beforeunload', function(e) {
+//   let warning = 'If you leave now, your progress will not be saved.';
+//   if (window.actionBtn) {
+//     return;
+//   }
+//   e.returnValue = warning;
+//   return false;
+// });
+
+$('.actionBtn').click(function() {
+  window.actionBtn = true;
+})
+
 function parseURL(url)
 {
 
@@ -228,6 +243,7 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
 function displyRepCnts() {
   return repCnt;
 }
+
 
 (function ()
 {

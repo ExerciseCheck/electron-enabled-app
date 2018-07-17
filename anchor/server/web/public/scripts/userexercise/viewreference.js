@@ -28,5 +28,3 @@ function showRecordedExercise(id) {
   window.location =  "../refexercises/play/"+id;
 
 }
-
-

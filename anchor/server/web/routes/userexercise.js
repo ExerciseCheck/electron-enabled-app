@@ -183,7 +183,8 @@ internals.applyRoutes = function (server, next) {
 
           done(dataForCntReps);
         }],
-        setComplete:['getDataForCntReps', function (results, done) {
+
+	setComplete:['getDataForCntReps', function (results, done) {
 
           if ( request.params.type === 'reference') {
             return done();
@@ -207,23 +208,18 @@ internals.applyRoutes = function (server, next) {
 
           PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
         }]
-
-
       }, (err, results) => {
 
         if (err) {
           return reply(err);
         }
-        if (!results.findExercise || results.findExercise === undefined) {
+        if (!results.findExercise) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( isComplete ) {
-            setNumber = results.findNumPractices[0].numSetsCompleted;
-          }
-          else if ( !isComplete )  {
+          isComplete = results.findNumPractices[0].isComplete;
+          (isComplete) ? setNumber = results.findNumPractices[0].numSetsCompleted :
             setNumber = results.findNumPractices[0].numSetsCompleted + 1;
-          }
         }
 
         if ( request.params.type === 'reference' ) {
