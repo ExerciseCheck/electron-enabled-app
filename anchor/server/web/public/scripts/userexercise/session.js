@@ -1,10 +1,13 @@
 'use strict';
 
 let liveFrames, refFrames, recentFrames;
-let dataForCntReps = {{dataForCntReps}};
+let nx_1stFrame, ny_1stFrame;
+//let dataForCntReps = {{dataForCntReps}};
 //const dataForCntReps = require('../../../routes/userexercise');
 var joint = dataForCntReps.joint;
 var coordinate = dataForCntReps.axis;
+var threshold_flag = dataForCntReps.direction; // initialize
+var repCnt = 0;
 
 function parseURL(url)
 {
@@ -180,60 +183,51 @@ function goToExercises() {
 //    scaled to a range between 0 and 1, for a repetition to count
 function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, bottom_thresh=0.75) {
 
-  //const parsedURL = parseURL(window.location.pathname);
-  //var patientId = parsedURL.patientId;
-  //var exerciseId = parsedURL.exerciseId;
-  //var exInfo = getExerciseInfo(exerciseId); //TODO: How to query?
-  //var ref_exData = getRefExerciseInfo(exerciseId, patientId);
-
   var reps = 0;
   var norm, ref_norm;
 
-  //var joint = exInfo['joint'];  // a number
-  //var coordinate = exInfo['axis'];
 
   // This is set when user is correctly positioned in circle
   // neck: 2
   if (coordinate == 'depthY') {
     ref_norm = dataForCntReps.neckY;
-    norm = body.joints[2].depthY; //THis will change with body. TODO: only frame1 ??
+    //norm = body.joints[2].depthY; //THis will change with body. TODO: only frame1 ??
+    norm = ny_1stFrame;
   } else if (coordinate == 'depthX') {
     ref_norm = dataForCntReps.neckX;
-    norm = body.joints[2].depthX; //TODO: same here
+    //norm = body.joints[2].depthX; //TODO: same here
+    norm = nx_1stFrame;
   }
 
-  /*
   // Normalize reference points to neck
-  // var ref_max = ref_exData['refMax'] - ref_norm;
-  // var ref_min = ref_exData['refMin'] - ref_norm;
 
-  // Range is based on distance between foot and spine
-  var ref_lower_joint = ref_exData['refLowerJoint'];
-  var ref_upper_joint = ref_exData['refUpperJoint'];
-  var range = (ref_lower_joint - ref_norm - ref_upper_joint) * range_scale; //TODO: why -ref_norm??
-  */
+  var ref_lower_joint = dataForCntReps.refLowerJoint - ref_norm;
+  var ref_upper_joint = dataForCntReps.refUpperJoint - ref_norm;
+  var range = (ref_lower_joint - ref_upper_joint) * range_scale;
 
   var ref_max = dataForCntReps.refMax - ref_norm;
   var ref_min = dataForCntReps.refMin - ref_norm;
-
-  var ref_lower_joint_pos = dataForCntReps.refLowerJoint;
-  var ref_upper_joint_pos = dataForCntReps.refUpperJoint;
-  var range = (ref_lower_joint_pos - ref_norm - ref_upper_joint_pos) * range_scale; //TODO: why -ref_norm??
-
 
   // Normalize current point by range and current neck value
   var current_pt = (body.joints[joint][coordinate] - norm - ref_max) / range;
 
   if ((threshold_flag == 'down') && (current_pt < top_thresh)) {
     reps++;
-    return [reps, 'up'];
+    //return [reps, 'up'];
+    threshold_flag = 'up';
+    console.log("flip down to up");
   } else if ((threshold_flag == 'up') && (current_pt > bottom_thresh)) {
-    return [reps, 'down'];
-  } else {
-    return [reps, threshold_flag]
+    //return [reps, 'down'];
+    threshold_flag = 'down';
+    console.log("flip up to down");
   }
+  console.log("No flip");
+  return reps
 }
 
+function displyRepCnts() {
+  return repCnt;
+}
 
 (function ()
 {
@@ -421,6 +415,10 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
     if(dist <= r){
       //When person's neck enters green circle && mode is 'play', recording will start.
       ctx.strokeStyle="green";
+      //record the neck position for norm
+      nx_1stFrame = neck_x;
+      ny_1stFrame = neck_y;
+
       var parsedURL = parseURL(window.location.pathname);
       if(parsedURL.mode === 'play') {
         localStorage.setItem('canStartRecording', true);
@@ -438,7 +436,7 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
   //only start drawing with a body frame is detected
   //even though
 
-  //TODO call here
+  //TODO call cntReps here
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
@@ -470,7 +468,6 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
         //draw the body skeleton in live canvas
         drawBody(body,ctx);
 
-        //TODO, also check track bodyid
         //increment the live counter
         //location of the neck
         let neck_x = body.joints[2].depthX;
@@ -486,6 +483,11 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
         {
           liveFrames.push(body);
         }
+
+        var tempCnt = countReps(body, threshold_flag);
+        console.log(threshold_flag)
+
+        repCnt = repCnt + tempCnt;
       }
       live_counter = live_counter + 1;
     });
@@ -502,6 +504,8 @@ function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, botto
           ref_index = (ref_index + 1) % refFrames.length;
           live_counter = 0;
         }
+
+
     }
 
     //check if it is in the state of displaying reference, if reference exists

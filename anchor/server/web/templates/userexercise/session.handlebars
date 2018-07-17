@@ -15,9 +15,10 @@
             {{#compare type 'practice'}}
               <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
               <p>Set {{setNumber}} of {{numSets}}</p>
-              <div>cntRep function here</div>
+              <div>
+                <p id="cntReps" onchange="displyRepCnts()">{{repCnts}} / {{numRepetition}} repetitions completed</p> <!---HERE---how to give values of repCnts?-->
+              </div>
 
-              <p>{{cntRep}} / {{numRepetition}} repetitions completed</p> <!---HERE---how to give values of cntRep?-->
             {{/compare}}
             {{#compare type 'reference'}}
               <p>{{formatName exercise.exerciseName}}</p>
@@ -81,6 +82,7 @@
   //handlebars variables to pass into session.js
   let setNumber = {{setNumber}};
   let numSets = {{numSets}};
+  let dataForCntReps = {{dataForCntReps}};
 </script>
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
 <script src="/public/data.js"></script>

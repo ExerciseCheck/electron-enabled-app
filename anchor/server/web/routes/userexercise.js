@@ -158,25 +158,28 @@ internals.applyRoutes = function (server, next) {
         }],
 
         getDataForCntReps: ['findExercise', function(results, done) {
-          let reference = results.findReference();
-          let exercise = results.findExercise();
+          let reference = results.findReference;
+          let exercise = results.findExercise;
           let dataForCntReps = {};
 
           dataForCntReps['joint'] = exercise.joint;
           dataForCntReps['axis'] = exercise.axis;
           dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
           dataForCntReps['refUpperJointID'] = exercise.refUpperJoint;
-          // position values below, not jointID, initially null(?)
-          dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
-          dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
-          dataForCntReps['refMin'] = reference.refMin;
-          dataForCntReps['refMax'] = reference.refMax;
-          dataForCntReps['neckX'] = reference.neckX;
-          dataForCntReps['neckY'] = reference.neckY;
-          // numbers between [0,1]
-          dataForCntReps['topThresh'] = reference.topThresh;
-          dataForCntReps['topThresh'] = reference.topThresh;
-          dataForCntReps['rangeScale'] = reference.rangeScale;
+
+          if (reference !== undefined) {
+            // position values below, not jointID, initially null(?)
+            dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
+            dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
+            dataForCntReps['refMin'] = reference.refMin;
+            dataForCntReps['refMax'] = reference.refMax;
+            dataForCntReps['neckX'] = reference.neckX;
+            dataForCntReps['neckY'] = reference.neckY;
+            // numbers between [0,1]
+            dataForCntReps['topThresh'] = reference.topThresh;
+            dataForCntReps['topThresh'] = reference.topThresh;
+            dataForCntReps['rangeScale'] = reference.rangeScale;
+          }
 
           done(dataForCntReps);
         }]
@@ -207,6 +210,8 @@ internals.applyRoutes = function (server, next) {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             exercise : results.findExercise,
+            dataForCntReps: results.getDataForCntReps,
+            //dataForCntReps: JSON.stringify(results.getDataForCntReps),
             mode: request.params.mode,
             type: request.params.type
           });
@@ -219,6 +224,7 @@ internals.applyRoutes = function (server, next) {
           setNumber,
           exercise : results.findExercise,
           dataForCntReps: results.getDataForCntReps,
+          //dataForCntReps: JSON.stringify(results.getDataForCntReps),
           mode: request.params.mode,
           type: request.params.type,
           isComplete
