@@ -156,30 +156,6 @@ internals.applyRoutes = function (server, next) {
 
           Exercise.findById(request.params.exerciseId, done);
         }],
-        setComplete:['findExercise', function (results, done) {
-
-          if ( request.params.type === 'reference') {
-            return done();
-          }
-
-          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
-            isComplete = true;
-          }
-
-          const query = {
-            userId: patientId,
-            exerciseId: request.params.exerciseId,
-            referenceId: results.findReference[0]._id.toString(),
-          };
-
-          const update = {
-            $set: {
-              isComplete: isComplete
-            }
-          }
-
-          PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
-        }]
       }, (err, results) => {
 
         if (err) {
@@ -189,6 +165,7 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
+          isComplete = results.findNumPractices[0].isComplete;
           if ( isComplete ) {
             setNumber = results.findNumPractices[0].numSetsCompleted;
           }

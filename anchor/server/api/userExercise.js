@@ -281,7 +281,7 @@ internals.applyRoutes = function (server, next) {
         exerciseId: request.params.exerciseId,
       };
 
-      ReferenceExercise.findOne(query, (err, refExercise) => {
+      ReferenceExercise.findOne(query, {sort: {$natural: -1}}, (err, refExercise) => {
 
         if (err) {
           return reply(err);
@@ -327,7 +327,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  // this route checks to see if there is a practice session completed for the latest reference
+  // this route checks to see if there is a practice session completed for the latest version of reference
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{exerciseId}/{patientId?}',
@@ -382,7 +382,7 @@ internals.applyRoutes = function (server, next) {
 
   //retrieves practice exercise with a particular referenceId for the logged in patient
   //this route is used if we don't tag practiceExercise documents with a referenceId tag
-  //Not used?
+  //Not used.
   // server.route({
   //   method: 'GET',
   //   path: '/userexercise/practice/{referenceId}',
@@ -805,7 +805,15 @@ internals.applyRoutes = function (server, next) {
           ];
           ReferenceExercise.aggregate(pipeLine, done);
         },
-        findPracticeandUpdate: ['findMostRecentReference', function(results, done) {
+        findPracticeExercise: ['findMostRecentReference', function (results, done) {
+          const query = {
+            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
+            exerciseId: request.params.exerciseId,
+            referenceId: results.findMostRecentReference[0]._id.toString()
+          };
+          PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
+        }],
+        findPracticeandUpdate: ['findPracticeExercise', function(results, done) {
 
           const query = {
             userId: patientId,
@@ -813,7 +821,7 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
-          const update = {
+          let update = {
             $addToSet: {
               sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
             },
@@ -825,6 +833,22 @@ internals.applyRoutes = function (server, next) {
               weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
             }
           };
+
+          if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
+            update = {
+              $addToSet: {
+                sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+              },
+              $inc: {
+                numSetsCompleted: 1,
+                numRepsCompleted: 1
+              },
+              $set: {
+                weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
+                isComplete: true
+              }
+            };
+          }
           PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
         }]
       }, (err, results) => {

@@ -1,6 +1,20 @@
 'use strict';
 
 let liveFrames, refFrames, recentFrames;
+window.actionBtn = false;
+
+// window.addEventListener('beforeunload', function(e) {
+//   let warning = 'If you leave now, your progress will not be saved.';
+//   if (window.actionBtn) {
+//     return;
+//   }
+//   e.returnValue = warning;
+//   return false;
+// });
+
+$('.actionBtn').click(function() {
+  window.actionBtn = true;
+})
 
 function parseURL(url)
 {
@@ -148,6 +162,7 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
+
 
 (function ()
 {
