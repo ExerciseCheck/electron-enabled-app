@@ -1,7 +1,7 @@
 'use strict';
 
 const schema = Joi.object({
-  numSessions: Joi.number().integer().required(),
+  numSets: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required()
 });
 
@@ -26,5 +26,3 @@ $('#update').click((event) => {
     }
   });
 });
-
-

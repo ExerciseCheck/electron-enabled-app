@@ -10,7 +10,7 @@ function deleteDoc(id) {
       url: '/api/userexercise/' + id,
       type: 'DELETE',
       success: function (result) {
-        successAlert('UserExercise Deleted');
+        successAlert('ReferenceExercise Deleted');
         table.ajax.reload();
       },
       error: function (result) {
@@ -21,11 +21,11 @@ function deleteDoc(id) {
 }
 
 function editDoc(id) {
-  
+
   const url = '/api/userexercise/exerciseId/' + id;
   const patientId = window.location.pathname.split('/').pop();
   $.get(url, function(data){
-    
+
     window.location = '/userexercise/setting/' + data.exerciseId + '/' + patientId;
 
   });

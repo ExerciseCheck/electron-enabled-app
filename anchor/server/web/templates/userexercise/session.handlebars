@@ -15,6 +15,10 @@
             {{#compare type 'practice'}}
               <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
               <p>Set {{setNumber}} of {{numSets}}</p>
+              <div>
+                <p id="cntReps" onchange="displyRepCnts()">{{repCnts}} / {{numRepetition}} repetitions completed</p> <!---HERE---how to give values of repCnts?-->
+              </div>
+
             {{/compare}}
             {{#compare type 'reference'}}
               <p>{{formatName exercise.exerciseName}}</p>
@@ -53,7 +57,7 @@
             <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play','{{type}}')">START</button>
           {{/compare}}
           {{#compare mode 'play'}}
-              <button type="button" class="red white actionBtn btn btn-primary" onclick="action('stop', '{{type}}')">STOP</button>
+              <button type="button" class="red white actionBtn btn btn-primary actionBtn" onclick="action('stop', '{{type}}')">STOP</button>
           {{/compare}}
           {{#compare mode 'stop'}}
             {{#compare type 'reference'}}
@@ -74,6 +78,12 @@
 <link rel="stylesheet" href="/public/css/styleSheet/session.css">
 <link rel="stylesheet" href="/public/css/styleSheet/color.css">
 <link rel="stylesheet" href="/public/css/styleSheet/genericStyles.css">
+<script>
+  //handlebars variables to pass into session.js
+  let setNumber = {{setNumber}};
+  let numSets = {{numSets}};
+  let dataForCntReps = {{dataForCntReps}};
+</script>
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
 <script src="/public/data.js"></script>
 <script src="/public/bundle.js"></script>
