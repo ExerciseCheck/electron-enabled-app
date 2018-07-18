@@ -371,7 +371,7 @@ internals.applyRoutes = function (server, next) {
           Exercise.findById(request.params.exerciseId, done);
         }],
         getDataForCntReps: ['findExercise', function(results, done) {
-          let reference = results.findReference;
+          let reference = results.findMostRecentReference;
           let exercise = results.findExercise;
 
           dataForCntReps['joint'] = exercise.joint;

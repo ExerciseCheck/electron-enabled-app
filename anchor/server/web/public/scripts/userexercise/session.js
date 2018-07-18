@@ -1,14 +1,7 @@
 'use strict';
 
 let liveFrames, refFrames, recentFrames;
-let nx_1stFrame, ny_1stFrame;
 let dataForCntReps = {};
-//let dataForCntReps = {{dataForCntReps}};
-//const dataForCntReps = require('../../../routes/userexercise');
-// var joint = dataForCntReps.joint;
-// var coordinate = dataForCntReps.axis;
-// var threshold_flag = dataForCntReps.direction; // initialize
-var repCnt = 0;
 
 window.actionBtn = false;
 
@@ -248,6 +241,8 @@ function displyRepCnts() {
 
 (function ()
 {
+  let nx_1stFrame, ny_1stFrame;
+  var repCnt = 0;
 
   let processing, canvas, ctx, ref_canvas, ref_ctx, exe_canvas, exe_ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
