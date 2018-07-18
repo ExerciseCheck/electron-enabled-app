@@ -8,9 +8,21 @@ window.actionBtn = false;
 //   if (window.actionBtn) {
 //     return;
 //   }
-//   e.returnValue = warning;
-//   return false;
+//   e.returnValue = undefined;
 // });
+
+window.onbeforeunload = (e) => {
+  if (window.actionBtn) {
+    return;
+  }
+
+  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
+    return;
+  }
+  else {
+    return false;
+  }
+}
 
 $('.actionBtn').click(function() {
   window.actionBtn = true;
