@@ -2,11 +2,12 @@
 
 let liveFrames, refFrames, recentFrames;
 let nx_1stFrame, ny_1stFrame;
+let dataForCntReps = {};
 //let dataForCntReps = {{dataForCntReps}};
 //const dataForCntReps = require('../../../routes/userexercise');
-var joint = dataForCntReps.joint;
-var coordinate = dataForCntReps.axis;
-var threshold_flag = dataForCntReps.direction; // initialize
+// var joint = dataForCntReps.joint;
+// var coordinate = dataForCntReps.axis;
+// var threshold_flag = dataForCntReps.direction; // initialize
 var repCnt = 0;
 
 function parseURL(url)
@@ -248,6 +249,15 @@ function displyRepCnts() {
   let live_counter = 0;
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
+
+  let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
+  (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
+  $.get(url, function(data){
+    dataForCntReps = data;
+    dataForCntReps.joint = data.joint;
+    dataForCntReps.coordinate = data.coordinate;
+    dataForCntReps.threshold_flag = data.threshold_flag;
+  });
 
   if (isElectron())
   {

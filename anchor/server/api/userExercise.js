@@ -329,6 +329,85 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
+    path: '/userexercise/dataforcount/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+      }
+    },
+    handler: function (request, reply) {
+
+      let patientId = '';
+      let dataForCntReps = {};
+      //logged in user is a clinician
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      //Logged in user is a patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+      Async.auto({
+
+        //first we need to find the referenceId of the exercise
+        //finding one document matching the query is enough
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findExercise:['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        getDataForCntReps: ['findExercise', function(results, done) {
+          let reference = results.findReference;
+          let exercise = results.findExercise;
+
+          dataForCntReps['joint'] = exercise.joint;
+          dataForCntReps['axis'] = exercise.axis;
+          dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
+          dataForCntReps['refUpperJointID'] = exercise.refUpperJoint;
+
+          if (reference !== undefined) {
+            // position values below, not jointID, initially null(?)
+            dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
+            dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
+            dataForCntReps['refMin'] = reference.refMin;
+            dataForCntReps['refMax'] = reference.refMax;
+            dataForCntReps['neckX'] = reference.neckX;
+            dataForCntReps['neckY'] = reference.neckY;
+            // numbers between [0,1]
+            dataForCntReps['topThresh'] = reference.topThresh;
+            dataForCntReps['topThresh'] = reference.topThresh;
+            dataForCntReps['rangeScale'] = reference.rangeScale;
+          }
+          done();
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+        return reply(dataForCntReps);
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
     path: '/userexercise/practice/{exerciseId}/{patientId?}',
     config: {
       auth: {

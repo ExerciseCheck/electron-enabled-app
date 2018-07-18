@@ -115,6 +115,7 @@ internals.applyRoutes = function (server, next) {
       }
       let isComplete = false;
       let setNumber = 0;
+      let dataForCntReps = {};
 
       Async.auto({
         findReference: function (done) {
@@ -160,7 +161,6 @@ internals.applyRoutes = function (server, next) {
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findReference;
           let exercise = results.findExercise;
-          let dataForCntReps = {};
 
           dataForCntReps['joint'] = exercise.joint;
           dataForCntReps['axis'] = exercise.axis;
@@ -180,8 +180,7 @@ internals.applyRoutes = function (server, next) {
             dataForCntReps['topThresh'] = reference.topThresh;
             dataForCntReps['rangeScale'] = reference.rangeScale;
           }
-
-          done(dataForCntReps);
+          done();
         }]
 
 
@@ -210,7 +209,7 @@ internals.applyRoutes = function (server, next) {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             exercise : results.findExercise,
-            dataForCntReps: results.getDataForCntReps,
+            dataForCntReps,
             //dataForCntReps: JSON.stringify(results.getDataForCntReps),
             mode: request.params.mode,
             type: request.params.type
