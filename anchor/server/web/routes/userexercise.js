@@ -20,7 +20,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      return reply.view('userexercise/index', {
+      return reply.view('userexercise/viewreference', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
       });
