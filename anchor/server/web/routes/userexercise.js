@@ -115,7 +115,6 @@ internals.applyRoutes = function (server, next) {
       }
       let isComplete = false;
       let setNumber = 0;
-      let dataForCntReps = {};
 
       Async.auto({
         findReference: function (done) {
@@ -151,7 +150,7 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findReference[0]._id.toString(),
           };
 
-          PracticeExercise.find(query, done);
+          PracticeExercise.find(query, {sort: {$natural: -1}}, done);
         }],
         findExercise:['findNumPractices', function (results, done) {
 
@@ -161,7 +160,6 @@ internals.applyRoutes = function (server, next) {
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findReference;
           let exercise = results.findExercise;
-
           dataForCntReps['joint'] = exercise.joint;
           dataForCntReps['axis'] = exercise.axis;
           dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
@@ -189,19 +187,13 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-        if (!results.findExercise || results.findExercise === undefined) {
+        if (!results.findExercise) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices[0].numSetsCompleted === results.findReference[0].numSets ) {
-            isComplete = true;
-          }
-          if ( isComplete ) {
-            setNumber = results.findNumPractices[0].numSetsCompleted;
-          }
-          else if ( !isComplete )  {
+          isComplete = results.findNumPractices[0].isComplete;
+          (isComplete) ? setNumber = results.findNumPractices[0].numSetsCompleted :
             setNumber = results.findNumPractices[0].numSetsCompleted + 1;
-          }
         }
 
         if ( request.params.type === 'reference' ) {

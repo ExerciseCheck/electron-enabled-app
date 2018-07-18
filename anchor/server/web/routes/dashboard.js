@@ -151,7 +151,6 @@ internals.applyRoutes = function (server, next) {
           if (!results.exercises || !results.getLatestReferenceSession) {
             return reply(Boom.notFound('Document not found.'));
           }
-          //return reply(results.findLatestSession);
           return reply.view('patient/viewExercises', {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),

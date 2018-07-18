@@ -57,7 +57,7 @@
             <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play','{{type}}')">START</button>
           {{/compare}}
           {{#compare mode 'play'}}
-              <button type="button" class="red white actionBtn btn btn-primary" onclick="action('stop', '{{type}}')">STOP</button>
+              <button type="button" class="red white actionBtn btn btn-primary actionBtn" onclick="action('stop', '{{type}}')">STOP</button>
           {{/compare}}
           {{#compare mode 'stop'}}
             {{#compare type 'reference'}}
