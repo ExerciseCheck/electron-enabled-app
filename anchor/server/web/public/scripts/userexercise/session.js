@@ -324,7 +324,7 @@ function goToExercises() {
     if(drawCircle)
     {
       drawCenterCircle({
-        x: width / 2, y: height / 5, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
+        x: width / 2, y: 130, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
       },ctx);
     }
     //connect all the joints with the order defined in jointType
@@ -457,7 +457,7 @@ function goToExercises() {
     //in theses cases, the in-position will not be checked
     else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
       ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
-      ((parsedURL.type === 'practice') && (parsedURL.mode === 'start')) ||
+      ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
     {
