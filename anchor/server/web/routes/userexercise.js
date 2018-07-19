@@ -4,6 +4,8 @@ const Async = require('async');
 const Boom = require('boom');
 const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
+const ReferenceExercise = require('../../models/referenceExercise');
+//const PracticeExercise = require('../../models/PracticeExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
 
@@ -210,17 +212,10 @@ internals.applyRoutes = function (server, next) {
       }
     },
     handler: function (request, reply) {
-      // FIX-ME: Must default values for impJoint, impAxis, direction,
-      // lowerJoint, upperJoint be defined here for certain known exercises like
-      // squats and hand-raise?
+
       let referenceExists = true;
       let defaultNumReps = 1;
       let defaultNumSets = 1;
-      let defaultImpJoint = 0; // Spine base
-      let defaultImpAxis = 'depthY';
-      let direction = 'up';
-      let lowerJoint = 0; // Spine base
-      let upperJoint = 20; // Spine shoulder
 
       Async.auto({
 
