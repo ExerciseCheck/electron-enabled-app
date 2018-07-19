@@ -16,11 +16,6 @@
                                 <th>ExerciseId</th>
                                 <th>numSessions</th>
                                 <th>numRepetition</th>
-                                <th>impJoint</th>
-                                <th>impAxis</th>
-                                <th>direction</th>
-                                <th>lowerJoint</th>
-                                <th>upperJoint</th>
                                 <th>type</th>
                                 <th>createdAt</th>
                               {{#role user 'admin'}}
@@ -53,7 +48,7 @@
             ajax: {
                 url: "../api/table/userexercise",
                 data: function (d) {
-                    d.fields = "userId exerciseId numSessions createdAt type name exerciseName numRepetition impJoint impAxis direction lowerJoint upperJoint";
+                    d.fields = "userId exerciseId numSessions createdAt type name exerciseName numRepetition";
                 }
             },
             columns: [
@@ -81,26 +76,6 @@
                 },
                 {
                     data: "numRepetition",
-                    defaultContent: ""
-                },
-                {
-                    data: "impJoint",
-                    defaultContent: ""
-                },
-                {
-                    data: "impAxis",
-                    defaultContent: ""
-                },
-                {
-                    data: "direction",
-                    defaultContent: ""
-                },
-                {
-                    data: "lowerJoint",
-                    defaultContent: ""
-                },
-                {
-                    data: "upperJoint",
                     defaultContent: ""
                 },
                 {
