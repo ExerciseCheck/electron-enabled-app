@@ -158,7 +158,7 @@ function savePractice() {
       $.get(url, function(data){
         localStorage.setItem("refFrames", JSON.stringify(data));
         if(isComplete) {
-          window.location = 'userexercise/session/end/practice/' +
+          window.location = '/userexercise/session/end/practice/' +
             exerciseId + '/' + patientId;
         }
         else {
@@ -256,7 +256,7 @@ function goToExercises() {
       document.getElementById("outputCanvas").style.display = "none";
     }
     // start of updating reference and practice
-    else if(parsedURL.mode === 'start' && refFrames)
+    else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
     {
       ref_index = 0;
       exe_index = 0;
