@@ -131,16 +131,19 @@ function saveReference() {
 function savePractice() {
 
   const parsedURL = parseURL(window.location.pathname);
-  let url ='/api/userexercise/practice/mostrecent/data/' + parsedURL.exerciseId + '/';
   let patientId = parsedURL.patientId;
+  let exerciseId = parsedURL.exerciseId;
+  let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
-  //logged-in user ia clinician
+
   if (patientId) {
     url = url + patientId;
   }
   if(setNumber === numSets) {
     values.weekEnd = new Date().getWeekNumber();
+    isComplete = true;
   }
   $.ajax({
     type: 'PUT',
@@ -148,15 +151,20 @@ function savePractice() {
     data: values,
     success: function (result) {
 
-      let url = '/api/userexercise/loadreference/' + parsedURL.exerciseId + '/';
+      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
       if(patientId) {
         url = url + patientId;
       }
       $.get(url, function(data){
         localStorage.setItem("refFrames", JSON.stringify(data));
-
-        window.location = '/userexercise/session/start/practice/' +
-        parsedURL.exerciseId + '/' + patientId;
+        if(isComplete) {
+          window.location = 'userexercise/session/end/practice' +
+            exerciseId + '/' + patientId;
+        }
+        else {
+          window.location = '/userexercise/session/start/practice/' +
+            exerciseId + '/' + patientId;
+        }
       });
     },
     error: function (result) {

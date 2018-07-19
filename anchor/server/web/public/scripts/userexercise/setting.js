@@ -156,14 +156,15 @@ function updateReference() {
 function StartPracticeSession() {
 
   const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
-  $.get(url, function(data) {
-    if (data === true) {
-      loadReferenceandStart('practice');
-    }
-    else {
-      initializePractice();
-    }
-  });
+  // $.get(url, function(data) {
+  //   if (data === true) {
+  //     loadReferenceandStart('practice');
+  //   }
+  //   else {
+  //     initializePractice();
+  //   }
+  // });
+  initializePractice();
 }
 
 function loadReferenceandStart(type) {

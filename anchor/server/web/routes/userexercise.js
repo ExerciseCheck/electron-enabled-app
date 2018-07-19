@@ -96,7 +96,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop') {
+      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop' && request.params.mode !== 'end') {
         return reply(Boom.notFound('Invalid Mode'));
       }
 
