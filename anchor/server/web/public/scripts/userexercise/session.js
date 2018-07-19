@@ -158,7 +158,7 @@ function savePractice() {
       $.get(url, function(data){
         localStorage.setItem("refFrames", JSON.stringify(data));
         if(isComplete) {
-          window.location = 'userexercise/session/end/practice' +
+          window.location = 'userexercise/session/end/practice/' +
             exerciseId + '/' + patientId;
         }
         else {
