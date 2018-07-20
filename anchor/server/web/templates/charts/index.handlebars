@@ -1,0 +1,308 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div style="padding: 30px">
+        <h3>Charts</h3>
+        <hr>
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-primary active">
+            <input type="radio" name="options" id="option1" autocomplete="off" checked> Day
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option2" autocomplete="off"> Week
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option3" autocomplete="off"> Month
+          </label>
+        </div>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/highcharts-more.js"></script>
+        <script src="https://code.highcharts.com/modules/series-label.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+
+        <div id="chart-container"></div>
+
+        <script>
+          var chart = Highcharts.chart('chart-container', {
+            title: {
+              text: 'Sessions Completed'
+            },
+            yAxis: {
+              title: {
+                text: 'Sessions'
+              }
+            },
+            legend: {
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'middle'
+            },
+            plotOptions: {
+              series: {
+                label: {
+                  connectorAllowed: false
+                },
+                pointStart: 2010
+              }
+            },
+            series: [{
+              name: 'Recommended',
+              data: [20, 20, 20, 20, 20, 20, 20, 20]
+            }, {
+              name: 'Your Progress',
+              data: [12, 15, 14, 10, 6, 12, 15, 14]
+            }],
+            responsive: {
+              rules: [{
+                condition: {
+                  maxWidth: 500
+                },
+                chartOptions: {
+                  legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                  }
+                }
+              }]
+            }
+          });
+          // on button click, get data with chart.series[1].processedYData
+          // manipulate data then run update function
+          /*
+          chart.series[1].update({
+              data: t
+          }, true);
+          */
+        </script>
+        <script>
+          //Dummy Data for checking cases
+          var repTime = 5
+          var numSets = 6
+          var rep1 = [3,6,4]
+          var rep2 = [4,3,5]
+          var rep3 = [5,2,6]
+          var rep4 = [5,7,7]
+          var rep5 = [4,4,5]
+          var rep6 = [7,5,3]
+
+          var barChart = document.getElementById('myChart').getContext('2d');
+          //Function to draw a line at recommended time for rep completion
+          Chart.pluginService.register({
+            afterDraw: function(chart) {
+              if (typeof chart.config.options.lineAt != 'undefined') {
+                var lineAt = chart.config.options.lineAt;
+                var ctxPlugin = chart.chart.ctx;
+                var xAxe = chart.scales[chart.config.options.scales.xAxes[0].id];
+                var yAxe = chart.scales[chart.config.options.scales.yAxes[0].id];
+                if(yAxe.min != 0) return;
+                ctxPlugin.strokeStyle = "red";
+                ctxPlugin.beginPath();
+                lineAt = (lineAt - yAxe.min) * (100 / yAxe.max);
+                lineAt = (100 - lineAt) / 100 * (yAxe.height) + yAxe.top;
+                ctxPlugin.moveTo(xAxe.left, lineAt);
+                ctxPlugin.lineTo(xAxe.right, lineAt);
+                ctxPlugin.stroke();
+              }
+            }
+          });
+
+          var data = {
+            labels: ["Set1", "Set2", "Set3"],
+            datasets: [
+              {
+                data: rep1,
+              },
+              {
+                data: rep2,
+              },
+              {
+                data: rep3,
+              },
+              {
+                data: rep4,
+              },
+              {
+                data: rep5,
+              },
+              {
+                data: rep6,
+              }
+            ],
+          };
+
+          var colorPlugin = {
+
+            // We affect the `beforeUpdate` event
+            beforeUpdate: function(chart) {
+
+              for(var x = 0; x < numSets; x++){
+                var backgroundColor = [];
+                var borderColor = [];
+                var color;
+                // For every data we have ...
+                for (var i = 0; i < chart.config.data.datasets[x].data.length; i++) {
+
+                  // check time against recommended time
+                  if(chart.config.data.datasets[x].data[i] <= repTime*0.7){
+                    color = ('rgba(255, 99, 132, ');
+                  }
+                  else if (chart.config.data.datasets[x].data[i] == repTime){
+                    color = ('rgba(142, 213, 87, ');
+                  }
+                  else if (chart.config.data.datasets[x].data[i] > repTime){
+                    color = ('rgba(144, 178, 71, ');
+                  }
+
+                  // We push this new color to both background and border color arrays
+                  backgroundColor.push(color + '0.65)');
+                  borderColor.push(color +'1)');
+                }
+
+                // We update the chart bars color properties
+                chart.config.data.datasets[x].backgroundColor = backgroundColor;
+                chart.config.data.datasets[x].borderColor = borderColor;
+              }
+            }
+          };
+
+          // We now register the plugin to the chart's plugin service to activate it
+          Chart.pluginService.register(colorPlugin);
+
+
+          var myChart = new Chart(barChart,{
+            type: 'bar',
+            data: data,
+            options: {
+              title:{
+                display: true,
+                text: 'Session Reptition Accuracies',
+                fontSize: 15,
+                fontColor: 'black'
+              },
+              legend: {
+                display: false,
+              },
+              lineAt: repTime,
+              scales: {
+                xAxes: [{
+                  scaleLabel:{
+                    display: true,
+                    labelString: 'Sets in session',
+                    fontColor: 'black',
+                    fontSize: 15
+                  },
+                }],
+                yAxes: [{
+                  scaleLabel:{
+                    display: true,
+                    labelString: 'Time taken for repition',
+                    fontColor: 'black',
+                    fontSize: 15
+                  },
+                  ticks: {
+                    beginAtZero:true
+                  },
+                  gridLines: {
+                    color: "black",
+                    borderDash: [2, 5]
+                  },
+                }]
+              }
+            }
+          });
+        </script>
+        <script>
+
+          var numReps = 5
+          Highcharts.chart('container', {
+
+            chart: {
+              type: 'boxplot'
+            },
+
+            title: {
+              text: 'Session Repition Accuracies'
+            },
+
+            legend: {
+              enabled: false
+            },
+
+            xAxis: {
+              categories: ['Set1', 'Set2', 'Set3', 'Set4', 'Set5'],
+              title: {
+                text: 'Session Summary'
+              }
+            },
+            yAxis: {
+              title: {
+                text: 'Repitition Accuracy'
+              },
+              plotLines: [{
+                value: 898,
+                color: 'red',
+                width: 1
+              }]
+            },
+
+            series: [{
+              name: 'Accuracies',
+              data: [
+                [760, 801, 848, 895, 965],
+                [733, 853, 939, 980, 1080],
+                [714, 762, 817, 870, 918],
+                [724, 802, 806, 871, 950],
+                [834, 836, 864, 882, 910]
+              ],
+              tooltip: {
+                headerFormat: '<em>Set: {point.key}</em><br/>',
+                pointFormat: 'Number of Repitions:' + numReps
+              }
+            },
+              {
+                name: 'Outlier',
+                //color: Highcharts.getOptions().colors[0],
+                type: 'scatter',
+                data: [ // x, y positions where 0 is the first category
+                  [0, 644],
+                  [4, 718],
+                  [4, 951],
+                  [4, 969]
+                ],
+                color: 'rgba(223, 83, 83, .5)',
+                allowPointSelect: true,
+                tooltip: {
+                  pointFormat: 'Accuracy: {point.y}',
+                }
+              },
+              {
+                name: 'Repition Accuracy',
+                //color: Highcharts.getOptions().colors[0],
+                type: 'scatter',
+                data: [
+                  // x, y positions where 0 is the first category
+                  // X = numSets
+                  //Y = Accuracy
+                  //length of data[0] = numReps
+                  [0, 760], [0, 801], [0, 848], [0, 895], [0, 965],
+                  [1, 733], [1, 853], [1, 939], [1, 980], [1, 1080],
+                  [2, 714], [2, 762], [2, 817], [2, 870], [2, 918],
+                  [3, 724], [3, 802], [3, 806], [3, 871], [3, 950],
+                  [4, 834], [4, 836], [4, 864], [4, 882], [4, 910]
+                ],
+                color: 'rgba(223, 83, 83, .5)',
+                allowPointSelect: true,
+                tooltip: {
+                  pointFormat: 'Accuracy: {point.y}',
+                }
+              }]
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</div>

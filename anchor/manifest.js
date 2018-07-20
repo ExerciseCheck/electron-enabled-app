@@ -121,6 +121,9 @@ const manifest = {
       }
     },
     {
+      plugin: './server/web/routes/charts'
+    },
+    {
       plugin: './server/api/contact',
       options: {
         routes: { prefix: '/api' }
