@@ -6,7 +6,7 @@ const Config = require('../../../config');
 const UserExercise = require('../../models/userExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
-const Info = require('../../web/templates/userexercise/exerciseInfo')
+const Info = require('./exerciseInfo.json');
 
 internals.applyRoutes = function (server, next) {
 
@@ -61,7 +61,6 @@ internals.applyRoutes = function (server, next) {
       }
     },
     handler: function (request, reply) {
-
       return reply.view('userexercise/create', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
@@ -476,12 +475,13 @@ internals.applyRoutes = function (server, next) {
       }
     },
     handler: function (request, reply) {
-      console.log(Info)
-      return reply.view('/userexercise/info/{exerciseName}', {
+      let exerciseName = request.params.exerciseName;
+      return reply.view('userexercise/info', {
         user: request.auth.credentials.user,
+        exerciseName: exerciseName,
         projectName: Config.get('/projectName'),
-        title: '{exerciseName} Information',
-      //  instructions:
+        title: exerciseName + ' Information',
+        instructions: Info[exerciseName]['Instructions']
 
       });
     }
