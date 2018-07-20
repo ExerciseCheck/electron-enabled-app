@@ -1,6 +1,32 @@
 'use strict';
 
 let liveFrames, refFrames, recentFrames;
+window.actionBtn = false;
+
+// window.addEventListener('beforeunload', function(e) {
+//   let warning = 'If you leave now, your progress will not be saved.';
+//   if (window.actionBtn) {
+//     return;
+//   }
+//   e.returnValue = undefined;
+// });
+
+window.onbeforeunload = (e) => {
+  if (window.actionBtn) {
+    return;
+  }
+
+  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
+    return;
+  }
+  else {
+    return false;
+  }
+}
+
+$('.actionBtn').click(function() {
+  window.actionBtn = true;
+})
 
 function parseURL(url)
 {
@@ -30,6 +56,14 @@ function parseURL(url)
     type: type
   };
 }
+
+Date.prototype.getWeekNumber = function(){
+  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+};
 
 function action(nextMode, type)
 {
@@ -75,6 +109,12 @@ function saveReference() {
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(refFrames);
+  values.neckX = 2;
+  values.neckY = 2;
+  values.refMin = 2;
+  values.refMax = 2;
+  values.refLowerJoint = 2;
+  values.refUpperJoint = 2;
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
@@ -91,31 +131,41 @@ function saveReference() {
 function savePractice() {
 
   const parsedURL = parseURL(window.location.pathname);
-  let url ='/api/userexercise/practice';
-  let patientId = '';
+  let patientId = parsedURL.patientId;
+  let exerciseId = parsedURL.exerciseId;
+  let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  let isComplete = false;
   let values = {};
-  values.exerciseId = parsedURL.exerciseId;
   values.bodyFrames = JSON.stringify(recentFrames);
-  //logged-in user ia clinician
-  if (parsedURL.patientId) {
-    url = '/api/userexercise/practice/' + parsedURL.patientId;
-    patientId = parsedURL.patientId;
+
+  if (patientId) {
+    url = url + patientId;
+  }
+  if(setNumber === numSets) {
+    values.weekEnd = new Date().getWeekNumber();
+    isComplete = true;
   }
   $.ajax({
-    type: 'POST',
+    type: 'PUT',
     url: url,
     data: values,
     success: function (result) {
-      let url = '/api/userexercise/loadreference/' + values.exerciseId + '/';
-      if(parsedURL.patientId) {
-        url = url + parsedURL.patientId;
-      }
-        $.get(url, function(data){
-          localStorage.setItem("refFrames", JSON.stringify(data));
 
-         window.location = '/userexercise/session/start/practice/' +
-            parsedURL.exerciseId + '/' + patientId;
-        });
+      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
+      if(patientId) {
+        url = url + patientId;
+      }
+      $.get(url, function(data){
+        localStorage.setItem("refFrames", JSON.stringify(data));
+        if(isComplete) {
+          window.location = '/userexercise/session/end/practice/' +
+            exerciseId + '/' + patientId;
+        }
+        else {
+          window.location = '/userexercise/session/start/practice/' +
+            exerciseId + '/' + patientId;
+        }
+      });
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -132,6 +182,7 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
+
 
 (function ()
 {
@@ -205,7 +256,7 @@ function goToExercises() {
       document.getElementById("outputCanvas").style.display = "none";
     }
     // start of updating reference and practice
-    else if(parsedURL.mode === 'start' && refFrames)
+    else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
     {
       ref_index = 0;
       exe_index = 0;
@@ -273,7 +324,7 @@ function goToExercises() {
     if(drawCircle)
     {
       drawCenterCircle({
-        x: width / 2, y: height / 5, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
+        x: width / 2, y: 130, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
       },ctx);
     }
     //connect all the joints with the order defined in jointType
@@ -379,7 +430,6 @@ function goToExercises() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
-          //localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
         }
       }
       live_counter = live_counter + 1;
@@ -407,7 +457,7 @@ function goToExercises() {
     //in theses cases, the in-position will not be checked
     else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
       ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
-      ((parsedURL.type === 'practice') && (parsedURL.mode === 'start')) ||
+      ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
     {

@@ -68,7 +68,7 @@ const manifest = {
             Invite: './server/models/invite',
             Session: './server/models/session',
             Template: './server/models/template',
-            UserExercise: './server/models/userExercise',
+            PracticeExercise: './server/models/practiceExercise',
             ReferenceExercise: './server/models/ReferenceExercise',
             // PracticeExercise: './server/models/PracticeExercise',
             Exercise: './server/models/exercise',
