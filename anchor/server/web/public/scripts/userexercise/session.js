@@ -190,6 +190,7 @@ function goToExercises() {
   let radius=9; //radius of joint circle
   let circle_radius = 50//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
+  let notAligned = true; // whether person has aligned in circle for the first time or not
   // index of reference frame
   let ref_index = 0;
   // index of exercise frame
@@ -316,7 +317,7 @@ function goToExercises() {
     jointType.forEach(function(jointType){
       drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx);
     });
-    if(drawCircle)
+    if(drawCircle && notAligned)
     {
       drawCenterCircle({
         x: width / 2, y: 130, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
@@ -366,8 +367,9 @@ function goToExercises() {
       //When person's neck enters green circle && mode is 'play', recording will start.
       ctx.strokeStyle="#3de562";
       var parsedURL = parseURL(window.location.pathname);
-      if(parsedURL.mode === 'play') {
+      if(parsedURL.mode === 'play' && notAligned) {
         startTimer();
+        notAligned = false; // Person has entered green circle; they are aligned.
       }
     }
     else
