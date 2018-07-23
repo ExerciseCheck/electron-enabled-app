@@ -1,15 +1,10 @@
 'use strict';
 
+// liveFrames is a temporary name/status for currently recorded frames.
+// ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
+// recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames;
 window.actionBtn = false;
-
-// window.addEventListener('beforeunload', function(e) {
-//   let warning = 'If you leave now, your progress will not be saved.';
-//   if (window.actionBtn) {
-//     return;
-//   }
-//   e.returnValue = undefined;
-// });
 
 window.onbeforeunload = (e) => {
   if (window.actionBtn) {
@@ -88,7 +83,7 @@ function action(nextMode, type)
     });
   }
   //This condition describes the end of an update or create reference.
-  //The refFrames data in local storage gets set to the most recent frames.
+  //The refFrames data in local storage gets set to the most recent/live frames.
   if(nextMode === 'stop' && type === 'reference') {
     localStorage.setItem("refFrames", JSON.stringify(liveFrames));
     redirect();
@@ -369,10 +364,10 @@ function goToExercises() {
     let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2));
     if(dist <= r){
       //When person's neck enters green circle && mode is 'play', recording will start.
-      ctx.strokeStyle="green";
+      ctx.strokeStyle="#3de562";
       var parsedURL = parseURL(window.location.pathname);
       if(parsedURL.mode === 'play') {
-        localStorage.setItem('canStartRecording', true);
+        startTimer();
       }
     }
     else

@@ -58,11 +58,7 @@ $(".listButtons a").click(function() {
   const checkPrac = '/api/userexercise/practice/' + exerciseId + '/';
 
   $.get(checkPrac, function(data) {
-     if(data === false) {
-       initializePractice(exerciseId, addressValue);
-     }
-     else {
-       window.location = addressValue;
-     }
+    initializePractice(exerciseId, addressValue);
+
   });
 });
