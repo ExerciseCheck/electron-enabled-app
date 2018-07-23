@@ -52,14 +52,6 @@ function parseURL(url)
   };
 }
 
-Date.prototype.getWeekNumber = function(){
-  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-  var dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
-};
-
 function action(nextMode, type)
 {
 
@@ -191,6 +183,7 @@ function goToExercises() {
   let circle_radius = 50//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   let notAligned = true; // whether person has aligned in circle for the first time or not
+  let useTimer = true; // whether or not to use the startTimer() function
   // index of reference frame
   let ref_index = 0;
   // index of exercise frame
@@ -310,6 +303,27 @@ function goToExercises() {
     }
   }
 
+  function startTimer() {
+    var start = Date.now();
+    var timer = setInterval(function () {
+      var delta = Date.now() - start;
+      var time = window.CONFIG.TIMER_MAX - Math.floor(delta / 1000);
+      if (time <= 0) {
+        clearInterval(timer);
+        $("#timerStart").attr("class", "greenColor large");
+        $("#timerStart").text("Recording has begun");
+        $("#num").text("");
+        localStorage.setItem('canStartRecording', true);
+        notAligned = false;
+        var event = new Event('timer-done');
+        document.dispatchEvent(event);
+      } else {
+        $("#timerStart").text("Recording will begin in...");
+        $("#num").text(time);
+      }
+    }, 100);
+  }
+
   //function that draws the body skeleton
   function drawBody(parameters, ctx, drawCircle = true){
 
@@ -367,9 +381,9 @@ function goToExercises() {
       //When person's neck enters green circle && mode is 'play', recording will start.
       ctx.strokeStyle="#3de562";
       var parsedURL = parseURL(window.location.pathname);
-      if(parsedURL.mode === 'play' && notAligned) {
+      if(parsedURL.mode === 'play' && useTimer) {
         startTimer();
-        notAligned = false; // Person has entered green circle; they are aligned.
+        useTimer = false;
       }
     }
     else
@@ -392,7 +406,7 @@ function goToExercises() {
     exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
     //tag the canvas
     ctx.font="30px MS";
-    ctx.fillStyle = "red";
+    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
     ctx.textAlign = "center";
     ctx.fillText("Live", canvas.width/2, canvas.height/20);
 
