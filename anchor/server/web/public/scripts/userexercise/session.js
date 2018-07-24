@@ -2,28 +2,7 @@
 
 var liveFrames, refFrames, recentFrames;
 var actionBtn = false;
-
-var db;
-var req = window.indexedDB.open("bodyFrames", 1);
-
-req.onerror = () => {
-  console.log('Database failed to open');
-};
-
-req.onsuccess = () => {
-  console.log('Database opened successfully');
-  db = request.result;
-};
-
-req.onupgradeneeded = function(e) {
-  console.log("Upgrade event triggered");
-  db = e.target.result;
-  let newObjectStore = db.createObjectStore('bodyFrames', {keyPath: 'type'});
-};
-
-db.onerror = function(e) {
-  alert("Database error: " + e.target.errorCode);
-}
+var db, req;
 
 function parseURL(url)
 {
@@ -62,54 +41,51 @@ Date.prototype.getWeekNumber = function(){
   return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
 };
 
-function action(nextMode, type)
-{
 
-  const parsedURL = parseURL(window.location.pathname);
-  var patientId = parsedURL.patientId;
-  var exerciseId = parsedURL.exerciseId;
+function action(nextMode, type) {
+  openDB(function() {
+    const parsedURL = parseURL(window.location.pathname);
+    var patientId = parsedURL.patientId;
+    var exerciseId = parsedURL.exerciseId;
 
-  function redirect() {
-    var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
-    window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
-  }
+    function redirect() {
+      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
+    }
 
-  //Because current functionality is set such that each step of session ("play", stop, review)
-  //opens on a new url, we must load reference bodyFrame data from database accordingly.
-  function loadReferenceandRedirect() {
-    let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-    (!parsedURL.patientId) ? url = url: url = url + patientId;
-    $.get(url, function(data){
-      let refEntry = {type: 'refFrames', body: data};
-      let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
-      let request = bodyFramesStore.put(refEntry);
-      // localStorage.setItem("refFrames", JSON.stringify(data));
-      request.onsuccess = function(e) {
+    //Because current functionality is set such that each step of session ("play", stop, review)
+    //opens on a new url, we must load reference bodyFrame data from database accordingly.
+    function loadReferenceandRedirect() {
+      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
+      (!parsedURL.patientId) ? url = url: url = url + patientId;
+      $.get(url, function(data){
+        let refEntry = {type: 'refFrames', body: data};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        bodyFramesStore.put(refEntry);
         redirect();
-      }
-      request.onerror = function(e) {
-        console.log("Could not load reference data");
-      }
-    });
-  }
-  //This condition describes the end of an update or create reference.
-  //The refFrames data in local storage gets set to the most recent frames.
-  if(nextMode === 'stop' && type === 'reference') {
-    let updatedRef = {type: 'refFrames', body: liveFrames};
-    let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
-    let request = bodyFramesStore.put(updatedRef);
-    // localStorage.setItem("refFrames", JSON.stringify(liveFrames));
-    request.onsuccess = function(event) {
-      redirect();
+        // localStorage.setItem("refFrames", JSON.stringify(data));
+      });
     }
-  }
-  else {
-    if(nextMode === 'stop') {
-      let request = db.transaction(['bodyFrames']), 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
-      // localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+
+    //This condition describes the end of an update or create reference.
+    //The refFrames data in local storage gets set to the most recent frames.
+    if(nextMode === 'stop' && type === 'reference') {
+        let updatedRef = {type: 'refFrames', body: liveFrames};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedRef);
+        // localStorage.setItem("refFrames", JSON.stringify(liveFrames));
+        request.onsuccess = function(event) {
+          redirect();
+        }
     }
-    loadReferenceandRedirect();
-  }
+    else {
+      if(nextMode === 'stop') {
+        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+        // localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+      }
+      loadReferenceandRedirect();
+    }
+  });
 }
 
 function saveReference() {
@@ -261,21 +237,23 @@ $('.actionBtn').click(function() {
       //   refFrames = JSON.parse(localStorage.getItem('refFrames'));
       //   localStorage.removeItem('refFrames');
       // }
-      let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
-      getref.onsuccess = function(e) {
-        if(getref.result.body.length !== 0) {
-          refFrames = getref.result.body;
-          let deleteref = db.transaction(['bodyFrames']).objectStore('bodyFrames').delete('refFrames');
+      openDB(function() {
+        let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
+        getref.onsuccess = function(e) {
+          if(getref.result.body.length !== 0) {
+            refFrames = getref.result.body;
+            let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('refFrames');
+          }
         }
-      }
 
-      let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
-      getrecent.onsuccess = function(e) {
-        if(getrecent.result.body.length !== 0) {
-          recentFrames = getrecent.result.body;
-          let deleteref = db.transaction(['bodyFrames']).objectStore('bodyFrames').delete('liveFrames');
+        let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        getrecent.onsuccess = function(e) {
+          if(getrecent.result) {
+            recentFrames = getrecent.result.body;
+            let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
+          }
         }
-      }
+      });
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist

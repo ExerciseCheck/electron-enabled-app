@@ -41,3 +41,23 @@ function startTimer() {
     }
   }, 100);
 }
+
+function openDB(callback) {
+  req = window.indexedDB.open("bodyFrames", 1);
+
+  req.onupgradeneeded = function(e) {
+    console.log("Upgrade event triggered");
+    db = e.target.result;
+    let newObjectStore = db.createObjectStore('bodyFrames', {keyPath: 'type'});
+  };
+
+  req.onerror = () => {
+    console.log('Database failed to open');
+  };
+
+  req.onsuccess = () => {
+    console.log('Database opened successfully');
+    db = req.result;
+    callback();
+  };
+}
