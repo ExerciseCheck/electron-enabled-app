@@ -1,32 +1,29 @@
 'use strict';
 
-let liveFrames, refFrames, recentFrames;
-window.actionBtn = false;
+var liveFrames, refFrames, recentFrames;
+var actionBtn = false;
 
-// window.addEventListener('beforeunload', function(e) {
-//   let warning = 'If you leave now, your progress will not be saved.';
-//   if (window.actionBtn) {
-//     return;
-//   }
-//   e.returnValue = undefined;
-// });
+var db;
+var req = window.indexedDB.open("bodyFrames", 1);
 
-window.onbeforeunload = (e) => {
-  if (window.actionBtn) {
-    return;
-  }
+req.onerror = () => {
+  console.log('Database failed to open');
+};
 
-  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
-    return;
-  }
-  else {
-    return false;
-  }
+req.onsuccess = () => {
+  console.log('Database opened successfully');
+  db = request.result;
+};
+
+req.onupgradeneeded = function(e) {
+  console.log("Upgrade event triggered");
+  db = e.target.result;
+  let newObjectStore = db.createObjectStore('bodyFrames', {keyPath: 'type'});
+};
+
+db.onerror = function(e) {
+  alert("Database error: " + e.target.errorCode);
 }
-
-$('.actionBtn').click(function() {
-  window.actionBtn = true;
-})
 
 function parseURL(url)
 {
@@ -83,19 +80,33 @@ function action(nextMode, type)
     let url = '/api/userexercise/loadreference/' + exerciseId + '/';
     (!parsedURL.patientId) ? url = url: url = url + patientId;
     $.get(url, function(data){
-      localStorage.setItem("refFrames", JSON.stringify(data));
-      redirect();
+      let refEntry = {type: 'refFrames', body: data};
+      let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+      let request = bodyFramesStore.put(refEntry);
+      // localStorage.setItem("refFrames", JSON.stringify(data));
+      request.onsuccess = function(e) {
+        redirect();
+      }
+      request.onerror = function(e) {
+        console.log("Could not load reference data");
+      }
     });
   }
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent frames.
   if(nextMode === 'stop' && type === 'reference') {
-    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
-    redirect();
+    let updatedRef = {type: 'refFrames', body: liveFrames};
+    let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+    let request = bodyFramesStore.put(updatedRef);
+    // localStorage.setItem("refFrames", JSON.stringify(liveFrames));
+    request.onsuccess = function(event) {
+      redirect();
+    }
   }
   else {
     if(nextMode === 'stop') {
-      localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+      let request = db.transaction(['bodyFrames']), 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      // localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
     }
     loadReferenceandRedirect();
   }
@@ -183,6 +194,24 @@ function goToExercises() {
   window.location = '/clinician/patientexercises/' + patientId;
 }
 
+window.onbeforeunload = (e) => {
+
+  if (actionBtn) {
+    return;
+  }
+
+  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
+    return;
+  }
+  else {
+    // electron treats any return value that is not 'null' as intent to stay on the page
+    return false;
+  }
+};
+
+$('.actionBtn').click(function() {
+  actionBtn = true;
+});
 
 (function ()
 {
@@ -202,6 +231,7 @@ function goToExercises() {
   // number of live frame captured from kinect
   let live_counter = 0;
   let inPosition = false;
+
   let parsedURL = parseURL(window.location.pathname);
 
   if (isElectron())
@@ -220,19 +250,32 @@ function goToExercises() {
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
+      liveFrames = [];
       localStorage.setItem('canStartRecording', false);
 
       // because a 'create reference' will still load essentially empty reference data from the
       // database, we should disregard such incomplete data and only access reference bodyframes when they
       // actually exist, i.e. length !== 0.
-      if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
-        //alert("No reference frames in localStorage");
-        refFrames = JSON.parse(localStorage.getItem('refFrames'));
-        localStorage.removeItem('refFrames');
+      // if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
+      //   //alert("No reference frames in localStorage");
+      //   refFrames = JSON.parse(localStorage.getItem('refFrames'));
+      //   localStorage.removeItem('refFrames');
+      // }
+      let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
+      getref.onsuccess = function(e) {
+        if(getref.result.body.length !== 0) {
+          refFrames = getref.result.body;
+          let deleteref = db.transaction(['bodyFrames']).objectStore('bodyFrames').delete('refFrames');
+        }
       }
-      liveFrames = [];
-      recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
-      localStorage.removeItem('liveFrames');
+
+      let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+      getrecent.onsuccess = function(e) {
+        if(getrecent.result.body.length !== 0) {
+          recentFrames = getrecent.result.body;
+          let deleteref = db.transaction(['bodyFrames']).objectStore('bodyFrames').delete('liveFrames');
+        }
+      }
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
