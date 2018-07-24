@@ -1,4 +1,5 @@
 'use strict';
+var req, db;
 
 function filter() {
 
@@ -39,8 +40,14 @@ function initializePractice(exerciseId, addressValue) {
         successAlert('Starting new practice session!');
         $.get(url, function(data){
           console.log("GET from patient side");
-          localStorage.setItem("refFrames", JSON.stringify(data));
-          window.location = addressValue;
+          openDB(function() {
+            let refEntry = {type: 'refFrames', body: data};
+            let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+            let req = bodyFramesStore.put(refEntry);
+            req.onsuccess = function(e) {
+              window.location = addressValue;
+            };
+          });
         });
     },
     error: function (result) {

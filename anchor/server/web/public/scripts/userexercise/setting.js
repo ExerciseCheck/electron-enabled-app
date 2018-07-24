@@ -1,5 +1,7 @@
 'use strict';
 
+var req, db;
+
 function getExerciseId() {
 
   return (window.location.pathname.split('/'))[3];
@@ -148,8 +150,14 @@ function updateReference() {
     getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
-    localStorage.setItem("refFrames", JSON.stringify(data));
-    initialSetting(numSets, numReps, getExerciseId(), getPatientId(), redirectToUrl);
+    openDB(function() {
+      let refEntry = {type: 'refFrames', body: data};
+      let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+      let req = bodyFramesStore.put(refEntry);
+      req.onsuccess = function(e) {
+        initialSetting(numSets, numReps, getExerciseId(), getPatientId(), redirectToUrl);
+      };
+    });
   });
 }
 
@@ -170,8 +178,14 @@ function StartPracticeSession() {
 function loadReferenceandStart(type) {
   const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data){
-    localStorage.setItem("refFrames", JSON.stringify(data));
-    redirect(type);
+    openDB(function() {
+      let refEntry = {type: 'refFrames', body: data};
+      let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+      let req = bodyFramesStore.put(refEntry);
+      req.onsuccess = function(e) {
+        redirect(type);
+      };
+    });
   });
 }
 

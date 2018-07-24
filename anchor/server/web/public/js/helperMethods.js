@@ -51,13 +51,14 @@ function openDB(callback) {
     let newObjectStore = db.createObjectStore('bodyFrames', {keyPath: 'type'});
   };
 
-  req.onerror = () => {
+  req.onerror = (e) => {
     console.log('Database failed to open');
   };
 
-  req.onsuccess = () => {
+  req.onsuccess = (e) => {
     console.log('Database opened successfully');
     db = req.result;
     callback();
   };
+
 }

@@ -143,15 +143,20 @@ function savePractice() {
         url = url + patientId;
       }
       $.get(url, function(data){
-        localStorage.setItem("refFrames", JSON.stringify(data));
-        if(isComplete) {
-          window.location = '/userexercise/session/end/practice/' +
-            exerciseId + '/' + patientId;
-        }
-        else {
-          window.location = '/userexercise/session/start/practice/' +
-            exerciseId + '/' + patientId;
-        }
+        openDB(function() {
+          let refEntry = {type: 'refFrames', body: data};
+          let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put(refEntry);
+          request.onsuccess = function(e) {
+            if(isComplete) {
+              window.location = '/userexercise/session/end/practice/' +
+                exerciseId + '/' + patientId;
+            }
+            else {
+              window.location = '/userexercise/session/start/practice/' +
+                exerciseId + '/' + patientId;
+            }
+          };
+        });
       });
     },
     error: function (result) {
@@ -240,23 +245,24 @@ $('.actionBtn').click(function() {
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
-          if(getref.result.body.length !== 0) {
+          if(getref.result && getref.result.body.length !== 0) {
             refFrames = getref.result.body;
+            console.log("refFrames loaded lcoally");
             let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('refFrames');
           }
+          showCanvas();
+          console.log("show canvas called after getting referenceFrames");
         }
 
         let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
         getrecent.onsuccess = function(e) {
           if(getrecent.result) {
             recentFrames = getrecent.result.body;
-            let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
+            let deleterecent = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
           }
         }
       });
       window.Bridge.eStartKinect();
-      showCanvas();
-      //checks what type of "mode" page is currently on && if reference exist
     });
   }
 
