@@ -24,12 +24,14 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
 
         <div id="chart-container"></div>
-
         <script>
+          //line chart
           var chart = Highcharts.chart('chart-container', {
+
             title: {
               text: 'Sessions Completed'
             },
+
             yAxis: {
               title: {
                 text: 'Sessions'
@@ -40,21 +42,37 @@
               align: 'right',
               verticalAlign: 'middle'
             },
-            plotOptions: {
-              series: {
-                label: {
-                  connectorAllowed: false
-                },
-                pointStart: 2010
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: {
+                day: '%d %b %Y'    //ex- 01 Jan 2016
               }
             },
+
             series: [{
               name: 'Recommended',
-              data: [20, 20, 20, 20, 20, 20, 20, 20]
+              data: [
+                [Date.UTC(2018, 9, 1), 20],
+                [Date.UTC(2018, 9, 2), 20],
+                [Date.UTC(2018, 9, 3), 20],
+                [Date.UTC(2018, 9, 4), 20],
+                [Date.UTC(2018, 9, 5), 20],
+                [Date.UTC(2018, 9, 6), 20],
+                [Date.UTC(2018, 9, 7), 20]
+              ]
             }, {
               name: 'Your Progress',
-              data: [12, 15, 14, 10, 6, 12, 15, 14]
+              data: [
+                [Date.UTC(2018, 9, 1), Math.round(Math.random() * 10) + 10],
+                [Date.UTC(2018, 9, 2), Math.round(Math.random() * 10) + 10],
+                [Date.UTC(2018, 9, 3), Math.round(Math.random() * 10) + 10],
+                [Date.UTC(2018, 9, 4), Math.round(Math.random() * 10) + 10],
+                [Date.UTC(2018, 9, 5), Math.round(Math.random() * 10) + 10],
+                [Date.UTC(2018, 9, 6), Math.round(Math.random() * 10) + 10],
+                [Date.UTC(2018, 9, 7), Math.round(Math.random() * 10) + 10]
+              ]
             }],
+
             responsive: {
               rules: [{
                 condition: {
@@ -68,17 +86,203 @@
                   }
                 }
               }]
+            },
+            chart: {
+              events: {
+                load: function () {
+                  $(".btn-group>.btn").click(function(){
+                    //console.log(chart.series[1].processedYData)
+                    val = $(this).children()[0].id
+                    if (val == "day") {
+                      chart.update({
+                        xAxis: {
+                          type: 'datetime',
+                          dateTimeLabelFormats: {
+                            day: '%d %b %Y'    //ex- 01 Jan 2016
+                          }
+                        },
+                        series: [{
+                          name: 'Recommended',
+                          data: [
+                            [Date.UTC(2018, 9, 1), 20],
+                            [Date.UTC(2018, 9, 2), 20],
+                            [Date.UTC(2018, 9, 3), 20],
+                            [Date.UTC(2018, 9, 4), 20],
+                            [Date.UTC(2018, 9, 5), 20],
+                            [Date.UTC(2018, 9, 6), 20],
+                            [Date.UTC(2018, 9, 7), 20]
+                          ]
+                        }, {
+                          name: 'Your Progress',
+                          data: [
+                            [Date.UTC(2018, 9, 1), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 9, 2), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 9, 3), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 9, 4), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 9, 5), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 9, 6), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 9, 7), Math.round(Math.random() * 10) + 10]
+                          ]
+                        }]
+                      })
+                    } else if (val == "week") {
+                      chart.update({
+                        xAxis: {
+                          type: 'datetime',
+                          dateTimeLabelFormats: {
+                            day: '%e. %b'    //ex- 01 Jan 2016
+                          }
+                        },
+                        series: [{
+                          name: 'Recommended',
+                          data: [
+                            [Date.UTC(2018, 1, 7), 20],
+                            [Date.UTC(2018, 1, 14), 20],
+                            [Date.UTC(2018, 1, 21), 20],
+                            [Date.UTC(2018, 1, 28), 20]
+                          ]
+                        }, {
+                          name: 'Your Progress',
+                          data: [
+                            [Date.UTC(2018, 1, 7), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 1, 14), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 1, 21), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 1, 28), Math.round(Math.random() * 10) + 10]
+                          ]
+                        }]
+                      })
+                    } else {
+                      chart.update({
+                        xAxis: {
+                          type: 'datetime',
+                          dateTimeLabelFormats: {
+                            day: '%b %Y'    //ex- 01 Jan 2016
+                          }
+                        },
+                        series: [{
+                          name: 'Recommended',
+                          data: [
+                            [Date.UTC(2018, 1, 1), 20],
+                            [Date.UTC(2018, 2, 2), 20],
+                            [Date.UTC(2018, 3, 3), 20],
+                            [Date.UTC(2018, 4, 4), 20],
+                            [Date.UTC(2018, 5, 5), 20],
+                            [Date.UTC(2018, 6, 6), 20],
+                            [Date.UTC(2018, 7, 7), 20]
+                          ]
+                        }, {
+                          name: 'Your Progress',
+                          data: [
+                            [Date.UTC(2018, 1, 1), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 2, 2), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 3, 3), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 4, 4), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 5, 5), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 6, 6), Math.round(Math.random() * 10) + 10],
+                            [Date.UTC(2018, 7, 7), Math.round(Math.random() * 10) + 10]
+                          ]
+                        }]
+                      })
+                    }
+                  })
+                }
+              }
             }
           });
-          // on button click, get data with chart.series[1].processedYData
-          // manipulate data then run update function
-          /*
-          chart.series[1].update({
-              data: t
-          }, true);
-          */
-        </script>
+       </script>
+        <div id="box-chart-container"></div>
         <script>
+          //box-plot
+          var numReps = 5
+          Highcharts.chart('box-chart-container', {
+
+            chart: {
+              type: 'boxplot'
+            },
+
+            title: {
+              text: 'Session Repitition Accuracies'
+            },
+
+            legend: {
+              enabled: false
+            },
+
+            xAxis: {
+              categories: ['Set1', 'Set2', 'Set3', 'Set4', 'Set5'],
+              title: {
+                text: 'Session Summary'
+              }
+            },
+            yAxis: {
+              title: {
+                text: 'Repitition Accuracy'
+              },
+              plotLines: [{
+                value: 898,
+                color: 'red',
+                width: 1
+              }]
+            },
+
+            series: [{
+              name: 'Accuracies',
+              data: [
+                [760, 801, 848, 895, 965],
+                [733, 853, 939, 980, 1080],
+                [714, 762, 817, 870, 918],
+                [724, 802, 806, 871, 950],
+                [834, 836, 864, 882, 910]
+              ],
+              tooltip: {
+                headerFormat: '<em>Set: {point.key}</em><br/>',
+                pointFormat: 'Number of Repitions:' + numReps
+              }
+            },
+              {
+                name: 'Outlier',
+                //color: Highcharts.getOptions().colors[0],
+                type: 'scatter',
+                data: [ // x, y positions where 0 is the first category
+                  [0, 644],
+                  [4, 718],
+                  [4, 951],
+                  [4, 969]
+                ],
+                color: 'rgba(223, 83, 83, .5)',
+                allowPointSelect: true,
+                tooltip: {
+                  pointFormat: 'Accuracy: {point.y}',
+                }
+              },
+              {
+                name: 'Repition Accuracy',
+                //color: Highcharts.getOptions().colors[0],
+                type: 'scatter',
+                data: [
+                  // x, y positions where 0 is the first category
+                  // X = numSets
+                  //Y = Accuracy
+                  //length of data[0] = numReps
+                  [0, 760], [0, 801], [0, 848], [0, 895], [0, 965],
+                  [1, 733], [1, 853], [1, 939], [1, 980], [1, 1080],
+                  [2, 714], [2, 762], [2, 817], [2, 870], [2, 918],
+                  [3, 724], [3, 802], [3, 806], [3, 871], [3, 950],
+                  [4, 834], [4, 836], [4, 864], [4, 882], [4, 910]
+                ],
+                color: 'rgba(223, 83, 83, .5)',
+                allowPointSelect: true,
+                tooltip: {
+                  pointFormat: 'Accuracy: {point.y}',
+                }
+              }]
+          });
+        </script>
+        <div id="container">
+          <canvas id="bar-chart-container"</canvas>
+        </div>
+        <script>
+          //bar chart
           //Dummy Data for checking cases
           var repTime = 5
           var numSets = 6
@@ -89,7 +293,7 @@
           var rep5 = [4,4,5]
           var rep6 = [7,5,3]
 
-          var barChart = document.getElementById('myChart').getContext('2d');
+          var barChart = document.getElementById('bar-chart-container').getContext('2d');
           //Function to draw a line at recommended time for rep completion
           Chart.pluginService.register({
             afterDraw: function(chart) {
@@ -213,93 +417,6 @@
                 }]
               }
             }
-          });
-        </script>
-        <script>
-
-          var numReps = 5
-          Highcharts.chart('container', {
-
-            chart: {
-              type: 'boxplot'
-            },
-
-            title: {
-              text: 'Session Repition Accuracies'
-            },
-
-            legend: {
-              enabled: false
-            },
-
-            xAxis: {
-              categories: ['Set1', 'Set2', 'Set3', 'Set4', 'Set5'],
-              title: {
-                text: 'Session Summary'
-              }
-            },
-            yAxis: {
-              title: {
-                text: 'Repitition Accuracy'
-              },
-              plotLines: [{
-                value: 898,
-                color: 'red',
-                width: 1
-              }]
-            },
-
-            series: [{
-              name: 'Accuracies',
-              data: [
-                [760, 801, 848, 895, 965],
-                [733, 853, 939, 980, 1080],
-                [714, 762, 817, 870, 918],
-                [724, 802, 806, 871, 950],
-                [834, 836, 864, 882, 910]
-              ],
-              tooltip: {
-                headerFormat: '<em>Set: {point.key}</em><br/>',
-                pointFormat: 'Number of Repitions:' + numReps
-              }
-            },
-              {
-                name: 'Outlier',
-                //color: Highcharts.getOptions().colors[0],
-                type: 'scatter',
-                data: [ // x, y positions where 0 is the first category
-                  [0, 644],
-                  [4, 718],
-                  [4, 951],
-                  [4, 969]
-                ],
-                color: 'rgba(223, 83, 83, .5)',
-                allowPointSelect: true,
-                tooltip: {
-                  pointFormat: 'Accuracy: {point.y}',
-                }
-              },
-              {
-                name: 'Repition Accuracy',
-                //color: Highcharts.getOptions().colors[0],
-                type: 'scatter',
-                data: [
-                  // x, y positions where 0 is the first category
-                  // X = numSets
-                  //Y = Accuracy
-                  //length of data[0] = numReps
-                  [0, 760], [0, 801], [0, 848], [0, 895], [0, 965],
-                  [1, 733], [1, 853], [1, 939], [1, 980], [1, 1080],
-                  [2, 714], [2, 762], [2, 817], [2, 870], [2, 918],
-                  [3, 724], [3, 802], [3, 806], [3, 871], [3, 950],
-                  [4, 834], [4, 836], [4, 864], [4, 882], [4, 910]
-                ],
-                color: 'rgba(223, 83, 83, .5)',
-                allowPointSelect: true,
-                tooltip: {
-                  pointFormat: 'Accuracy: {point.y}',
-                }
-              }]
           });
         </script>
       </div>
