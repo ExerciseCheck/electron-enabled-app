@@ -279,7 +279,7 @@
           });
         </script>
         <div id="container">
-          <canvas id="bar-chart-container"</canvas>
+          <canvas id="bar-chart-container"></canvas>
         </div>
         <script>
           //bar chart
@@ -376,7 +376,14 @@
           // We now register the plugin to the chart's plugin service to activate it
           Chart.pluginService.register(colorPlugin);
 
-
+          Chart.plugins.register({
+            beforeDraw: function(chartInstance) {
+              var ctx = chartInstance.chart.ctx;
+              ctx.fillStyle = "white";
+              ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
+            }
+          });
+          
           var myChart = new Chart(barChart,{
             type: 'bar',
             data: data,
