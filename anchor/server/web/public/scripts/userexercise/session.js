@@ -63,7 +63,6 @@ function action(nextMode, type) {
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         bodyFramesStore.put(refEntry);
         redirect();
-        // localStorage.setItem("refFrames", JSON.stringify(data));
       });
     }
 
@@ -73,7 +72,6 @@ function action(nextMode, type) {
         let updatedRef = {type: 'refFrames', body: liveFrames};
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         let request = bodyFramesStore.put(updatedRef);
-        // localStorage.setItem("refFrames", JSON.stringify(liveFrames));
         request.onsuccess = function(event) {
           redirect();
         }
@@ -81,7 +79,6 @@ function action(nextMode, type) {
     else {
       if(nextMode === 'stop') {
         let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
-        // localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
       }
       loadReferenceandRedirect();
     }
@@ -211,7 +208,6 @@ $('.actionBtn').click(function() {
   let exe_index = 0;
   // number of live frame captured from kinect
   let live_counter = 0;
-  let inPosition = false;
 
   let parsedURL = parseURL(window.location.pathname);
 
@@ -237,11 +233,6 @@ $('.actionBtn').click(function() {
       // because a 'create reference' will still load essentially empty reference data from the
       // database, we should disregard such incomplete data and only access reference bodyframes when they
       // actually exist, i.e. length !== 0.
-      // if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
-      //   //alert("No reference frames in localStorage");
-      //   refFrames = JSON.parse(localStorage.getItem('refFrames'));
-      //   localStorage.removeItem('refFrames');
-      // }
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
@@ -448,12 +439,6 @@ $('.actionBtn').click(function() {
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
-        // check in-position status whenever kinect captures a body
-        if(!inPosition) {
-          if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
-            inPosition = true;
-          }
-        }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
@@ -463,7 +448,7 @@ $('.actionBtn').click(function() {
     });
 
     //if the patient is in position and doing a practice session
-    if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
+    if((JSON.parse(localStorage.getItem('canStartRecording')) === true) && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
     {
         //draw in the reference canvas
         drawBody(refFrames[ref_index], ref_ctx, false);
