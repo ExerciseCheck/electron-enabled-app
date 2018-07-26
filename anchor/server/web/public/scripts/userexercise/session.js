@@ -304,10 +304,10 @@ function goToExercises() {
   }
 
   function startTimer() {
-    var start = Date.now();
-    var timer = setInterval(function () {
-      var delta = Date.now() - start;
-      var time = window.CONFIG.TIMER_MAX - Math.floor(delta / 1000);
+    let start = Date.now();
+    let timer = setInterval(function () {
+      let delta = Date.now() - start;
+      let time = window.CONFIG.TIMER_MAX - Math.floor(delta / 1000);
       if (time <= 0) {
         clearInterval(timer);
         $("#timerStart").attr("class", "greenColor large");
@@ -315,7 +315,7 @@ function goToExercises() {
         $("#num").text("");
         localStorage.setItem('canStartRecording', true);
         notAligned = false;
-        var event = new Event('timer-done');
+        let event = new Event('timer-done');
         document.dispatchEvent(event);
       } else {
         $("#timerStart").text("Recording will begin in...");
