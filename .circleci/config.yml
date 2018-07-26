@@ -4,7 +4,7 @@ general:
 
 jobs:
   build:
-    working_directory: ~/anchor
+    working_directory: ~/electron-enabled-app/anchor
     docker:
       - image: node:8
       - image: mongo:3.4.5
