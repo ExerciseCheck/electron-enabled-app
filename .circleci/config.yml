@@ -1,6 +1,6 @@
 version: 2
 general:
-  build_dir: anchor
+  build_dir: ~/electron-enabled-app/anchor
 
 jobs:
   build:
