@@ -9,7 +9,7 @@ jobs:
       - image: node:8
       - image: mongo:3.4.5
     steps:
-      - checkout
+      - checkout:
           path: ~/electron-enabled-app
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
