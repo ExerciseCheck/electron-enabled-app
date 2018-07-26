@@ -57,7 +57,8 @@
   z-index: 99999;
   overflow: hidden;
 }
+
 #num {
   font-size: 64px;
-  color: grey;
+  color: orangered;
 }
