@@ -70,11 +70,7 @@
     "lab": "14.x.x",
     "nodemon": "1.x.x",
     "npm-run": "^4.1.2",
-    "pre-commit": "1.x.x",
     "promptly": "2.x.x",
     "proxyquire": "1.x.x"
-  },
-  "pre-commit": [
-    "lint"
-  ]
+  }
 }

@@ -3,7 +3,7 @@ const signUpSchema = Joi.object({
   name: Joi.string().required(),
   username: Joi.string().lowercase().invalid('root').required(),
   email: Joi.string().email().required(),
-  password: Joi.string().required(),
+  password: Joi.string().required().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{6,}/, "Minimum 6 characters, at least one uppercase letter, one lowercase letter, one number and one special character"),
   confirmPassword: Joi.string().required()
 });
 joiToForm('signUpFormFields',signUpSchema);
