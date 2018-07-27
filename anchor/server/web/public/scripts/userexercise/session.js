@@ -2,7 +2,6 @@
 
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
-
 window.actionBtn = false;
 
 // window.addEventListener('beforeunload', function(e) {
@@ -89,6 +88,9 @@ function action(nextMode, type)
     }
     loadReferenceandRedirect();
   }
+  if(nextMode === 'play' && type === 'practice') {
+    console.log("start practice");
+  }
 }
 
 // helper function for calculating the refMax, refMin
@@ -96,7 +98,6 @@ function action(nextMode, type)
 function getMinMax_joint(joint, array, axis) {
   var out = [];
   array.forEach(function(el) {
-    //console.log(el.joints[joint][axis]);
     return out.push.apply(out, [el.joints[joint][axis]]);
   }, []);
   return { min: Math.min.apply(null, out), max: Math.max.apply(null, out) };
@@ -109,21 +110,20 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
+  // save to referenceExercise
   values.bodyFrames = JSON.stringify(refFrames);
-  values.neckX = values.bodyFrames[0].joints[2].depthX;
-  values.neckY = values.bodyFrames[0].joints[2].depthY;
-  var mm = getMinMax_joint(joint, values.bodyFrames, coordinate);
+  values.neckX = refFrames[0].joints[2].depthX;
+  values.neckY = refFrames[0].joints[2].depthY;
+  var mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
   values.refMin = mm.min;
   values.refMax = mm.max;
-  values.refLowerJoint = values.bodyFrames[0].joints[dataForCntReps.refLowerJointID].coordinate;
-  values.refUpperJoint = values.bodyFrames[0].joints[dataForCntReps.refUpperJointID].coordinate;
+  values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
+  values.refUpperJoint = refFrames[0].joints[dataForCntReps.refUpperJointID][dataForCntReps.axis];
+  // save also to dataForCntReps
+  dataForCntReps.refLowerJointPos = values.refLowerJoint;
+  dataForCntReps.refUpperJointPos = values.refUpperJoint;
+  console.log("func saveReference", dataForCntReps);
 
-  //values.neckX = 2;
-  //values.neckY = 2;
-  //values.refMin = 2;
-  //values.refMax = 2;
-  //values.refLowerJoint = 2;
-  //values.refUpperJoint = 2;
   $.ajax({
     type: 'PUT',
     url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
@@ -184,66 +184,8 @@ function goToExercises() {
   window.location = '/clinician/patientexercises/' + patientId;
 }
 
-//@params:
-// range_scale:
-//    how much to scale the distance between spine and foot, TODO: spine==SpineBase==0? why?
-// top_thresh, bottom_thresh:
-//    the thresholds the patient should reach when the signal has been
-//    scaled to a range between 0 and 1, for a repetition to count
-function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, bottom_thresh=0.75) {
-
-  var reps = 0;
-  var norm, ref_norm;
-
-
-  // This is set when user is correctly positioned in circle
-  // neck: 2
-  if (coordinate == 'depthY') {
-    ref_norm = dataForCntReps.neckY;
-    //norm = body.joints[2].depthY; //THis will change with body. TODO: only frame1 ??
-    norm = ny_1stFrame;
-  } else if (coordinate == 'depthX') {
-    ref_norm = dataForCntReps.neckX;
-    //norm = body.joints[2].depthX; //TODO: same here
-    norm = nx_1stFrame;
-  }
-
-  // Normalize reference points to neck
-
-  var ref_lower_joint = dataForCntReps.refLowerJoint - ref_norm;
-  var ref_upper_joint = dataForCntReps.refUpperJoint - ref_norm;
-  var range = (ref_lower_joint - ref_upper_joint) * range_scale;
-
-  var ref_max = dataForCntReps.refMax - ref_norm;
-  var ref_min = dataForCntReps.refMin - ref_norm;
-
-  // Normalize current point by range and current neck value
-  var current_pt = (body.joints[joint][coordinate] - norm - ref_max) / range;
-
-  if ((threshold_flag == 'down') && (current_pt < top_thresh)) {
-    reps++;
-    //return [reps, 'up'];
-    threshold_flag = 'up';
-    console.log("flip down to up");
-  } else if ((threshold_flag == 'up') && (current_pt > bottom_thresh)) {
-    //return [reps, 'down'];
-    threshold_flag = 'down';
-    console.log("flip up to down");
-  }
-  console.log("No flip");
-  return reps
-}
-
-function displyRepCnts() {
-  return repCnt;
-}
-
-
 (function ()
 {
-  let nx_1stFrame, ny_1stFrame;
-  var repCnt = 0;
-
   let processing, canvas, ctx, ref_canvas, ref_ctx, exe_canvas, exe_ctx;
   const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
   //canvas dimension
@@ -258,17 +200,25 @@ function displyRepCnts() {
   let exe_index = 0;
   // number of live frame captured from kinect
   let live_counter = 0;
+
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
 
+  // value for countReps
+  if (parsedURL.type === 'practice'){
+    let repCnt = parseInt(document.getElementById("cntReps").innerHTML);
+  }
+  let threshold_flag;
+  // fetch data before start exercise
   let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;
-    dataForCntReps.joint = data.joint;
-    dataForCntReps.coordinate = data.coordinate;
-    dataForCntReps.threshold_flag = data.threshold_flag;
+    console.log("func noName, url to userExercise.js", dataForCntReps);
+    threshold_flag = data.direction;
   });
+
+  let nx_1stFrame, ny_1stFrame;
 
   if (isElectron())
   {
@@ -302,6 +252,7 @@ function displyRepCnts() {
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
+      console.log("if isElectron()");
     });
   }
 
@@ -419,7 +370,7 @@ function displyRepCnts() {
     ctx.fill();
   }
 
-  // Draw the red Center Circle in ctx1 (canvasSKLT)
+  //function that draws the red Center Circle in ctx1 (canvasSKLT)
   function drawCenterCircle(parameters, ctx){
 
     //coordinate of the red circle
@@ -436,9 +387,6 @@ function displyRepCnts() {
     if(dist <= r){
       //When person's neck enters green circle && mode is 'play', recording will start.
       ctx.strokeStyle="green";
-      //record the neck position for norm
-      nx_1stFrame = neck_x;
-      ny_1stFrame = neck_y;
 
       var parsedURL = parseURL(window.location.pathname);
       if(parsedURL.mode === 'play') {
@@ -454,10 +402,61 @@ function displyRepCnts() {
     ctx.strokeStyle="black";
   }
 
+  //function that counts repetitions
+  function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, bottom_thresh=0.75) {
+
+    var reps = 0;
+    var norm, ref_norm;
+    // This is set when user is correctly positioned in circle
+    // neck: 2
+    if (dataForCntReps.axis == 'depthY') {
+      ref_norm = dataForCntReps.neckY;
+      norm = ny_1stFrame;
+    } else if (dataForCntReps.axis == 'depthX') {
+      ref_norm = dataForCntReps.neckX;
+      norm = nx_1stFrame;
+    }
+
+    // Normalize reference points to neck
+
+    var ref_lower_joint = dataForCntReps.refLowerJointPos - ref_norm;
+    var ref_upper_joint = dataForCntReps.refUpperJointPos - ref_norm;
+    var range = (ref_lower_joint - ref_upper_joint) * range_scale;
+
+
+    var ref_max = dataForCntReps.refMax - ref_norm;
+    var ref_min = dataForCntReps.refMin - ref_norm;
+
+    //var range = (ref_max - ref_min) * range_scale;
+    // Normalize current point by range and current neck value
+    var current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
+    // TODO: the number is changing even if I am standing still????
+    console.log("THE joint's position:", body.joints[dataForCntReps.joint][dataForCntReps.axis]);
+    console.log("current_pt:", current_pt);
+    console.log("flag:", threshold_flag);
+
+
+    if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
+      // goes up and pass the top_thresh
+      reps++;
+      console.log("flip up to down, reps increased");
+      console.log("reps=", reps);
+      return [reps, 'down'];
+    } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
+      // goes down and pass the bottom_thresh
+      console.log("flip down to up");
+      console.log("reps=", reps);
+      return [reps, 'up'];
+    } else {
+      console.log("No flip");
+      console.log("reps=", reps);
+      return [reps, threshold_flag];
+    }
+  }
+
   //only start drawing with a body frame is detected
   //even though
 
-  //TODO call cntReps here
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
@@ -490,6 +489,8 @@ function displyRepCnts() {
         drawBody(body,ctx);
 
         //increment the live counter
+        live_counter = live_counter + 1;
+
         //location of the neck
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
@@ -498,19 +499,26 @@ function displyRepCnts() {
         if(!inPosition) {
           if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
             inPosition = true;
+            //TODO: if there is timer, may need to move this
+            //record the neck position for norm once inPosition
+            nx_1stFrame = neck_x;
+            ny_1stFrame = neck_y;
+            console.log("neck position in the first frame recorded");
           }
         }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
+          console.log("window.Bridge.aOnBodyFrame, bodyFrames.body.foreach, canStartRecording");
+          // countReps
+          var tempCnt = countReps(body, threshold_flag);
+          threshold_flag = tempCnt[1];
+          document.getElementById("cntReps").innerHTML =
+            parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+
         }
-
-        var tempCnt = countReps(body, threshold_flag);
-        console.log(threshold_flag)
-
-        repCnt = repCnt + tempCnt;
       }
-      live_counter = live_counter + 1;
+      //live_counter = live_counter + 1;
     });
 
     //if the patient is in position and doing a practice session
@@ -518,6 +526,7 @@ function displyRepCnts() {
     {
         //draw in the reference canvas
         drawBody(refFrames[ref_index], ref_ctx, false);
+
         //display one frame of reference every 2 frames of live frame captured
         //we can manipulate the number to control the display speed
         if (live_counter >= 3)
@@ -525,7 +534,6 @@ function displyRepCnts() {
           ref_index = (ref_index + 1) % refFrames.length;
           live_counter = 0;
         }
-
 
     }
 
@@ -563,7 +571,6 @@ function displyRepCnts() {
   };
 
   function isElectron() {
-
     return 'Bridge' in window;
   }
 })();

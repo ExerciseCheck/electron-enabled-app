@@ -371,16 +371,18 @@ internals.applyRoutes = function (server, next) {
           Exercise.findById(request.params.exerciseId, done);
         }],
         getDataForCntReps: ['findExercise', function(results, done) {
-          let reference = results.findMostRecentReference;
+          let reference = results.findMostRecentReference[0];
           let exercise = results.findExercise;
 
           dataForCntReps['joint'] = exercise.joint;
           dataForCntReps['axis'] = exercise.axis;
+          dataForCntReps['direction'] = exercise.direction;
           dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
           dataForCntReps['refUpperJointID'] = exercise.refUpperJoint;
 
           if (reference !== undefined) {
-            // position values below, not jointID, initially null(?)
+            console.log("reference exists");
+            // position values below, not jointID, initially undefined
             dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
             dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
             dataForCntReps['refMin'] = reference.refMin;
@@ -392,6 +394,7 @@ internals.applyRoutes = function (server, next) {
             dataForCntReps['topThresh'] = reference.topThresh;
             dataForCntReps['rangeScale'] = reference.rangeScale;
           }
+          //console.log(dataForCntReps);
           done();
         }]
       }, (err, results) => {
