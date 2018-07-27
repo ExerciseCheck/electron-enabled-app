@@ -311,7 +311,7 @@ function goToExercises() {
       if (time <= 0) {
         clearInterval(timer);
         $("#timerStart").attr("class", "greenColor large");
-        $("#timerStart").text("Recording has begun");
+        $("#timerStart").text("Now Recording...");
         $("#num").text("");
         localStorage.setItem('canStartRecording', true);
         notAligned = false;
@@ -331,7 +331,7 @@ function goToExercises() {
     jointType.forEach(function(jointType){
       drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx);
     });
-    if(drawCircle && notAligned)
+    if(drawCircle)
     {
       drawCenterCircle({
         x: width / 2, y: 130, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
@@ -377,18 +377,23 @@ function goToExercises() {
     ctx.beginPath();
     //euclidean distance from head to calibration circle
     let dist = Math.sqrt(Math.pow((head_x - x),2) + Math.pow((head_y - y), 2));
-    if(dist <= r){
-      //When person's neck enters green circle && mode is 'play', recording will start.
-      ctx.strokeStyle="#3de562";
-      var parsedURL = parseURL(window.location.pathname);
-      if(parsedURL.mode === 'play' && useTimer) {
-        startTimer();
-        useTimer = false;
+    if(notAligned) {
+      if(dist <= r){
+        //When person's neck enters green circle && mode is 'play', recording will start.
+        ctx.strokeStyle="#3de562"; //green color
+        var parsedURL = parseURL(window.location.pathname);
+        if(parsedURL.mode === 'play' && useTimer) {
+          startTimer();
+          useTimer = false;
+        }
+      }
+      else {
+        ctx.strokeStyle="red";
       }
     }
-    else
-      ctx.strokeStyle="red";
-
+    else {
+      ctx.strokeStyle="#73957b"; // circle turns into a greenish grey color once countdown finishes
+    }
     ctx.arc(x, y, r, 0, Math.PI*2);
     ctx.stroke();
     ctx.closePath();
@@ -447,7 +452,7 @@ function goToExercises() {
     });
 
     //if the patient is in position and doing a practice session
-    if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
+    if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
     {
         //draw in the reference canvas
         drawBody(refFrames[ref_index], ref_ctx, false);
