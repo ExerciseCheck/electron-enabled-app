@@ -205,6 +205,7 @@ function goToExercises() {
 
   // value for countReps
   let nx_1stFrame, ny_1stFrame;
+  let neck_z; // depth to the camera sensor
   let threshold_flag;
   // fetch data before start exercise
   let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
@@ -428,12 +429,16 @@ function goToExercises() {
     // console.log("current_pt:", current_pt);
     // console.log("flag:", threshold_flag);
 
+
+
     // TODO: better define direction as 1 (up, right) and -1 (down, left)
     // flag against the exercise direction:
     if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
       // goes up and pass the top_thresh
-      reps++;
-      // console.log("flip up to down, reps increased");
+      if (isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
+        reps++;
+      }
+
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
       // goes down and pass the bottom_thresh
@@ -445,9 +450,17 @@ function goToExercises() {
     }
   }
 
+
+  // patient reaching out for button makes body NOT in plane
+  function isBodyInPlane(ref_neck, neck) {
+    if (ref_neck * 0.6 < neck && ref_neck * 1.2 > neck){
+      return true;
+    }
+    return false;
+  }
+
   //only start drawing with a body frame is detected
   //even though
-
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
@@ -494,6 +507,8 @@ function goToExercises() {
             //record the neck position for norm once inPosition
             nx_1stFrame = neck_x;
             ny_1stFrame = neck_y;
+            neck_z = body.joints[2].cameraZ;
+
             console.log("neck position in the first frame recorded");
             st = new Date().getTime();
             console.log("start time: ", st);
