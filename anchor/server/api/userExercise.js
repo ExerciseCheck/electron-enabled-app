@@ -393,6 +393,7 @@ internals.applyRoutes = function (server, next) {
             dataForCntReps['topThresh'] = reference.topThresh;
             dataForCntReps['topThresh'] = reference.topThresh;
             dataForCntReps['rangeScale'] = reference.rangeScale;
+            //dataForCntReps['timing'] = reference.timing;
           }
           //console.log(dataForCntReps);
           done();

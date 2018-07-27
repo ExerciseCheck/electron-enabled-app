@@ -122,7 +122,6 @@ function saveReference() {
   // save also to dataForCntReps
   dataForCntReps.refLowerJointPos = values.refLowerJoint;
   dataForCntReps.refUpperJointPos = values.refUpperJoint;
-  console.log("func saveReference", dataForCntReps);
 
   $.ajax({
     type: 'PUT',
@@ -205,20 +204,17 @@ function goToExercises() {
   let parsedURL = parseURL(window.location.pathname);
 
   // value for countReps
-  if (parsedURL.type === 'practice'){
-    let repCnt = parseInt(document.getElementById("cntReps").innerHTML);
-  }
+  let nx_1stFrame, ny_1stFrame;
   let threshold_flag;
   // fetch data before start exercise
   let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;
-    console.log("func noName, url to userExercise.js", dataForCntReps);
     threshold_flag = data.direction;
   });
-
-  let nx_1stFrame, ny_1stFrame;
+  // time for speed evaluation
+  var st, ed;
 
   if (isElectron())
   {
@@ -252,7 +248,6 @@ function goToExercises() {
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
-      console.log("if isElectron()");
     });
   }
 
@@ -418,38 +413,34 @@ function goToExercises() {
     }
 
     // Normalize reference points to neck
-
     var ref_lower_joint = dataForCntReps.refLowerJointPos - ref_norm;
     var ref_upper_joint = dataForCntReps.refUpperJointPos - ref_norm;
     var range = (ref_lower_joint - ref_upper_joint) * range_scale;
 
-
     var ref_max = dataForCntReps.refMax - ref_norm;
     var ref_min = dataForCntReps.refMin - ref_norm;
-
     //var range = (ref_max - ref_min) * range_scale;
+
     // Normalize current point by range and current neck value
     var current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
-    // TODO: the number is changing even if I am standing still????
-    console.log("THE joint's position:", body.joints[dataForCntReps.joint][dataForCntReps.axis]);
-    console.log("current_pt:", current_pt);
-    console.log("flag:", threshold_flag);
+    // TODO: camera X Y Z?
+    // console.log("THE joint's position:", body.joints[dataForCntReps.joint][dataForCntReps.axis]);
+    // console.log("current_pt:", current_pt);
+    // console.log("flag:", threshold_flag);
 
-
+    // TODO: better define direction as 1 (up, right) and -1 (down, left)
+    // flag against the exercise direction:
     if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
       // goes up and pass the top_thresh
       reps++;
-      console.log("flip up to down, reps increased");
-      console.log("reps=", reps);
+      // console.log("flip up to down, reps increased");
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
       // goes down and pass the bottom_thresh
-      console.log("flip down to up");
-      console.log("reps=", reps);
+      // console.log("flip down to up");
       return [reps, 'up'];
     } else {
-      console.log("No flip");
-      console.log("reps=", reps);
+      // console.log("No flip");
       return [reps, threshold_flag];
     }
   }
@@ -504,17 +495,29 @@ function goToExercises() {
             nx_1stFrame = neck_x;
             ny_1stFrame = neck_y;
             console.log("neck position in the first frame recorded");
+            st = new Date().getTime();
+            console.log("start time: ", st);
           }
         }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
           console.log("window.Bridge.aOnBodyFrame, bodyFrames.body.foreach, canStartRecording");
-          // countReps
+          // countReps and timing
           var tempCnt = countReps(body, threshold_flag);
           threshold_flag = tempCnt[1];
           document.getElementById("cntReps").innerHTML =
             parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+
+          if (tempCnt[0] === 1) {
+            ed = new Date().getTime();
+            console.log("end time: ", ed);
+            var diff = Math.round((ed - st)/1000);
+            var speedEval = "It takes " + diff + " s";
+            document.getElementById("speedEval").innerHTML = speedEval;
+            st = ed;
+            console.log("start time: ", st);
+          }
 
         }
       }
@@ -524,16 +527,16 @@ function goToExercises() {
     //if the patient is in position and doing a practice session
     if(inPosition && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
     {
-        //draw in the reference canvas
-        drawBody(refFrames[ref_index], ref_ctx, false);
+      //draw in the reference canvas
+      drawBody(refFrames[ref_index], ref_ctx, false);
 
-        //display one frame of reference every 2 frames of live frame captured
-        //we can manipulate the number to control the display speed
-        if (live_counter >= 3)
-        {
-          ref_index = (ref_index + 1) % refFrames.length;
-          live_counter = 0;
-        }
+      //display one frame of reference every 2 frames of live frame captured
+      //we can manipulate the number to control the display speed
+      if (live_counter >= 3)
+      {
+        ref_index = (ref_index + 1) % refFrames.length;
+        live_counter = 0;
+      }
 
     }
 

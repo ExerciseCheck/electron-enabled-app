@@ -15,10 +15,11 @@
             {{#compare type 'practice'}}
               <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
               <p>Set {{setNumber}} of {{numSets}}</p>
-              <div id="cntReps" style="color: #491217">0</div>
-              <p>of {{numRepetition}} repetitions completed.</p>
-
+              <p id="cntReps" style="color: darkred">0</p>
+              <p>repetitions completed.</p>
+              <p id="speedEval" style="color: grey">**speed evaluation here**</p>
             {{/compare}}
+
             {{#compare type 'reference'}}
               <p>{{formatName exercise.exerciseName}}</p>
               <p>Reference</p>
