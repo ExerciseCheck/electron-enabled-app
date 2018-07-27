@@ -2,6 +2,7 @@
 
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
+var ref_st;
 window.actionBtn = false;
 
 // window.addEventListener('beforeunload', function(e) {
@@ -103,12 +104,14 @@ function getMinMax_joint(joint, array, axis) {
   return { min: Math.min.apply(null, out), max: Math.max.apply(null, out) };
 }
 
+// assuming the save button is clicked by someone else
 function saveReference() {
-
   const pathToArray = window.location.pathname.split('/');
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
+
+  var ref_ed = new Date().getTime();
   let values = {};
   // save to referenceExercise
   values.bodyFrames = JSON.stringify(refFrames);
@@ -119,9 +122,12 @@ function saveReference() {
   values.refMax = mm.max;
   values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
   values.refUpperJoint = refFrames[0].joints[dataForCntReps.refUpperJointID][dataForCntReps.axis];
+  values.refTime = Math.round((ref_ed - ref_st) / 1000);
+  console.log(values.refTime);
   // save also to dataForCntReps
   dataForCntReps.refLowerJointPos = values.refLowerJoint;
   dataForCntReps.refUpperJointPos = values.refUpperJoint;
+  dataForCntReps.refTime = values.refTime;
 
   $.ajax({
     type: 'PUT',
@@ -287,6 +293,8 @@ function goToExercises() {
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "block";
+      //timer starts
+      ref_st = new Date().getTime();
     }
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
@@ -511,6 +519,9 @@ function goToExercises() {
 
             console.log("neck position in the first frame recorded");
             st = new Date().getTime();
+            if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
+              ref_st = st;
+            }
             console.log("start time: ", st);
           }
         }

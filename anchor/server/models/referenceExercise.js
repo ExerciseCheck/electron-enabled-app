@@ -22,6 +22,7 @@ class ReferenceExercise extends MongoModels {
       refMax: -1,
       refLowerJoint: -1,
       refUpperJoint: -1,
+      refTime: -1,
       createdAt: new Date()
     };
 
@@ -57,6 +58,7 @@ ReferenceExercise.schema = Joi.object().keys({
   refMax: Joi.number().required(),
   refLowerJoint: Joi.number().required(),
   refUpperJoint: Joi.number().required(),
+  refTime: Joi.number().required(),
 
   isActive: Joi.boolean().required(),
   bodyFrames: Joi.array().required(),
@@ -83,6 +85,7 @@ ReferenceExercise.dataPayload = Joi.object().keys({
   refMax: Joi.number().required(),
   refLowerJoint: Joi.number().required(),
   refUpperJoint: Joi.number().required(),
+  refTime: Joi.number().required(),
 });
 
 //This is for validating reference settings update
