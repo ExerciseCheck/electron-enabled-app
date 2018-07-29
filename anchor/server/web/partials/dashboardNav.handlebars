@@ -23,13 +23,14 @@
     </h6>
     <li class="nav-item">
       <a class="nav-link text-light" href="/dashboard">Dashboard</a>
+      <a class="nav-link text-light" href="../charts">Charts</a>
     </li>
   </ul>
   <ul class="nav nav-pills flex-column" style="padding-top: 20px">
     <h6 class="text-dark">Collections</h6>
     <li class="nav-item">
       {{#role user 'clinician'}}
-        <a class="nav-link text-light" href="/userexercise">User Exercises</a>
+        <a class="nav-link text-light" href="/refexercise">Reference Exercises</a>
         <a class="nav-link text-light" href="/exercise">Exercises</a>
         <a class="nav-link text-light" href="/invite">Invites</a>
         <a class="nav-link text-light" href="/users">Users</a>
@@ -49,7 +50,7 @@
   {{/role}}
   {{#role user 'researcher'}}
     <ul class="nav nav-pills flex-column" style="padding-top: 20px">
-       
+
       <li class="nav-item">
       </li>
     </ul>
