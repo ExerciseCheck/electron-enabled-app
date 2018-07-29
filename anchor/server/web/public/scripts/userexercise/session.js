@@ -2,7 +2,8 @@
 
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
-var ref_st;
+//var ref_st, ref_ed;
+//var reps = [];
 window.actionBtn = false;
 
 // window.addEventListener('beforeunload', function(e) {
@@ -77,10 +78,14 @@ function action(nextMode, type)
       redirect();
     });
   }
+
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent frames.
   if(nextMode === 'stop' && type === 'reference') {
+    var ref_ed = new Date().getTime();
+    //TODO: maybe save ref_ed to localStorage??
     localStorage.setItem("refFrames", JSON.stringify(liveFrames));
+    localStorage.setItem("refEnd", ref_ed);
     redirect();
   }
   else {
@@ -111,7 +116,6 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
 
-  var ref_ed = new Date().getTime();
   let values = {};
   // save to referenceExercise
   values.bodyFrames = JSON.stringify(refFrames);
@@ -149,6 +153,9 @@ function savePractice() {
   let patientId = parsedURL.patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
+  //TODO:
+  values.reps = [];
+
   //logged-in user is clinician
   if (patientId) {
     url = url + patientId;
@@ -293,8 +300,6 @@ function goToExercises() {
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "block";
-      //timer starts
-      ref_st = new Date().getTime();
     }
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
@@ -407,7 +412,7 @@ function goToExercises() {
   }
 
   //function that counts repetitions
-  function countReps(body, threshold_flag, range_scale=0.7, top_thresh=0.25, bottom_thresh=0.75) {
+  function countReps(body, threshold_flag, range_scale, top_thresh, bottom_thresh) {
 
     var reps = 0;
     var norm, ref_norm;
@@ -432,12 +437,6 @@ function goToExercises() {
 
     // Normalize current point by range and current neck value
     var current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
-    // TODO: camera X Y Z?
-    // console.log("THE joint's position:", body.joints[dataForCntReps.joint][dataForCntReps.axis]);
-    // console.log("current_pt:", current_pt);
-    // console.log("flag:", threshold_flag);
-
-
 
     // TODO: better define direction as 1 (up, right) and -1 (down, left)
     // flag against the exercise direction:
@@ -446,7 +445,6 @@ function goToExercises() {
       if (isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
         reps++;
       }
-
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
       // goes down and pass the bottom_thresh
@@ -457,7 +455,6 @@ function goToExercises() {
       return [reps, threshold_flag];
     }
   }
-
 
   // patient reaching out for button makes body NOT in plane
   function isBodyInPlane(ref_neck, neck) {
@@ -520,31 +517,34 @@ function goToExercises() {
             console.log("neck position in the first frame recorded");
             st = new Date().getTime();
             if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
-              ref_st = st;
+              localStorage.setItem("refStart", st);
             }
-            console.log("start time: ", st);
           }
         }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
-          console.log("window.Bridge.aOnBodyFrame, bodyFrames.body.foreach, canStartRecording");
-          // countReps and timing
-          var tempCnt = countReps(body, threshold_flag);
-          threshold_flag = tempCnt[1];
-          document.getElementById("cntReps").innerHTML =
-            parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+          if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
+            // countReps and timing
+            var tempCnt = countReps(body, threshold_flag,
+              dataForCntReps.rangeScale, dataForCntReps.topThresh, dataForCntReps.bottomThresh);
 
-          if (tempCnt[0] === 1) {
-            ed = new Date().getTime();
-            console.log("end time: ", ed);
-            var diff = Math.round((ed - st)/1000);
-            var speedEval = "It takes " + diff + " s";
-            document.getElementById("speedEval").innerHTML = speedEval;
-            st = ed;
-            console.log("start time: ", st);
+            threshold_flag = tempCnt[1];
+            document.getElementById("cntReps").innerHTML =
+              parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+
+            if (tempCnt[0] === 1) {
+              ed = new Date().getTime();
+              console.log("end time: ", ed);
+              var diff = Math.round((ed - st) / 1000);
+              var speedEval = "It takes " + diff + " s";
+              var repItem = {"speed": diff};
+              reps.push(repItem);
+              document.getElementById("speedEval").innerHTML = speedEval;
+              st = ed;
+              console.log("start time: ", st);
+            }
           }
-
         }
       }
       //live_counter = live_counter + 1;

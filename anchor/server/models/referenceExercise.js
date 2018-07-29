@@ -23,6 +23,13 @@ class ReferenceExercise extends MongoModels {
       refLowerJoint: -1,
       refUpperJoint: -1,
       refTime: -1,
+      // neckX,
+      // neckY,
+      // refMin,
+      // refMax,
+      // refLowerJoint,
+      // refUpperJoint,
+      // refTime,
       createdAt: new Date()
     };
 

@@ -391,7 +391,7 @@ internals.applyRoutes = function (server, next) {
             dataForCntReps['neckY'] = reference.neckY;
             // numbers between [0,1]
             dataForCntReps['topThresh'] = reference.topThresh;
-            dataForCntReps['topThresh'] = reference.topThresh;
+            dataForCntReps['bottomThresh'] = reference.bottomThresh;
             dataForCntReps['rangeScale'] = reference.rangeScale;
             // time for one repetition in reference, in seconds
             dataForCntReps['refTime'] = reference.refTime;
@@ -572,6 +572,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       let bodyFrames = [];
+      let neckX, neckY, refMin, refMax, refLowerJoint, refUpperJoint, refTime;
 
       Async.auto({
 
@@ -594,21 +595,37 @@ internals.applyRoutes = function (server, next) {
         createReference:['findMostRecentReference', function (results, done) {
 
           if(results.findMostRecentReference.length > 0 ) {
-            if(results.findMostRecentReference[0].bodyFrames.length > 0) {
+            if (results.findMostRecentReference[0].bodyFrames.length > 0) {
               bodyFrames = results.findMostRecentReference[0].bodyFrames;
+              //TODO: maybe use a loop?
+              neckX = results.findMostRecentReference[0].neckX;
+              neckY = results.findMostRecentReference[0].neckY;
+              refMin = results.findMostRecentReference[0].refMin
+              refMax = results.findMostRecentReference[0].refMax;
+              refLowerJoint = results.findMostRecentReference[0].refLowerJoint;
+              refUpperJoint = results.findMostRecentReference[0].refUpperJoint;
+              refTime = results.findMostRecentReference[0].refTime;
             }
+
+            ReferenceExercise.create(
+              request.payload.userId,
+              request.payload.exerciseId,
+              request.payload.numSets,
+              request.payload.numRepetition,
+              request.payload.rangeScale,
+              request.payload.topThresh,
+              request.payload.bottomThresh,
+              bodyFrames,
+              neckX,
+              neckY,
+              refMin,
+              refMax,
+              refLowerJoint,
+              refUpperJoint,
+              refTime,
+              done);
           }
 
-          ReferenceExercise.create(
-            request.payload.userId,
-            request.payload.exerciseId,
-            request.payload.numSets,
-            request.payload.numRepetition,
-            request.payload.rangeScale,
-            request.payload.topThresh,
-            request.payload.bottomThresh,
-            bodyFrames,
-            done);
           }]
         }, (err, results) => {
 
