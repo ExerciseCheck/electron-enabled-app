@@ -595,37 +595,36 @@ internals.applyRoutes = function (server, next) {
         createReference:['findMostRecentReference', function (results, done) {
 
           if(results.findMostRecentReference.length > 0 ) {
-            if (results.findMostRecentReference[0].bodyFrames.length > 0) {
+            if(results.findMostRecentReference[0].bodyFrames.length > 0) {
               bodyFrames = results.findMostRecentReference[0].bodyFrames;
               //TODO: maybe use a loop?
-              neckX = results.findMostRecentReference[0].neckX;
-              neckY = results.findMostRecentReference[0].neckY;
-              refMin = results.findMostRecentReference[0].refMin
-              refMax = results.findMostRecentReference[0].refMax;
-              refLowerJoint = results.findMostRecentReference[0].refLowerJoint;
-              refUpperJoint = results.findMostRecentReference[0].refUpperJoint;
-              refTime = results.findMostRecentReference[0].refTime;
+              // neckX = results.findMostRecentReference[0].neckX;
+              // neckY = results.findMostRecentReference[0].neckY;
+              // refMin = results.findMostRecentReference[0].refMin
+              // refMax = results.findMostRecentReference[0].refMax;
+              // refLowerJoint = results.findMostRecentReference[0].refLowerJoint;
+              // refUpperJoint = results.findMostRecentReference[0].refUpperJoint;
+              // refTime = results.findMostRecentReference[0].refTime;
             }
-
-            ReferenceExercise.create(
-              request.payload.userId,
-              request.payload.exerciseId,
-              request.payload.numSets,
-              request.payload.numRepetition,
-              request.payload.rangeScale,
-              request.payload.topThresh,
-              request.payload.bottomThresh,
-              bodyFrames,
-              neckX,
-              neckY,
-              refMin,
-              refMax,
-              refLowerJoint,
-              refUpperJoint,
-              refTime,
-              done);
           }
 
+          ReferenceExercise.create(
+            request.payload.userId,
+            request.payload.exerciseId,
+            request.payload.numSets,
+            request.payload.numRepetition,
+            request.payload.rangeScale,
+            request.payload.topThresh,
+            request.payload.bottomThresh,
+            bodyFrames,
+            // neckX,
+            // neckY,
+            // refMin,
+            // refMax,
+            // refLowerJoint,
+            // refUpperJoint,
+            // refTime,
+            done);
           }]
         }, (err, results) => {
 
@@ -845,7 +844,8 @@ internals.applyRoutes = function (server, next) {
               refMin: request.payload.refMin,
               refMax: request.payload.refMax,
               refLowerJoint: request.payload.refLowerJoint,
-              refUpperJoint: request.payload.refUpperJoint
+              refUpperJoint: request.payload.refUpperJoint,
+              refTime: request.payload.refTime,
             }
           };
           ReferenceExercise.findByIdAndUpdate(id, update, done);

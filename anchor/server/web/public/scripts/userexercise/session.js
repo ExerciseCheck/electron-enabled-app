@@ -2,7 +2,8 @@
 
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
-//var ref_st, ref_ed;
+let refStart, refEnd;
+let ref_st, ref_ed;
 //var reps = [];
 window.actionBtn = false;
 
@@ -82,7 +83,7 @@ function action(nextMode, type)
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent frames.
   if(nextMode === 'stop' && type === 'reference') {
-    var ref_ed = new Date().getTime();
+    ref_ed = new Date().getTime();
     //TODO: maybe save ref_ed to localStorage??
     localStorage.setItem("refFrames", JSON.stringify(liveFrames));
     localStorage.setItem("refEnd", ref_ed);
@@ -126,7 +127,9 @@ function saveReference() {
   values.refMax = mm.max;
   values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
   values.refUpperJoint = refFrames[0].joints[dataForCntReps.refUpperJointID][dataForCntReps.axis];
-  values.refTime = Math.round((ref_ed - ref_st) / 1000);
+  var ed = localStorage.getItem("refEnd");
+  var st = localStorage.getItem("refStart");
+  values.refTime = Math.round((ed - st) / 1000);
   console.log(values.refTime);
   // save also to dataForCntReps
   dataForCntReps.refLowerJointPos = values.refLowerJoint;
@@ -517,6 +520,7 @@ function goToExercises() {
             console.log("neck position in the first frame recorded");
             st = new Date().getTime();
             if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
+              ref_st = st;
               localStorage.setItem("refStart", st);
             }
           }
