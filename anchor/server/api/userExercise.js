@@ -877,7 +877,7 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: PracticeExercise.dataPayload
-    },
+      },
       payload:{ maxBytes: 1048576 * 5 }
     },
     handler: function (request, reply) {
@@ -936,7 +936,7 @@ internals.applyRoutes = function (server, next) {
             },
             $set: {
               weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
-              numRepsCompleted: 1 //TODO: FIX ME
+              numRepsCompleted: request.payload.repEvals.length //TODO: FIX ME
             }
           };
 

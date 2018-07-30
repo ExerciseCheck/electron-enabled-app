@@ -159,6 +159,7 @@ function savePractice() {
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
   //TODO: better ways than store to localStorage?
+  //values.repEvals = JSON.parse(localStorage.getItem("repEvals"));
   values.repEvals = localStorage.getItem("repEvals");
   console.log(values.repEvals);
   //localStorage.removeItem("repEvals");
@@ -547,7 +548,9 @@ function goToExercises() {
               var speedEval = "It takes " + diff + " s";
               var repItem = {"speed": diff};
               repEvals.push(repItem);
-              localStorage.setItem("repEvals", JSON.stringify(repEvals));
+              localStorage.setItem("repEvals", JSON.stringify((repEvals)));
+              console.log(repEvals);
+              console.log(JSON.parse(localStorage.getItem("repEvals")));
               document.getElementById("speedEval").innerHTML = speedEval;
               st = ed;
               console.log("start time: ", st);
