@@ -18,7 +18,7 @@ Date.prototype.getWeekNumber = function(){
   return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
 };
 
-function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) {
+function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, redirectToUrl) {
 
   const values = {};
   values.exerciseId = exerciseId;
@@ -71,7 +71,7 @@ function initializePractice() {
   });
 }
 
-function updateSetting(numSets, numReps, exerciseId, patientId) {
+function updateSetting(numSets, numReps, rangeScale, exerciseId, patientId) {
 
   const values = {};
   values.exerciseId = exerciseId;
@@ -101,16 +101,19 @@ function changeSetting() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
+  //const rangeScale = $("rangeScale").val();
+  const rangeScale = 0.7; //TODO: comment this out
+
   const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
   $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
-      updateSetting(numSets, numReps, getExerciseId(), getPatientId());
+      updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
     }
 
     else {
-      initialSetting(numSets, numReps, getExerciseId(), getPatientId());
+      initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
     }
   });
 }
@@ -119,8 +122,10 @@ function update() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
+  //const rangeScale = $("rangeScale").val();
+  const rangeScale = 0.7; //TODO: comment this out
   const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
-  updateSetting(numSets, numReps, getExerciseId(), getPatientId(), url);
+  updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), url);
 }
 
 function createRef() {
@@ -136,7 +141,7 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, getExerciseId(), getPatientId(), redirectToUrl);
+      initialSetting(1, 1, 0.7, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
 }
@@ -149,6 +154,8 @@ function viewReferences() {
 function updateReference() {
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
+  //const rangeScale = $("rangeScale").val();
+  const rangeScale = 0.7; //TODO: comment this out
 
   const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +
@@ -156,7 +163,7 @@ function updateReference() {
 
   $.get(url, function(data){
     localStorage.setItem("refFrames", JSON.stringify(data));
-    initialSetting(numSets, numReps, getExerciseId(), getPatientId(), redirectToUrl);
+    initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), redirectToUrl);
   });
 }
 
