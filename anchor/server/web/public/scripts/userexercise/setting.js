@@ -28,6 +28,13 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
   values.rangeScale = 0.7; // default
   values.topThresh = 0.25; // values
   values.bottomThresh = 0.75;
+  values.neckX = -1,
+  values.neckY = -1,
+  values.refMin = -1,
+  values.refMax = -1,
+  values.refLowerJoint = -1,
+  values.refUpperJoint = -1,
+  values.refTime = -1,
 
   $.ajax({
     type: 'POST',

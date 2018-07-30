@@ -596,15 +596,17 @@ internals.applyRoutes = function (server, next) {
 
           if(results.findMostRecentReference.length > 0 ) {
             if(results.findMostRecentReference[0].bodyFrames.length > 0) {
-              bodyFrames = results.findMostRecentReference[0].bodyFrames;
+
               //TODO: maybe use a loop?
-              // neckX = results.findMostRecentReference[0].neckX;
-              // neckY = results.findMostRecentReference[0].neckY;
-              // refMin = results.findMostRecentReference[0].refMin
-              // refMax = results.findMostRecentReference[0].refMax;
-              // refLowerJoint = results.findMostRecentReference[0].refLowerJoint;
-              // refUpperJoint = results.findMostRecentReference[0].refUpperJoint;
-              // refTime = results.findMostRecentReference[0].refTime;
+              let temp = results.findMostRecentReference[0];
+              bodyFrames = temp.bodyFrames;
+              neckX = temp.neckX;
+              neckY = temp.neckY;
+              refMin = temp.refMin
+              refMax = temp.refMax;
+              refLowerJoint = temp.refLowerJoint;
+              refUpperJoint = temp.refUpperJoint;
+              refTime = temp.refTime;
             }
           }
 
@@ -617,13 +619,13 @@ internals.applyRoutes = function (server, next) {
             request.payload.topThresh,
             request.payload.bottomThresh,
             bodyFrames,
-            // neckX,
-            // neckY,
-            // refMin,
-            // refMax,
-            // refLowerJoint,
-            // refUpperJoint,
-            // refTime,
+            neckX,
+            neckY,
+            refMin,
+            refMax,
+            refLowerJoint,
+            refUpperJoint,
+            refTime,
             done);
           }]
         }, (err, results) => {
@@ -875,7 +877,7 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: PracticeExercise.dataPayload
-      },
+    },
       payload:{ maxBytes: 1048576 * 5 }
     },
     handler: function (request, reply) {
@@ -924,13 +926,13 @@ internals.applyRoutes = function (server, next) {
 
           let update = {
             $addToSet: {
-              sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
+              sets: {date: new Date(), repEvals: [200,100], bodyFrames: request.payload.bodyFrames}
               //TODO: ERROR "reps" is not allowed??
             },
             $inc: {
               numSetsCompleted: 1,
               //numRepsCompleted: 1
-              numRepsCompleted: JSON.parse(request.payload.repEvals).length //TODO: not sure
+              numRepsCompleted: (request.payload.repEvals).length //TODO: not sure
             },
             $set: {
               weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
@@ -940,12 +942,12 @@ internals.applyRoutes = function (server, next) {
           if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
             update = {
               $addToSet: {
-                sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
+                sets: {date: new Date(), repEvals: [200, 100], bodyFrames: request.payload.bodyFrames}
               },
               $inc: {
                 numSetsCompleted: 1,
                 //numRepsCompleted: 1
-                numRepsCompleted: JSON.parse(request.payload.repEvals).length //TODO: not sure
+                numRepsCompleted: request.payload.repEvals.length //TODO: not sure
               },
               $set: {
                 weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
@@ -958,7 +960,7 @@ internals.applyRoutes = function (server, next) {
       }, (err, results) => {
 
         if (err) {
-          return reply(err);
+          return reply(request.payload.repEvals);
         }
         if (!results.findMostRecentReference[0]) {
           return reply(Boom.notFound('Document not found.'));

@@ -4,7 +4,15 @@ const MongoModels = require('hicsail-mongo-models');
 
 class ReferenceExercise extends MongoModels {
 
-  static create(userId, exerciseId, numSets, numRepetition, rangeScale, topThresh, bottomThresh, bodyFrames, callback){
+  static create(userId, exerciseId, numSets, numRepetition, rangeScale, topThresh, bottomThresh, bodyFrames,
+                neckX,
+                neckY,
+                refMin,
+                refMax,
+                refLowerJoint,
+                refUpperJoint,
+                refTime,
+                callback){
 
     const document = {
       userId,
@@ -16,20 +24,20 @@ class ReferenceExercise extends MongoModels {
       bottomThresh,
       isActive: true, //default value
       bodyFrames,
-      neckX: -1,
-      neckY: -1,
-      refMin: -1,
-      refMax: -1,
-      refLowerJoint: -1,
-      refUpperJoint: -1,
-      refTime: -1,
-      // neckX,
-      // neckY,
-      // refMin,
-      // refMax,
-      // refLowerJoint,
-      // refUpperJoint,
-      // refTime,
+      // neckX: -1,
+      // neckY: -1,
+      // refMin: -1,
+      // refMax: -1,
+      // refLowerJoint: -1,
+      // refUpperJoint: -1,
+      // refTime: -1,
+      neckX,
+      neckY,
+      refMin,
+      refMax,
+      refLowerJoint,
+      refUpperJoint,
+      refTime,
       createdAt: new Date()
     };
 
