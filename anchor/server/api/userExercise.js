@@ -637,7 +637,7 @@ internals.applyRoutes = function (server, next) {
     });
 
   //this route inserts a new practice exercise document into its respective collection,
-  //could be trrigered by both clinician and patient,
+  //could be triggered by both clinician and patient,
   server.route({
     method: 'POST',
     path: '/userexercise/practice/{patientId?}',
@@ -924,11 +924,13 @@ internals.applyRoutes = function (server, next) {
 
           let update = {
             $addToSet: {
-              sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+              sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
+              //TODO: ERROR "reps" is not allowed??
             },
             $inc: {
               numSetsCompleted: 1,
-              numRepsCompleted: 1
+              //numRepsCompleted: 1
+              numRepsCompleted: JSON.parse(request.payload.repEvals).length //TODO: not sure
             },
             $set: {
               weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
@@ -938,11 +940,12 @@ internals.applyRoutes = function (server, next) {
           if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
             update = {
               $addToSet: {
-                sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+                sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
               },
               $inc: {
                 numSetsCompleted: 1,
-                numRepsCompleted: 1
+                //numRepsCompleted: 1
+                numRepsCompleted: JSON.parse(request.payload.repEvals).length //TODO: not sure
               },
               $set: {
                 weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,

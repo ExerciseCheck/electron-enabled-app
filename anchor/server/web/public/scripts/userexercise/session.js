@@ -2,9 +2,9 @@
 
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
-let refStart, refEnd;
-let ref_st, ref_ed;
-//var reps = [];
+let refStart, refEnd; //not used
+let ref_st, ref_ed; //not used
+let repEvals = [];
 window.actionBtn = false;
 
 // window.addEventListener('beforeunload', function(e) {
@@ -129,6 +129,8 @@ function saveReference() {
   values.refUpperJoint = refFrames[0].joints[dataForCntReps.refUpperJointID][dataForCntReps.axis];
   var ed = localStorage.getItem("refEnd");
   var st = localStorage.getItem("refStart");
+  localStorage.removeItem("refEnd");
+  localStorage.removeItem("refStart");
   values.refTime = Math.round((ed - st) / 1000);
   console.log(values.refTime);
   // save also to dataForCntReps
@@ -156,9 +158,10 @@ function savePractice() {
   let patientId = parsedURL.patientId;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
-  //TODO:
-  values.reps = [];
-
+  //TODO: better ways than store to localStorage?
+  values.repEvals = localStorage.getItem("repEvals");
+  console.log(values.repEvals.length);
+  //localStorage.removeItem("repEvals");
   //logged-in user is clinician
   if (patientId) {
     url = url + patientId;
@@ -261,7 +264,7 @@ function goToExercises() {
       }
       liveFrames = [];
       recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
-      localStorage.removeItem('liveFrames');
+      //localStorage.removeItem('liveFrames');
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
@@ -543,7 +546,8 @@ function goToExercises() {
               var diff = Math.round((ed - st) / 1000);
               var speedEval = "It takes " + diff + " s";
               var repItem = {"speed": diff};
-              reps.push(repItem);
+              repEvals.push(repItem);
+              localStorage.setItem("repEvals", JSON.stringify(repEvals));
               document.getElementById("speedEval").innerHTML = speedEval;
               st = ed;
               console.log("start time: ", st);
