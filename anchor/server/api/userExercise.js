@@ -924,33 +924,34 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
+          //let numReps = JSON.parse(request.payload.repEvals).length;
           let update = {
             $addToSet: {
-              sets: {date: new Date(), repEvals: [200,100], bodyFrames: request.payload.bodyFrames}
+              sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
               //TODO: ERROR "reps" is not allowed??
             },
             $inc: {
               numSetsCompleted: 1,
-              //numRepsCompleted: 1
-              numRepsCompleted: (request.payload.repEvals).length //TODO: not sure
+              //numRepsCompleted: 1 // Not increase but set
             },
             $set: {
-              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
+              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
+              numRepsCompleted: 1 //TODO: FIX ME
             }
           };
 
           if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
             update = {
               $addToSet: {
-                sets: {date: new Date(), repEvals: [200, 100], bodyFrames: request.payload.bodyFrames}
+                sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
               },
               $inc: {
                 numSetsCompleted: 1,
                 //numRepsCompleted: 1
-                numRepsCompleted: request.payload.repEvals.length //TODO: not sure
               },
               $set: {
                 weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
+                numRepsCompleted: 1, //TODO: FIX ME
                 isComplete: true
               }
             };

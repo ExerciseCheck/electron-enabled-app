@@ -159,7 +159,7 @@ function savePractice() {
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
   //TODO: better ways than store to localStorage?
-  values.repEvals = JSON.parse(localStorage.getItem("repEvals"));
+  values.repEvals = localStorage.getItem("repEvals");
   console.log(values.repEvals);
   //localStorage.removeItem("repEvals");
   //logged-in user is clinician
@@ -180,10 +180,10 @@ function savePractice() {
         url = url + patientId;
       }
       $.get(url, function(data){
-        localStorage.setItem("refFrames", JSON.stringify(data));s
+        localStorage.setItem("refFrames", JSON.stringify(data));
 
-        // window.location = '/userexercise/session/start/practice/' +
-        // parsedURL.exerciseId + '/' + patientId;
+        window.location = '/userexercise/session/start/practice/' +
+        parsedURL.exerciseId + '/' + patientId;
       });
     },
     error: function (result) {
@@ -264,7 +264,7 @@ function goToExercises() {
       }
       liveFrames = [];
       recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
-      //localStorage.removeItem('liveFrames');
+      localStorage.removeItem('liveFrames');
       window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
@@ -546,7 +546,7 @@ function goToExercises() {
               var diff = Math.round((ed - st) / 1000);
               var speedEval = "It takes " + diff + " s";
               var repItem = {"speed": diff};
-              repEvals.push(200);
+              repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify(repEvals));
               document.getElementById("speedEval").innerHTML = speedEval;
               st = ed;

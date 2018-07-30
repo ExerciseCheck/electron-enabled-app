@@ -78,9 +78,9 @@ function updateSetting(numSets, numReps, rangeScale, exerciseId, patientId) {
   values.userId = patientId;
   values.numSets = numSets;
   values.numRepetition = numReps;
-  values.rangeScale = 0.5; //dummy
-  values.topThresh = 0.5; // dummy
-  values.bottomThresh = 0.5;//dummy values
+  values.rangeScale = 0.8; //dummy
+  values.topThresh = 0.2; // dummy
+  values.bottomThresh = 0.7;//dummy values
 
   //updating settings creates a new reference document with the latest reference bodyframes
   $.ajax({
