@@ -35,8 +35,22 @@ function createWindow() {
     mainWindow = null;
   });
 
+  mainWindow.on('close', function(e){
+    var choice = require('electron').dialog.showMessageBox(this,
+      {
+        type: 'question',
+        buttons: ['Yes', 'No'],
+        title: 'Confirm',
+        message: 'Are you sure you want to quit? Any unsaved progress will be lost.'
+      });
+    if(choice == 1){
+      e.preventDefault();
+    }
+  });
+
   createMenu();
 }
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -20,7 +20,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      return reply.view('userexercise/index', {
+      return reply.view('userexercise/viewreference', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
       });
@@ -96,7 +96,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop') {
+      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop' && request.params.mode !== 'end') {
         return reply(Boom.notFound('Invalid Mode'));
       }
 
