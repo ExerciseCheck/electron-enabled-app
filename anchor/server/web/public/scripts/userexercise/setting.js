@@ -125,7 +125,7 @@ function update() {
   //const rangeScale = $("rangeScale").val();
   const rangeScale = 0.7; //TODO: comment this out
   const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
-  updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), url);
+  updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), url); //TODO: no url??
 }
 
 function createRef() {
@@ -163,10 +163,13 @@ function updateReference() {
 
   $.get(url, function(data){
     localStorage.setItem("refFrames", JSON.stringify(data));
-    initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), redirectToUrl);
+    //initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), redirectToUrl);
+    updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
+    window.location = redirectToUrl;
   });
 }
 
+//TODO: everytime we start exercise a new document is created but it could be empty
 function StartPracticeSession() {
 
   const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();

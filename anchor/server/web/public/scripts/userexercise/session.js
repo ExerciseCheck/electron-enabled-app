@@ -59,7 +59,6 @@ Date.prototype.getWeekNumber = function(){
 
 function action(nextMode, type)
 {
-
   const parsedURL = parseURL(window.location.pathname);
   var patientId = parsedURL.patientId;
   var exerciseId = parsedURL.exerciseId;
@@ -84,9 +83,10 @@ function action(nextMode, type)
   //The refFrames data in local storage gets set to the most recent frames.
   if(nextMode === 'stop' && type === 'reference') {
     ref_ed = new Date().getTime();
-    //TODO: maybe save ref_ed to localStorage??
-    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
     localStorage.setItem("refEnd", ref_ed);
+
+    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
+
     redirect();
   }
   else {
@@ -184,7 +184,7 @@ function savePractice() {
         localStorage.setItem("refFrames", JSON.stringify(data));
 
         window.location = '/userexercise/session/start/practice/' +
-        parsedURL.exerciseId + '/' + patientId;
+          parsedURL.exerciseId + '/' + patientId;
       });
     },
     error: function (result) {

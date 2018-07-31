@@ -263,7 +263,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //this route finds the a reference document for (exerciseId, patientId) with empty bodyFrames
-  //the purspose of this route is to find out if a reference with specified setting is already
+  //the purpose of this route is to find out if a reference with specified setting is already
   //inserted or not
   server.route({
     method: 'GET',
@@ -309,7 +309,7 @@ internals.applyRoutes = function (server, next) {
 
       const query = {
         userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-        exerciseId: request.params.exerciseId,
+        exerciseId: request.params.exerciseId
       };
 
       ReferenceExercise.findOne(query, {sort: {$natural: -1}}, (err, refExercise) => {
@@ -327,7 +327,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  // this route checks to see if there is a practice session completed for the latest version of reference
+  // this route get the data from the latest version of reference for count reps
   server.route({
     method: 'GET',
     path: '/userexercise/dataforcount/{exerciseId}/{patientId?}',
@@ -412,6 +412,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  // this route checks to see if there is a practice session completed for the latest version of reference
   server.route({
     method: 'GET',
     path: '/userexercise/practice/{exerciseId}/{patientId?}',
@@ -804,7 +805,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route updates the bodyframes data for most recent reference of a (patientId, exerciseId) pair
+  //this route updates the bodyframes and relative data for most recent reference of a (patientId, exerciseId) pair
   server.route({
     method: 'PUT',
     path: '/userexercise/reference/mostrecent/data/{exerciseId}/{patientId}',
@@ -867,7 +868,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-//updates practice document with new set information
+  //updates practice document with new set information
   server.route({
     method: 'PUT',
     path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
@@ -924,11 +925,16 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
-          //let numReps = JSON.parse(request.payload.repEvals).length;
+          let repEvals = request.payload.repEvals;
+          console.log("request.payload.repEvals:", repEvals);
+          console.log("*.length:", repEvals.length);
+          // TODO: to reduce the request which is expensive, maybe we use:
+          // let requestPayload = request.payload;
+          // repEvals: requestPayload.repEvals, bodyFrames: requestPayload.bodyFrames, requestPayload.weekEnd
+
           let update = {
             $addToSet: {
               sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
-              //TODO: ERROR "reps" is not allowed??
             },
             $inc: {
               numSetsCompleted: 1,
@@ -936,7 +942,7 @@ internals.applyRoutes = function (server, next) {
             },
             $set: {
               weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
-              numRepsCompleted: request.payload.repEvals.length //TODO: FIX ME
+              numRepsCompleted: request.payload.repEvals.length
             }
           };
 
@@ -951,7 +957,7 @@ internals.applyRoutes = function (server, next) {
               },
               $set: {
                 weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
-                numRepsCompleted: 1, //TODO: FIX ME
+                numRepsCompleted: request.payload.repEvals.length,
                 isComplete: true
               }
             };
@@ -970,6 +976,7 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
 
   // not used
   server.route({
@@ -993,11 +1000,9 @@ internals.applyRoutes = function (server, next) {
       };
 
       ReferenceExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
-
         if (err) {
           return reply(err);
         }
-
         if (!document) {
           return reply(Boom.notFound('Document not found.'));
         }
