@@ -21,7 +21,6 @@
                 <th>direction</th>
                 <th>lowerJoint</th>
                 <th>upperJoint</th>
-                <th>type</th>
                 {{#role user 'clinician'}}
                   <th>ID</th>
                   <th>Edit</th>
@@ -54,7 +53,7 @@
       ajax: {
         url: "../api/table/exercise",
         data: function (d) {
-          d.fields = "exerciseName description createdAt numSessions numRepetition impJoint impAxis direction lowerJoint upperJoint type";
+          d.fields = "exerciseName description createdAt numSessions numRepetition impJoint impAxis direction lowerJoint upperJoint";
         }
       },
       columns: [
