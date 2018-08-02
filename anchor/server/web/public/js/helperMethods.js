@@ -24,20 +24,11 @@ function createStorageObject(storage, key, val) {
     return false;
   }
 }
-function startTimer() {
-  var start = Date.now();
-  var timer = setInterval(function () {
-    var delta = Date.now() - start;
-    var time = window.CONFIG.TIMER_MAX - Math.floor(delta / 1000);
-    if (time <= 0) {
-      clearInterval(timer);
-      $("#num").text("");
-      $("#start").text("Time to start!");
-      $("#cover").css("display", "none");
-      var event = new Event('timer-done');
-      document.dispatchEvent(event);
-    } else {
-      $("#num").text(time);
-    }
-  }, 100);
-}
+
+Date.prototype.getWeekNumber = function(){
+  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+};
