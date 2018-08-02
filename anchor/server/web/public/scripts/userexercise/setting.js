@@ -19,15 +19,17 @@ Date.prototype.getWeekNumber = function(){
 };
 
 function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, redirectToUrl) {
-
+  
+  rangeScale = 0.7 // comment this out
+  
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
   values.numSets = numSets;
   values.numRepetition = numReps;
-  values.rangeScale = 0.7; // default
-  values.topThresh = 0.25; // values
-  values.bottomThresh = 0.75;
+  values.rangeScale = rangeScale;
+  values.topThresh = 0.25; // default values
+  values.bottomThresh = 0.75; // defalut values
   values.neckX = -1,
   values.neckY = -1,
   values.refMin = -1,
@@ -73,12 +75,13 @@ function initializePractice() {
 
 function updateSetting(numSets, numReps, rangeScale, exerciseId, patientId) {
 
+  rangeScale = 0.8 // comment this out
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
   values.numSets = numSets;
   values.numRepetition = numReps;
-  values.rangeScale = 0.8; //dummy
+  values.rangeScale = rangeScale;
   values.topThresh = 0.2; // dummy
   values.bottomThresh = 0.7;//dummy values
 
