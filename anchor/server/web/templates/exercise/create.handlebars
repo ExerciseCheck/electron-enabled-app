@@ -9,6 +9,16 @@
           <div style="padding: 20px">
             <form id="form">
               <div id="formFields"></div>
+              <label for="impJoint" class="label">Most Important Joint</label>
+              {{> jointList}}
+              <label for="impAxis" class="label">Axis</label>
+              {{> axis}}
+              <label for="direction" class="label">Direction</label>
+              {{> direction}}
+              <label for="lowerJoint" class="label">Ref Lower Joint</label>
+              {{> jointList}}
+              <label for="upperJoint" class="label">Ref Lower Joint</label>
+              {{> jointList}}
               <button id="create" type="submit" class="btn btn-primary">Create</button>
             </form>
           </div>
