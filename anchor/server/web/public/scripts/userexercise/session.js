@@ -380,7 +380,7 @@ function goToExercises() {
     if(notAligned) {
       if(dist <= r){
         //When person's neck enters green circle && mode is 'play', recording will start.
-        ctx.strokeStyle="Lime"; //green color
+        ctx.strokeStyle="Lime";
         var parsedURL = parseURL(window.location.pathname);
         if(parsedURL.mode === 'play' && useTimer) {
           startTimer();
@@ -392,7 +392,7 @@ function goToExercises() {
       }
     }
     else {
-      ctx.strokeStyle="DimGray"; // circle turns into a greenish grey color once countdown finishes
+      ctx.strokeStyle="DimGray"; // circle turns into a dark grey color once countdown finishes
     }
     ctx.arc(x, y, r, 0, Math.PI*2);
     ctx.stroke();
