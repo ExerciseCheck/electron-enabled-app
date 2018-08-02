@@ -380,7 +380,7 @@ function goToExercises() {
     if(notAligned) {
       if(dist <= r){
         //When person's neck enters green circle && mode is 'play', recording will start.
-        ctx.strokeStyle="#3de562"; //green color
+        ctx.strokeStyle="Lime"; //green color
         var parsedURL = parseURL(window.location.pathname);
         if(parsedURL.mode === 'play' && useTimer) {
           startTimer();
@@ -392,7 +392,7 @@ function goToExercises() {
       }
     }
     else {
-      ctx.strokeStyle="#73957b"; // circle turns into a greenish grey color once countdown finishes
+      ctx.strokeStyle="DimGray"; // circle turns into a greenish grey color once countdown finishes
     }
     ctx.arc(x, y, r, 0, Math.PI*2);
     ctx.stroke();
@@ -452,9 +452,9 @@ function goToExercises() {
     });
 
     //if the patient is in position and doing a practice session
-    if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play'))
-    {
-        //draw in the reference canvas
+    if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
+
+      //draw in the reference canvas
         drawBody(refFrames[ref_index], ref_ctx, false);
         //display one frame of reference every 2 frames of live frame captured
         //we can manipulate the number to control the display speed
