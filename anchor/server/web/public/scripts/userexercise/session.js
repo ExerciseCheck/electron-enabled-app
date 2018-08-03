@@ -193,6 +193,12 @@ function goToExercises() {
   let inPosition = false;
   let parsedURL = parseURL(window.location.pathname);
 
+  // canvas grid lines
+  let bw = 500;
+  let bh = 500;
+  let p = -0.5;
+
+
   if (isElectron())
   {
     document.addEventListener('DOMContentLoaded', function() {
@@ -222,9 +228,10 @@ function goToExercises() {
       liveFrames = [];
       recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
       localStorage.removeItem('liveFrames');
-      showCanvas();
+      //showCanvas();
       window.Bridge.eStartKinect();
-    //  showCanvas();
+      showCanvas();
+      drawBoard();
       //checks what type of "mode" page is currently on && if reference exist
     });
   }
@@ -368,6 +375,15 @@ function goToExercises() {
     ctx.stroke();
     ctx.closePath();
   }
+
+  function drawBoard(){
+     for (let x = 0; x <= bh; x += 100.3) {
+      ctx.moveTo(p, x + p);
+      ctx.lineTo(bw + p, x + p);
+    }
+     ctx.strokeStyle = "gray";
+    ctx.stroke();
+    }
 
   //function that draws each joint as a yellow round dot
   function drawJoints(parameters, ctx){
