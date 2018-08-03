@@ -10,15 +10,15 @@
             <form id="form">
               <div id="formFields"></div>
               <label for="impJoint" class="label">Most Important Joint</label>
-              {{> jointList}}
+              {{> jointList context1}}
               <label for="impAxis" class="label">Axis</label>
               {{> axis}}
               <label for="direction" class="label">Direction</label>
               {{> direction}}
-              <label for="lowerJoint" class="label">Ref Lower Joint</label>
-              {{> jointList}}
-              <label for="upperJoint" class="label">Ref Lower Joint</label>
-              {{> jointList}}
+              <label for="lowerJoint" class="label">Reference Lower Joint</label>
+              {{> jointList context2}}
+              <label for="upperJoint" class="label">Reference Upper Joint</label>
+              {{> jointList context3}}
               <button id="create" type="submit" class="btn btn-primary">Create</button>
             </form>
           </div>

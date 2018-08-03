@@ -6,7 +6,6 @@
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
 let refStart, refEnd; //not used
-let ref_st, ref_ed; //not used
 let repEvals = [];
 window.actionBtn = false;
 
@@ -81,7 +80,7 @@ function action(nextMode, type)
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent/live frames.
   if(nextMode === 'stop' && type === 'reference') {
-    ref_ed = new Date().getTime();
+    var ref_ed = new Date().getTime();
     localStorage.setItem("refEnd", ref_ed);
 
     localStorage.setItem("refFrames", JSON.stringify(liveFrames));
@@ -240,13 +239,24 @@ function goToExercises() {
   // value for countReps
   let nx_1stFrame, ny_1stFrame;
   let neck_z; // distance to the camera sensor
-  let threshold_flag;
+  let threshold_flag, direction;
   // fetch data before start exercise
   let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;
-    threshold_flag = data.direction;
+    //threshold_flag = data.direction;
+    //group: (down, L2R) +; (up, R2L) -
+    if(data.direction === 'L2R') {
+      direction = "down";
+      threshold_flag = "down";
+    } else if (data.direction === 'R2L') {
+      direction = "up";
+      threshold_flag = "up";
+    } else {
+      direction = data.direction;
+      threshold_flag = data.direction;
+    }
   });
   // time for speed evaluation
   var st, ed;
@@ -485,17 +495,20 @@ function goToExercises() {
     // Normalize current point by range and current neck value
     var current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
 
-    // TODO: better define direction as 1 (up, right) and -1 (down, left)
-    // flag against the exercise direction:
+    // direction group: (down, right), (up, left)
     if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
       // goes up and pass the top_thresh
-      if (isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
+      // only increase reps when moving against the exercise direction:
+      if (threshold_flag !== direction && isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
         reps++;
       }
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
       // goes down and pass the bottom_thresh
-      // console.log("flip down to up");
+      // only increase reps when moving against the exercise direction:
+      if (threshold_flag !== direction && isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
+        reps++;
+      }
       return [reps, 'up'];
     } else {
       // console.log("No flip");
@@ -541,9 +554,6 @@ function goToExercises() {
     {
       if (body.tracked)
       {
-        //draw the body skeleton in live canvas
-        drawBody(body,ctx);
-
         //increment the live counter
         live_counter = live_counter + 1;
 
@@ -551,24 +561,40 @@ function goToExercises() {
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
-        // check in-position status whenever kinect captures a body
-        if(!inPosition) {
-          if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
-            inPosition = true;
-            //TODO: if there is timer, may need to move this
-            //record the neck position for norm once inPosition
-            nx_1stFrame = neck_x;
-            ny_1stFrame = neck_y;
-            neck_z = body.joints[2].cameraZ;
+        //draw the body skeleton in live canvas
+        drawBody(body,ctx);
 
-            console.log("neck position in the first frame recorded");
-            st = new Date().getTime();
-            if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
-              ref_st = st;
-              localStorage.setItem("refStart", st);
-            }
+        document.addEventListener('timer-done', function(evt){
+          console.log("timer done", evt.detail);
+          nx_1stFrame = neck_x;
+          ny_1stFrame = neck_y;
+          neck_z = body.joints[2].cameraZ;
+
+          console.log("neck position in the first frame recorded");
+          st = new Date().getTime();
+          if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
+            localStorage.setItem("refStart", st);
           }
-        }
+        });
+
+        // check in-position status whenever kinect captures a body
+        // if(!inPosition) {
+        //   if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
+        //     inPosition = true;
+        //     //TODO: if there is timer, may need to move this
+        //     //record the neck position for norm once inPosition
+        //     nx_1stFrame = neck_x;
+        //     ny_1stFrame = neck_y;
+        //     neck_z = body.joints[2].cameraZ;
+        //
+        //     console.log("neck position in the first frame recorded");
+        //     st = new Date().getTime();
+        //     if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
+        //       localStorage.setItem("refStart", st);
+        //     }
+        //   }
+        // }
+
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);

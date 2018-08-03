@@ -35,6 +35,8 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
+      //let defaultJoint = 0;
+
       return reply.view('exercise/create', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName'),

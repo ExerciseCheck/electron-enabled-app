@@ -598,7 +598,6 @@ internals.applyRoutes = function (server, next) {
           if(results.findMostRecentReference.length > 0 ) {
             if(results.findMostRecentReference[0].bodyFrames.length > 0) {
 
-              //TODO: maybe use a loop?
               let temp = results.findMostRecentReference[0];
               bodyFrames = temp.bodyFrames;
               neckX = temp.neckX;

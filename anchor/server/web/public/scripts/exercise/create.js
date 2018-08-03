@@ -3,11 +3,6 @@
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
-  joint: Joi.number().integer().required(),
-  axis: Joi.string().required(),
-  direction: Joi.string().required(),
-  refLowerJoint: Joi.number().integer().required(),
-  refUpperJoint: Joi.number().integer().required(),
 });
 
 
@@ -20,6 +15,13 @@ $('#create').click((event) => {
   $.each($('#form').serializeArray(), (i, field) => {
     values[field.name] = field.value;
   });
+
+  values.joint = 0;
+  values.axis = $('#impAxis').val();
+  values.direction = $('#direction').val();
+  values.refLowerJoint = $('#jointList context2').val();
+  values.refUpperJoint = $('#jointList').context(3).val();
+
   $.ajax({
     type: 'POST',
     url: '/api/exercise',

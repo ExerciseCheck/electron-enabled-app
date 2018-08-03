@@ -149,6 +149,9 @@ internals.applyRoutes = function (server, next) {
         payload: Exercise.payload
       }
     },
+
+
+
     handler: function (request, reply) {
 
       Exercise.create(
@@ -159,12 +162,6 @@ internals.applyRoutes = function (server, next) {
         request.payload.direction,
         request.payload.refLowerJoint,
         request.payload.refUpperJoint,
-
-        // 4, //dmmy shoulder
-        // 0.5, //dummy axis
-        // 'up', //dummy direction
-        // 2, //dummy neck
-        // 3, //dummy head
 
         request.auth.credentials.user._id.toString(),
         (err, document) => {

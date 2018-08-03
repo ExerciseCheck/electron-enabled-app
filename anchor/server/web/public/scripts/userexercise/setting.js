@@ -19,9 +19,9 @@ Date.prototype.getWeekNumber = function(){
 };
 
 function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, redirectToUrl) {
-  
+
   rangeScale = 0.7 // comment this out
-  
+
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
@@ -30,13 +30,13 @@ function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, red
   values.rangeScale = rangeScale;
   values.topThresh = 0.25; // default values
   values.bottomThresh = 0.75; // defalut values
-  values.neckX = -1,
-  values.neckY = -1,
-  values.refMin = -1,
-  values.refMax = -1,
-  values.refLowerJoint = -1,
-  values.refUpperJoint = -1,
-  values.refTime = -1,
+  // values.neckX = -1,
+  // values.neckY = -1,
+  // values.refMin = -1,
+  // values.refMax = -1,
+  // values.refLowerJoint = -1,
+  // values.refUpperJoint = -1,
+  // values.refTime = -1,
 
   $.ajax({
     type: 'POST',
