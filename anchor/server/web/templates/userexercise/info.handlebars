@@ -1,5 +1,19 @@
 
-    <h1>{{exerciseName}}</h1>
+    <h1>How To: {{exerciseName}}</h1>
+
+
+<div class="instructions">
+<ol>
     {{#each instructions}}
-        <div> {{this.text}} </div>
+        <li class="text"> {{this.text}} </li>
     {{/each}}
+</ol>
+</div>
+
+<div class="button-wrapper">
+<a href ='/userexercise/setting/{{patientId}}{{exerciseId}}'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
+</div>
+
+
+
+<link rel="stylesheet" href="/public/css/styleSheet/exerciseInfo.css">
