@@ -222,8 +222,9 @@ function goToExercises() {
       liveFrames = [];
       recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
       localStorage.removeItem('liveFrames');
-      window.Bridge.eStartKinect();
       showCanvas();
+      window.Bridge.eStartKinect();
+    //  showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
     });
   }
@@ -243,6 +244,7 @@ function goToExercises() {
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "none";
+      showFloorPlane();
     }
     // start of updating reference and practice
     else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
@@ -263,6 +265,7 @@ function goToExercises() {
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "block";
+      showFloorPlane();
     }
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
@@ -301,7 +304,22 @@ function goToExercises() {
       exe_index = 0;
       console.log("State error occurs!");
     }
+
   }
+
+  function showFloorPlane(){
+
+    let img = new Image;
+    img.src = '/floorplane.png';
+
+    canvas = document.getElementById('outputCanvas');
+    ctx = canvas.getContext('2d');
+
+    ctx.drawImage(img, 0, 0);
+
+  }
+
+
 
   function startTimer() {
     let start = Date.now();
