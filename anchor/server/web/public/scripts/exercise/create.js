@@ -16,11 +16,11 @@ $('#create').click((event) => {
     values[field.name] = field.value;
   });
 
-  values.joint = 0;
+  values.joint = $('#impJoint').val();
   values.axis = $('#impAxis').val();
   values.direction = $('#direction').val();
-  values.refLowerJoint = $('#jointList context2').val();
-  values.refUpperJoint = $('#jointList').context(3).val();
+  values.refLowerJoint = $('#refLowerJoint').val();
+  values.refUpperJoint = $('#refUpperJoint').val();
 
   $.ajax({
     type: 'POST',

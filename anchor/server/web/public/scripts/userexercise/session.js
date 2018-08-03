@@ -371,6 +371,15 @@ function goToExercises() {
     }
   }
 
+  function showFloorPlane(canvas){
+
+    ctx = canvas.getContext('2d');
+
+    ctx.drawImage(img, 0, 0);
+
+  }
+
+
   function startTimer() {
     let start = Date.now();
     let timer = setInterval(function () {
