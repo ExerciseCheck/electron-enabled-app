@@ -268,12 +268,16 @@ function goToExercises() {
       //live canvas
       canvas = document.getElementById('outputCanvas');
       ctx = canvas.getContext('2d');
+      drawGridandFloor(ctx);
       //reference canvas
       ref_canvas = document.getElementById('refCanvas');
       ref_ctx = ref_canvas.getContext('2d');
+      drawGridandFloor(ref_ctx);
       //exercise canvas
       exe_canvas = document.getElementById('exeCanvas');
       exe_ctx = exe_canvas.getContext('2d');
+      drawGridandFloor(exe_ctx);
+
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
@@ -301,16 +305,22 @@ function goToExercises() {
   // we also reset the reference counter whenever we transit to a new state
   function showCanvas()
   {
+    let refCanvas = document.getElementById("refCanvas");
+    let exeCanvas = document.getElementById("exeCanvas");
+    let outputCanvas = document.getElementById("outputCanvas");
 
     //start of creating reference
     if(parsedURL.mode === 'start' && refFrames === undefined)
     {
       ref_index = 0;
       exe_index = 0;
-      //nothing should be shwon
-      document.getElementById("refCanvas").style.display = "none";
-      document.getElementById("exeCanvas").style.display = "none";
-      document.getElementById("outputCanvas").style.display = "none";
+      //nothing should be shown
+      // document.getElementById("refCanvas").style.display = "none";
+      // document.getElementById("exeCanvas").style.display = "none";
+      // document.getElementById("outputCanvas").style.display = "none";
+      refCanvas.style.display = "none";
+      exeCanvas.style.display = "none";
+      outputCanvas.style.display = "none";
     }
     // start of updating reference and practice
     else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
@@ -318,9 +328,15 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show reference canvas only
-      document.getElementById("refCanvas").style.display = "block";
-      document.getElementById("exeCanvas").style.display = "none";
-      document.getElementById("outputCanvas").style.display = "none";
+      // document.getElementById("refCanvas").style.display = "block";
+      // document.getElementById("exeCanvas").style.display = "none";
+      // document.getElementById("outputCanvas").style.display = "none";
+      refCanvas.style.display = "block";
+      exeCanvas.style.display = "none";
+      outputCanvas.style.display = "none";
+      let ctx = refCanvas.getContext('2d');
+      drawGridandFloor(ctx);
+
     }
     //play state for updating reference and creating reference
     else if(parsedURL.mode === 'play' && parsedURL.type === 'reference')
@@ -328,9 +344,14 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show live canvas only
-      document.getElementById("refCanvas").style.display = "none";
-      document.getElementById("exeCanvas").style.display = "none";
-      document.getElementById("outputCanvas").style.display = "block";
+      // document.getElementById("refCanvas").style.display = "none";
+      // document.getElementById("exeCanvas").style.display = "none";
+      // document.getElementById("outputCanvas").style.display = "block";
+      refCanvas.style.display = "none";
+      exeCanvas.style.display = "none";
+      outputCanvas.style.display = "block";
+      let ctx = outputCanvas.getContext('2d');
+      drawGridandFloor(ctx);
     }
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
@@ -338,9 +359,17 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show live canvas and reference canvas
-      document.getElementById("refCanvas").style.display = "inline";
-      document.getElementById("exeCanvas").style.display = "none";
-      document.getElementById("outputCanvas").style.display = "inline";
+      // document.getElementById("refCanvas").style.display = "inline";
+      // document.getElementById("exeCanvas").style.display = "none";
+      // document.getElementById("outputCanvas").style.display = "inline";
+      refCanvas.style.display = "inline";
+      exeCanvas.style.display = "none";
+      outputCanvas.style.display = "inline";
+      let ctx1 = refCanvas.getContext('2d');
+      drawGridandFloor(ctx1);
+      let ctx2 = outputCanvas.getContext('2d');
+      drawGridandFloor(ctx2);
+
     }
     //stop state for updating reference and creating reference
     else if(parsedURL.mode === 'stop' && parsedURL.type === 'reference')
@@ -348,9 +377,15 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show reference canvas
-      document.getElementById("refCanvas").style.display = "block";
-      document.getElementById("exeCanvas").style.display = "none";
-      document.getElementById("outputCanvas").style.display = "none";
+      // document.getElementById("refCanvas").style.display = "block";
+      // document.getElementById("exeCanvas").style.display = "none";
+      // document.getElementById("outputCanvas").style.display = "none";
+      refCanvas.style.display = "block";
+      exeCanvas.style.display = "none";
+      outputCanvas.style.display = "none";
+      let ctx = refCanvas.getContext('2d');
+      drawGridandFloor(ctx);
+
     }
     //stop state for exercise
     else if(parsedURL.mode === 'stop' && parsedURL.type === 'practice')
@@ -358,9 +393,16 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show reference and exercise canvas
-      document.getElementById("refCanvas").style.display = "inline";
-      document.getElementById("exeCanvas").style.display = "inline";
-      document.getElementById("outputCanvas").style.display = "none";
+      // document.getElementById("refCanvas").style.display = "inline";
+      // document.getElementById("exeCanvas").style.display = "inline";
+      // document.getElementById("outputCanvas").style.display = "none";
+      refCanvas.style.display = "inline";
+      exeCanvas.style.display = "inline";
+      outputCanvas.style.display = "none";
+      let ctx1 = refCanvas.getContext('2d');
+      drawGridandFloor(ctx1);
+      let ctx2 = exeCanvas.getContext('2d');
+      drawGridandFloor(ctx2);
     }
     //this case is used for error safety, should not be called normally
     else
@@ -371,12 +413,28 @@ function goToExercises() {
     }
   }
 
-  function showFloorPlane(canvas){
+  function drawGridandFloor(ctx){
+    // grid
+    let bw = 500; // canvas.width
+    let bh = 500; // canvas.height
+    let p = -0.5; // padding
+    for (let x = 0; x <= bh; x += 100.3) {
+      ctx.moveTo(p, x + p);
+      ctx.lineTo(bw + p, x + p);
+    }
+    ctx.strokeStyle = "gray";
+    ctx.stroke();
+    // floor plane
+    drawFloorPlane(ctx);
+  }
 
-    ctx = canvas.getContext('2d');
-
-    ctx.drawImage(img, 0, 0);
-
+  function drawFloorPlane(ctx) {
+    ctx.beginPath();
+    ctx.moveTo(0, 500);
+    ctx.lineTo(70, 430);
+    ctx.lineTo(430, 430);
+    ctx.lineTo(500, 500);
+    ctx.fill();
   }
 
 
@@ -547,16 +605,19 @@ function goToExercises() {
     (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
     ctx.textAlign = "center";
     ctx.fillText("Live", canvas.width/2, canvas.height/20);
+    drawGridandFloor(ctx);
 
     ref_ctx.font="30px MS";
     ref_ctx.fillStyle = "red";
     ref_ctx.textAlign = "center";
     ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
+    drawGridandFloor(ref_ctx);
 
     exe_ctx.font="30px MS";
     exe_ctx.fillStyle = "red";
     exe_ctx.textAlign = "center";
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
+    drawGridandFloor(exe_ctx);
 
     //draw each joint circles when a body is tracked
     bodyFrame.bodies.forEach(function (body)
