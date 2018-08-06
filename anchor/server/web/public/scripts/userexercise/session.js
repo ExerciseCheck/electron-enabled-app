@@ -232,6 +232,7 @@ function goToExercises() {
       window.Bridge.eStartKinect();
       showCanvas();
       drawBoard();
+      drawFloorPlane();
       //checks what type of "mode" page is currently on && if reference exist
     });
   }
@@ -251,7 +252,7 @@ function goToExercises() {
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "none";
-      showFloorPlane();
+      drawFloorPlane();
     }
     // start of updating reference and practice
     else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
@@ -272,7 +273,7 @@ function goToExercises() {
       document.getElementById("refCanvas").style.display = "none";
       document.getElementById("exeCanvas").style.display = "none";
       document.getElementById("outputCanvas").style.display = "block";
-      showFloorPlane();
+      drawFloorPlane();
     }
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
@@ -314,16 +315,17 @@ function goToExercises() {
 
   }
 
-  function showFloorPlane(){
+  function drawFloorPlane(){
 
-    let img = new Image;
-    img.src = '/floorplane.png';
-
-    canvas = document.getElementById('outputCanvas');
-    ctx = canvas.getContext('2d');
-
-    ctx.drawImage(img, 0, 0);
-
+    ctx.strokeStyle = "grey";
+    ctx.fillStyle = '#c0c0c0';
+    ctx.beginPath();
+    ctx.moveTo(0, 500);
+    ctx.lineTo(100,401);
+    ctx.lineTo(401, 401);
+    ctx.lineTo(500, 500);
+    ctx.closePath();
+    ctx.fill();
   }
 
 
