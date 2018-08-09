@@ -384,7 +384,7 @@ function goToExercises() {
       ctx.lineTo(bw + p, x + p);
     }
      ctx.strokeStyle = "gray";
-    ctx.stroke();
+     ctx.stroke();
     }
 
   //function that draws each joint as a yellow round dot
