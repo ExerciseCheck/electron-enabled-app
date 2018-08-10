@@ -445,6 +445,8 @@ function goToExercises() {
         }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
+          //filter joints, remove fingertips and spineShoulder for they are not used
+          body.joints.splice(20,5);
           liveFrames.push(body);
         }
       }
