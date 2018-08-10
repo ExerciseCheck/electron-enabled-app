@@ -233,7 +233,7 @@ function goToExercises() {
   // number of live frame captured from kinect
   let live_counter = 0;
 
-  let inPosition = false;
+  let inPosition = false; //not used
   let parsedURL = parseURL(window.location.pathname);
 
   // value for countReps
@@ -268,15 +268,18 @@ function goToExercises() {
       //live canvas
       canvas = document.getElementById('outputCanvas');
       ctx = canvas.getContext('2d');
-      drawGridandFloor(ctx);
+      drawGrids(ctx);
+      drawFloorPlane(ctx);
       //reference canvas
       ref_canvas = document.getElementById('refCanvas');
       ref_ctx = ref_canvas.getContext('2d');
-      drawGridandFloor(ref_ctx);
+      drawGrids(ref_ctx);
+      drawFloorPlane(ref_ctx);
       //exercise canvas
       exe_canvas = document.getElementById('exeCanvas');
       exe_ctx = exe_canvas.getContext('2d');
-      drawGridandFloor(exe_ctx);
+      drawGrids(exe_ctx);
+      drawFloorPlane(exe_ctx);
 
       //get the canvas dimension
       width = canvas.width;
@@ -335,7 +338,8 @@ function goToExercises() {
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
       let ctx = refCanvas.getContext('2d');
-      drawGridandFloor(ctx);
+      drawGrids(ctx);
+      drawFloorPlane(ctx);
 
     }
     //play state for updating reference and creating reference
@@ -351,7 +355,8 @@ function goToExercises() {
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "block";
       let ctx = outputCanvas.getContext('2d');
-      drawGridandFloor(ctx);
+      drawGrids(ctx);
+      drawFloorPlane(ctx);
     }
     //play state for practice
     else if(parsedURL.mode === 'play' && parsedURL.type === 'practice')
@@ -366,9 +371,11 @@ function goToExercises() {
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "inline";
       let ctx1 = refCanvas.getContext('2d');
-      drawGridandFloor(ctx1);
+      drawGrids(ctx1);
+      drawFloorPlane(ctx1);
       let ctx2 = outputCanvas.getContext('2d');
-      drawGridandFloor(ctx2);
+      drawGrids(ctx2);
+      drawFloorPlane(ctx2);
 
     }
     //stop state for updating reference and creating reference
@@ -384,7 +391,8 @@ function goToExercises() {
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
       let ctx = refCanvas.getContext('2d');
-      drawGridandFloor(ctx);
+      drawGrids(ctx);
+      drawFloorPlane(ctx);
 
     }
     //stop state for exercise
@@ -400,9 +408,11 @@ function goToExercises() {
       exeCanvas.style.display = "inline";
       outputCanvas.style.display = "none";
       let ctx1 = refCanvas.getContext('2d');
-      drawGridandFloor(ctx1);
+      drawGrids(ctx1);
+      drawFloorPlane(ctx1);
       let ctx2 = exeCanvas.getContext('2d');
-      drawGridandFloor(ctx2);
+      drawGrids(ctx2);
+      drawFloorPlane(ctx2);
     }
     //this case is used for error safety, should not be called normally
     else
@@ -413,7 +423,7 @@ function goToExercises() {
     }
   }
 
-  function drawGridandFloor(ctx){
+  function drawGrids(ctx){
     // grid
     let bw = 500; // canvas.width
     let bh = 500; // canvas.height
@@ -422,19 +432,21 @@ function goToExercises() {
       ctx.moveTo(p, x + p);
       ctx.lineTo(bw + p, x + p);
     }
-    ctx.strokeStyle = "gray";
+    ctx.lineWidth=1;
+    ctx.strokeStyle = "black";
     ctx.stroke();
-    // floor plane
-    drawFloorPlane(ctx);
   }
 
   function drawFloorPlane(ctx) {
+    //ctx.strokeStyle = "black";
+    ctx.fillStyle = '#c0c0c0';
     ctx.beginPath();
     ctx.moveTo(0, 500);
-    ctx.lineTo(70, 430);
-    ctx.lineTo(430, 430);
+    ctx.lineTo(100, 400);
+    ctx.lineTo(400, 400);
     ctx.lineTo(500, 500);
     ctx.fill();
+
   }
 
 
@@ -585,7 +597,7 @@ function goToExercises() {
 
   // patient reaching out for button makes body NOT in plane
   function isBodyInPlane(ref_neck, neck) {
-    if (ref_neck * 0.6 < neck && ref_neck * 1.2 > neck){
+    if (ref_neck * 0.6 < neck && ref_neck * 1.2 > neck && neck >= 1.5){
       return true;
     }
     return false;
@@ -605,19 +617,24 @@ function goToExercises() {
     (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
     ctx.textAlign = "center";
     ctx.fillText("Live", canvas.width/2, canvas.height/20);
-    drawGridandFloor(ctx);
+    drawGrids(ctx);
+    drawFloorPlane(ctx);
 
     ref_ctx.font="30px MS";
-    ref_ctx.fillStyle = "red";
+    //ref_ctx.fillStyle = "red";
+    ref_ctx.fillStyle = "#428bca";
     ref_ctx.textAlign = "center";
     ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
-    drawGridandFloor(ref_ctx);
+    drawGrids(ref_ctx);
+    drawFloorPlane(ref_ctx);
 
     exe_ctx.font="30px MS";
-    exe_ctx.fillStyle = "red";
+    //exe_ctx.fillStyle = "red";
+    exe_ctx.fillStyle = "#428bca";
     exe_ctx.textAlign = "center";
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
-    drawGridandFloor(exe_ctx);
+    drawGrids(exe_ctx);
+    drawFloorPlane(exe_ctx);
 
     //draw each joint circles when a body is tracked
     bodyFrame.bodies.forEach(function (body)
