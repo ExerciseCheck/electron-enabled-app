@@ -52,6 +52,15 @@ function parseURL(url)
   };
 }
 
+function formatBytes(bytes,decimals) {
+  if(bytes == 0) return '0 Bytes';
+  var k = 1024,
+    dm = decimals || 2,
+    sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+    i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 function action(nextMode, type)
 {
 
@@ -77,7 +86,28 @@ function action(nextMode, type)
   //This condition describes the end of an update or create reference.
   //The refFrames data in local storage gets set to the most recent/live frames.
   if(nextMode === 'stop' && type === 'reference') {
-    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
+    // console.log("size=", Object.keys(liveFrames).length)
+    console.log("Size of liveFrames list=", formatBytes(JSON.stringify(liveFrames).length));
+
+    var liveFrames_packed = JSONH.pack(liveFrames);
+    // localStorage.setItem("refFrames", JSON.stringify(liveFrames));
+    console.log("liveFrames Packed size=", formatBytes(JSON.stringify(liveFrames_packed).length));
+    localStorage.setItem("refFrames", JSON.stringify(liveFrames_packed));
+
+    console.log("liveFrames_packed + stringify saved to localStorage as refFrames");
+
+    var _lsTotal=0,_xLen,_x;
+    for(_x in localStorage){
+      _xLen= ((localStorage[_x].length + _x.length)* 2);
+      _lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")
+    };
+    console.log("Total localStorage used= " + (_lsTotal / 1024).toFixed(2) + " KB");
+
+    // item = JSON.parse(localStorage.getItem("refFrames"));
+    var item = JSON.parse(localStorage.getItem("refFrames"));
+    var liveFrames_unpacked =  JSONH.unpack(item);
+    console.log("Size of unpacked liveFrames list=", formatBytes(JSON.stringify(liveFrames_unpacked).length));
+
     redirect();
   }
   else {
@@ -446,6 +476,7 @@ function goToExercises() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
+          // console.log("live length=", formatBytes(JSON.stringify(liveFrames).length));
         }
       }
       live_counter = live_counter + 1;
