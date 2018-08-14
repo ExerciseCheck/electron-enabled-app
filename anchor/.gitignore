@@ -5,3 +5,4 @@ test/artifacts/*
 server/backups
 .coveralls.yml
 db
+.orig

@@ -156,6 +156,7 @@ internals.applyRoutes = function (server, next) {
 
           Exercise.findById(request.params.exerciseId, done);
         }],
+
       }, (err, results) => {
 
         if (err) {

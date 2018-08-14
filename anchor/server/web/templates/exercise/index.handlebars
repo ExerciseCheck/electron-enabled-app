@@ -14,8 +14,6 @@
                 <th>Exercise Name</th>
                 <th>Description</th>
                 <th>Created At</th>
-                <th>numSessions</th>
-                <th>numRepetition</th>
                 <th>impJoint</th>
                 <th>impAxis</th>
                 <th>direction</th>
@@ -53,7 +51,7 @@
       ajax: {
         url: "../api/table/exercise",
         data: function (d) {
-          d.fields = "exerciseName description createdAt numSessions numRepetition impJoint impAxis direction lowerJoint upperJoint";
+          d.fields = "exerciseName description createdAt impJoint impAxis direction lowerJoint upperJoint";
         }
       },
       columns: [
@@ -73,14 +71,6 @@
           }
         },
         {
-          data: "numSessions",
-          defaultContent: ""
-        },
-        {
-          data: "numRepetition",
-          defaultContent: ""
-        },
-        {
           data: "impJoint",
           defaultContent: ""
         },
@@ -98,10 +88,6 @@
         },
         {
           data: "upperJoint",
-          defaultContent: ""
-        },
-        {
-          data: "type",
           defaultContent: ""
         },
         {{#role user 'clinician'}}

@@ -263,7 +263,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //this route finds the a reference document for (exerciseId, patientId) with empty bodyFrames
-  //the purspose of this route is to find out if a reference with specified setting is already
+  //the purpose of this route is to find out if a reference with specified setting is already
   //inserted or not
   server.route({
     method: 'GET',
@@ -309,7 +309,7 @@ internals.applyRoutes = function (server, next) {
 
       const query = {
         userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-        exerciseId: request.params.exerciseId,
+        exerciseId: request.params.exerciseId
       };
 
       ReferenceExercise.findOne(query, {sort: {$natural: -1}}, (err, refExercise) => {
@@ -323,6 +323,91 @@ internals.applyRoutes = function (server, next) {
         }
 
         return reply(refExercise.bodyFrames);
+      });
+    }
+  });
+
+  // this route get the data from the latest version of reference for count reps
+  server.route({
+    method: 'GET',
+    path: '/userexercise/dataforcount/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+      }
+    },
+    handler: function (request, reply) {
+
+      let patientId = '';
+      let dataForCntReps = {};
+      //logged in user is a clinician
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      //Logged in user is a patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+      Async.auto({
+
+        //first we need to find the referenceId of the exercise
+        //finding one document matching the query is enough
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findExercise:['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        getDataForCntReps: ['findExercise', function(results, done) {
+          let reference = results.findMostRecentReference[0];
+          let exercise = results.findExercise;
+
+          dataForCntReps['joint'] = exercise.joint;
+          dataForCntReps['axis'] = exercise.axis;
+          dataForCntReps['direction'] = exercise.direction;
+          dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
+          dataForCntReps['refUpperJointID'] = exercise.refUpperJoint;
+
+          if (reference !== undefined) {
+            console.log("reference exists");
+            // position values below, not jointID, initially undefined
+            dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
+            dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
+            dataForCntReps['refMin'] = reference.refMin;
+            dataForCntReps['refMax'] = reference.refMax;
+            dataForCntReps['neckX'] = reference.neckX;
+            dataForCntReps['neckY'] = reference.neckY;
+            // numbers between [0,1]
+            dataForCntReps['topThresh'] = reference.topThresh;
+            dataForCntReps['bottomThresh'] = reference.bottomThresh;
+            dataForCntReps['rangeScale'] = reference.rangeScale;
+            // time for one repetition in reference, in seconds
+            dataForCntReps['refTime'] = reference.refTime;
+          }
+          //console.log(dataForCntReps);
+          done();
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+        return reply(dataForCntReps);
       });
     }
   });
@@ -488,6 +573,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       let bodyFrames = [];
+      let neckX, neckY, refMin, refMax, refLowerJoint, refUpperJoint, refTime;
 
       Async.auto({
 
@@ -511,7 +597,16 @@ internals.applyRoutes = function (server, next) {
 
           if(results.findMostRecentReference.length > 0 ) {
             if(results.findMostRecentReference[0].bodyFrames.length > 0) {
-              bodyFrames = results.findMostRecentReference[0].bodyFrames;
+
+              let temp = results.findMostRecentReference[0];
+              bodyFrames = temp.bodyFrames;
+              neckX = temp.neckX;
+              neckY = temp.neckY;
+              refMin = temp.refMin
+              refMax = temp.refMax;
+              refLowerJoint = temp.refLowerJoint;
+              refUpperJoint = temp.refUpperJoint;
+              refTime = temp.refTime;
             }
           }
 
@@ -524,6 +619,13 @@ internals.applyRoutes = function (server, next) {
             request.payload.topThresh,
             request.payload.bottomThresh,
             bodyFrames,
+            neckX,
+            neckY,
+            refMin,
+            refMax,
+            refLowerJoint,
+            refUpperJoint,
+            refTime,
             done);
           }]
         }, (err, results) => {
@@ -702,7 +804,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route updates the bodyframes data for most recent reference of a (patientId, exerciseId) pair
+  //this route updates the bodyframes and relative data for most recent reference of a (patientId, exerciseId) pair
   server.route({
     method: 'PUT',
     path: '/userexercise/reference/mostrecent/data/{exerciseId}/{patientId}',
@@ -744,7 +846,8 @@ internals.applyRoutes = function (server, next) {
               refMin: request.payload.refMin,
               refMax: request.payload.refMax,
               refLowerJoint: request.payload.refLowerJoint,
-              refUpperJoint: request.payload.refUpperJoint
+              refUpperJoint: request.payload.refUpperJoint,
+              refTime: request.payload.refTime,
             }
           };
           ReferenceExercise.findByIdAndUpdate(id, update, done);
@@ -764,7 +867,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-//updates practice document with new set information
+  //updates practice document with new set information
   server.route({
     method: 'PUT',
     path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
@@ -821,30 +924,39 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
+          let repEvals = request.payload.repEvals;
+          console.log("request.payload.repEvals:", repEvals);
+          console.log("*.length:", repEvals.length);
+          // TODO: to reduce the request which is expensive, maybe we use:
+          // let requestPayload = request.payload;
+          // repEvals: requestPayload.repEvals, bodyFrames: requestPayload.bodyFrames, requestPayload.weekEnd
+
           let update = {
             $addToSet: {
-              sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+              sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
             },
             $inc: {
               numSetsCompleted: 1,
-              numRepsCompleted: 1
+              //numRepsCompleted: 1 // Not increase but set
             },
             $set: {
-              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
+              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
+              numRepsCompleted: request.payload.repEvals.length
             }
           };
 
           if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
             update = {
               $addToSet: {
-                sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+                sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
               },
               $inc: {
                 numSetsCompleted: 1,
-                numRepsCompleted: 1
+                //numRepsCompleted: 1
               },
               $set: {
                 weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
+                numRepsCompleted: request.payload.repEvals.length,
                 isComplete: true
               }
             };
@@ -854,7 +966,7 @@ internals.applyRoutes = function (server, next) {
       }, (err, results) => {
 
         if (err) {
-          return reply(err);
+          return reply(request.payload.repEvals);
         }
         if (!results.findMostRecentReference[0]) {
           return reply(Boom.notFound('Document not found.'));
@@ -863,6 +975,7 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
 
   // not used
   server.route({
@@ -886,11 +999,9 @@ internals.applyRoutes = function (server, next) {
       };
 
       ReferenceExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
-
         if (err) {
           return reply(err);
         }
-
         if (!document) {
           return reply(Boom.notFound('Document not found.'));
         }
