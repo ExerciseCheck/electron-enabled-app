@@ -537,7 +537,7 @@ internals.applyRoutes = function (server, next) {
     });
 
   //this route inserts a new practice exercise document into its respective collection,
-  //could be trrigered by both clinician and patient,
+  //could be triggered by both clinician and patient,
   server.route({
     method: 'POST',
     path: '/userexercise/practice/{patientId?}',
