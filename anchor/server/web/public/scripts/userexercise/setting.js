@@ -75,7 +75,7 @@ function initializePractice() {
 
 function updateSetting(numSets, numReps, rangeScale, exerciseId, patientId) {
 
-  rangeScale = 0.8 // comment this out
+  rangeScale = 0.7 // comment this out
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
