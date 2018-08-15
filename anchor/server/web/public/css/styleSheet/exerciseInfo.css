@@ -1,0 +1,27 @@
+.button {
+  position: absolute;
+}
+
+h1 {
+  text-transform: capitalize;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-left: 20px;
+
+}
+
+.instructions {
+  font-size: 25px;
+  margin-left: 40px;
+}
+
+li.text {
+  margin-top: 30px;
+}
+
+.button-wrapper {
+  /* margin-left: 45px; */
+  margin-top: 100px;
+  text-align: center;
+
+}
