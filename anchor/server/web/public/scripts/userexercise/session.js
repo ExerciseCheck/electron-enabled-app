@@ -1,11 +1,12 @@
 'use strict';
+var DTW = require('dtw');
 
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
-// recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
+// recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
-let refStart, refEnd; //not used
+//let refStart, refEnd; //not used
 let repEvals = [];
 window.actionBtn = false;
 
@@ -95,6 +96,7 @@ function action(nextMode, type)
   }
   if(nextMode === 'play' && type === 'practice') {
     console.log("start practice");
+
   }
 }
 
@@ -110,6 +112,7 @@ function getMinMax_joint(joint, array, axis) {
 
 // assuming the save button is clicked by someone else
 function saveReference() {
+
   const pathToArray = window.location.pathname.split('/');
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
@@ -147,10 +150,30 @@ function saveReference() {
       errorAlert(result.responseJSON.message);
     }
   });
+
 }
 
-function savePractice() {
+// helper function for calculating dtw and speed offline
+function analyzePractice() {
+  //TODO: multiple joints later
+  // get reference data for the important joint
+  const parsedURL = parseURL(window.location.pathname);
+  let patientId = parsedURL.patientId;
+  let exerciseId = parsedURL.exerciseId;
+  let ref_impt_joint = []; //for dtw analysis, one joint for now
 
+  let ref_url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
+  $.get(ref_url, function(data){
+    for (var i=0; i<data.length; ++i) {
+      ref_impt_joint.push(data[i].joints[dataForCntReps['joint']][dataForCntReps['axis']]);
+    }
+  });
+  console.log(ref_impt_joint); //TODO: sometimes print empty, maybe due to Async?
+
+}
+
+
+function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
@@ -158,13 +181,34 @@ function savePractice() {
   let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
+
+  //for analysis
+  let prac_impt_joint = [];
+  for (var i=0; i<recentFrames.length; ++i) {
+    prac_impt_joint.push(recentFrames[i].joints[dataForCntReps['joint']][dataForCntReps['axis']]);
+  }
+
+  let ref_impt_joint = [];
+  let ref_url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
+  $.get(ref_url, function(data){
+    for (var i=0; i<data.length; ++i) {
+      ref_impt_joint.push(data[i].joints[dataForCntReps['joint']][dataForCntReps['axis']]);
+    }
+  });
+  //console.log(ref_impt_joint);
+  var dtw_impt_joint = new DTW();
+  var cost = dtw_impt_joint.compute(ref_impt_joint, prac_impt_joint);
+  var path = dtw_hand.path();
+  console.log("DTW cost: " + cost);
+  console.log("Path: ");
+  console.log(path);
+
   //TODO: better ways than store to localStorage?
-  //values.repEvals = JSON.parse(localStorage.getItem("repEvals"));
   values.repEvals = localStorage.getItem("repEvals");
   console.log(values.repEvals);
-  //localStorage.removeItem("repEvals");
-  //logged-in user is clinician
+  localStorage.removeItem("repEvals");
 
+  //logged-in user is clinician
   if (patientId) {
     url = url + patientId;
   }
@@ -258,7 +302,7 @@ function goToExercises() {
       threshold_flag = data.direction;
     }
   });
-  // time for speed evaluation
+  // time pt for speed evaluation
   var st, ed;
 
   if (isElectron())
@@ -701,11 +745,14 @@ function goToExercises() {
               console.log("end time: ", ed);
               var diff = Math.round((ed - st) / 1000);
               var speedEval = "It takes " + diff + " s";
+
+              //TODO: online speed, not accurate, not to be stored
               var repItem = {"speed": diff};
               repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify((repEvals)));
-              console.log(repEvals);
-              console.log(JSON.parse(localStorage.getItem("repEvals")));
+
+              //console.log(repEvals);
+              //console.log(JSON.parse(localStorage.getItem("repEvals")));
               document.getElementById("speedEval").innerHTML = speedEval;
               st = ed;
               console.log("start time: ", st);
