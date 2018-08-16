@@ -2,6 +2,7 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
+const DTW = require('dtw');
 
 
 const internals = {};
@@ -868,6 +869,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //updates practice document with new set information
+  //it also calculates dtw and rep time offline
   server.route({
     method: 'PUT',
     path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
@@ -908,7 +910,11 @@ internals.applyRoutes = function (server, next) {
           ];
           ReferenceExercise.aggregate(pipeLine, done);
         },
-        findPracticeExercise: ['findMostRecentReference', function (results, done) {
+        findExercise:['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        findPracticeExercise: ['findExercise', function (results, done) {
           const query = {
             userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
             exerciseId: request.params.exerciseId,
@@ -924,39 +930,174 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
-          let repEvals = request.payload.repEvals;
-          console.log("request.payload.repEvals:", repEvals);
-          console.log("*.length:", repEvals.length);
-          // TODO: to reduce the request which is expensive, maybe we use:
-          // let requestPayload = request.payload;
-          // repEvals: requestPayload.repEvals, bodyFrames: requestPayload.bodyFrames, requestPayload.weekEnd
+          let requestPayload = request.payload;
+          //TODO: currently only one joint is used for the accuracy
+          //analysis
+          let theJoint = results.findExercise.joint;
+          let theAxis = results.findExercise.axis;
+          let theDirection = results.findExercise.direction;
+
+          let prac_impt_joint_X = []; //separate X,Y,Z for smoothing
+          let prac_impt_joint_Y = [];
+          let prac_impt_joint_Z = [];
+          let prac_impt_joint; // the chosen axis
+          let prac_impt_joint_XYZ = [];
+          for (var i=0; i<requestPayload.bodyFrames.length; ++i) {
+            prac_impt_joint_X.push(requestPayload.bodyFrames[i].joints[theJoint]["depthX"]);
+            prac_impt_joint_Y.push(requestPayload.bodyFrames[i].joints[theJoint]["depthY"]);
+            prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"]);
+          }
+
+          let ref_impt_joint_X = [];
+          let ref_impt_joint_Y = [];
+          let ref_impt_joint_Z = [];
+          let ref_impt_joint;
+          let ref_impt_joint_XYZ = [];
+          for (var i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
+            ref_impt_joint_X.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"]);
+            ref_impt_joint_Y.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"]);
+            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"]);
+          }
+
+          //TODO: smoothing here
+          let prac_impt_joint_X_smoothed = prac_impt_joint_X;
+          let prac_impt_joint_Y_smoothed = prac_impt_joint_Y;
+          let prac_impt_joint_Z_smoothed = prac_impt_joint_Z;
+          for (var i=0; i<prac_impt_joint_X.length; ++i) {
+            prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
+          }
+          let ref_impt_joint_X_smoothed = ref_impt_joint_X;
+          let ref_impt_joint_Y_smoothed = ref_impt_joint_Y;
+          let ref_impt_joint_Z_smoothed = ref_impt_joint_Z;
+          for (var i=0; i<ref_impt_joint_X.length; ++i) {
+            ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
+          }
+
+
+          //do we need to consider exercise moving in the Z?
+          if (theAxis === "depthX") {
+            prac_impt_joint = prac_impt_joint_X;
+            ref_impt_joint = ref_impt_joint_X;
+          } else if (theAxis === "depthY") {
+            prac_impt_joint = prac_impt_joint_Y;
+            ref_impt_joint = ref_impt_joint_Y;
+          }
+
+          //offline speed analysis, could also be used for segmentation
+          let time_thresh = 30; // 1 sec
+          let ifIncreased; // direction flag
+          if(theDirection === 'L2R' || theDirection === 'down') {
+            ifIncreased = true;
+          } else if (theDirection === 'R2L' || theDirection === 'up') {
+            ifIncreased = false;
+          } else {
+            console.log("You should not see this")
+          }
+
+          let prac_idx=[];
+          for (var i=0; i<prac_impt_joint.length - 1; i++) {
+            let v = prac_impt_joint[i+1] - prac_impt_joint[i];
+            if(v >= 0) {
+              if (ifIncreased) {
+                prac_idx.push([i, true]); // true means moving in the same direction as the exercise
+                // prac_idx.push([i, (v>=0) === ifIncreased]);
+              } else {
+                prac_idx.push([i, false]);
+              }
+            } else {
+              if (ifIncreased) {
+                prac_idx.push([i, false]);
+              } else {
+                prac_idx.push([i, true]);
+              }
+            }
+          }
+          let prac_st=[];
+          let prac_ed=[];
+          let timing = [];
+          let ifFirst = true;
+          for (var ii=0; ii<prac_idx.length-1; ii++) {
+            if(prac_idx[ii][1] && ifFirst) {
+              prac_st.push(prac_idx[ii][0]);
+              ifFirst = false;
+            } else if (prac_idx[ii][1] === false && prac_idx[ii+1][1]) {
+              prac_ed.push(prac_idx[ii][0]);
+              ifFirst = true;
+            }
+          }
+          if (prac_idx[-1][1] === false) {
+            prac_ed.push(prac_idx[-1][0]);
+          }
+
+          for (var j=0; j<prac_st.length; j++) {
+            let delta = prac_ed[j] - prac_st[j];
+            if(delta >= time_thresh) {
+              timing.push(delta);
+            }
+          }
+          console.log(timing);
+
+          //TODO:same thing for reference exercise
+          //TODO:but for now, we compare total time for speed analysis
+          let prac_ttl;
+          for (var i=0; i<requestPayload.repEvals.length; i++){
+            prac_ttl += requestPayload.repEvals.speed;
+          }
+          let ref_ttl = results.findMostRecentReference[0].refTime;
+          let msg_speed = "It takes you " + prac_ttl + " seconds to complete the set.\nYour reference time is " + ref_ttl + " seconds."
+          console.log(msg_speed);
+
+          //dtw
+          // 'squaredEuclidean' has been modified for >1 dimension
+          // the other two ('manhattan' | 'euclidean') are for 1 dim only
+          var dtw_impt_joint = new DTW('euclidean');
+          var cost = dtw_impt_joint.compute(ref_impt_joint, prac_impt_joint);
+          var path = dtw_impt_joint.path();
+          let msg_dtw = "DTW (1 dim) cost: " + cost;
+          console.log(msg_dtw);
+          console.log("Path: ");
+          console.log(path);
+
+          var dtw_impt_joint_XYZ = new DTW('squaredEuclidean');
+
+          var cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
+          var path_XYZ = dtw_impt_joint_XYZ.path();
+          let msg_dtw_XYZ = "DTW_XYZ cost: " + cost_XYZ;
+          console.log(msg_dtw_XYZ);
+          console.log("Path_XYZ: ");
+          console.log(path_XYZ);
+
 
           let update = {
             $addToSet: {
-              sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
+              sets: {date: new Date(),
+                onlineSpeed: requestPayload.repEvals,
+                analysis:[msg_speed,msg_dtw],
+                bodyFrames: requestPayload.bodyFrames}
             },
             $inc: {
               numSetsCompleted: 1,
-              //numRepsCompleted: 1 // Not increase but set
             },
             $set: {
-              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
-              numRepsCompleted: request.payload.repEvals.length
+              weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
+              numRepsCompleted: requestPayload.repEvals.length
             }
           };
 
           if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
             update = {
               $addToSet: {
-                sets: {date: new Date(), repEvals: request.payload.repEvals, bodyFrames: request.payload.bodyFrames}
+                sets: {date: new Date(),
+                  onlineSpeed: requestPayload.repEvals,
+                  analysis:[msg_speed,msg_dtw],
+                  bodyFrames: requestPayload.bodyFrames}
               },
               $inc: {
                 numSetsCompleted: 1,
-                //numRepsCompleted: 1
               },
               $set: {
-                weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
-                numRepsCompleted: request.payload.repEvals.length,
+                weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
+                numRepsCompleted: requestPayload.repEvals.length,
                 isComplete: true
               }
             };
@@ -966,7 +1107,7 @@ internals.applyRoutes = function (server, next) {
       }, (err, results) => {
 
         if (err) {
-          return reply(request.payload.repEvals);
+          return reply(results);
         }
         if (!results.findMostRecentReference[0]) {
           return reply(Boom.notFound('Document not found.'));

@@ -1,5 +1,4 @@
 'use strict';
-var DTW = require('dtw');
 
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
@@ -153,26 +152,6 @@ function saveReference() {
 
 }
 
-// helper function for calculating dtw and speed offline
-function analyzePractice() {
-  //TODO: multiple joints later
-  // get reference data for the important joint
-  const parsedURL = parseURL(window.location.pathname);
-  let patientId = parsedURL.patientId;
-  let exerciseId = parsedURL.exerciseId;
-  let ref_impt_joint = []; //for dtw analysis, one joint for now
-
-  let ref_url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
-  $.get(ref_url, function(data){
-    for (var i=0; i<data.length; ++i) {
-      ref_impt_joint.push(data[i].joints[dataForCntReps['joint']][dataForCntReps['axis']]);
-    }
-  });
-  console.log(ref_impt_joint); //TODO: sometimes print empty, maybe due to Async?
-
-}
-
-
 function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
@@ -181,27 +160,6 @@ function savePractice() {
   let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
-
-  //for analysis
-  let prac_impt_joint = [];
-  for (var i=0; i<recentFrames.length; ++i) {
-    prac_impt_joint.push(recentFrames[i].joints[dataForCntReps['joint']][dataForCntReps['axis']]);
-  }
-
-  let ref_impt_joint = [];
-  let ref_url = '/api/userexercise/loadreference/' + exerciseId + '/' + patientId;
-  $.get(ref_url, function(data){
-    for (var i=0; i<data.length; ++i) {
-      ref_impt_joint.push(data[i].joints[dataForCntReps['joint']][dataForCntReps['axis']]);
-    }
-  });
-  //console.log(ref_impt_joint);
-  var dtw_impt_joint = new DTW();
-  var cost = dtw_impt_joint.compute(ref_impt_joint, prac_impt_joint);
-  var path = dtw_hand.path();
-  console.log("DTW cost: " + cost);
-  console.log("Path: ");
-  console.log(path);
 
   //TODO: better ways than store to localStorage?
   values.repEvals = localStorage.getItem("repEvals");
