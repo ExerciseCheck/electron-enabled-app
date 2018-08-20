@@ -163,6 +163,9 @@ function savePractice() {
 
   //TODO: better ways than store to localStorage?
   values.repEvals = localStorage.getItem("repEvals");
+  if(!values.repEvals) {
+    values.repEvals=JSON.stringify([{"speed": 0}]);
+  }
   console.log(values.repEvals);
   localStorage.removeItem("repEvals");
 
@@ -179,6 +182,18 @@ function savePractice() {
     url: url,
     data: values,
     success: function (result) {
+
+      //popup the analysis result:
+      let url_analysis = '/api/userexercise/practiceanalysis/' + exerciseId + '/';
+      if(patientId) {
+        url_analysis = url_analysis + patientId;
+      }
+      $.get(url_analysis, function(data) {
+        alert(data); // did not pop up...
+        localStorage.setItem("feedback", JSON.stringify(data));
+      });
+      let msg = localStorage.getItem("feedback");
+      alert(msg);
 
       let url = '/api/userexercise/loadreference/' + exerciseId + '/';
       if(patientId) {
