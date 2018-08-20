@@ -10,12 +10,16 @@
 </ol>
 </div>
 
+<div> patient id: {{patientId}} </div>
+<div> ex id: {{exerciseId}} </div>
+
 <div class="button-wrapper">
-<a href ='/userexercise/setting/{{patientId}}{{exerciseId}}'><button onclick="goToSettings" class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
+<a href ='/userexercise/setting/{{exerciseId}}{{patientId}}'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
 </div>
 
 
 
+
 <link rel="stylesheet" href="/public/css/styleSheet/exerciseInfo.css">
-<script type="text/javascript" src="../public/scripts/userexercise/exerciseinfo.js"></script>
-<script type="text/javascript" src="../public/scripts/clinician.js"></script>
+<!-- <script type="text/javascript" src="../public/scripts/userexercise/exerciseinfo.js"></script> -->
+<!-- <script type="text/javascript" src="../public/scripts/clinician.js"></script> -->

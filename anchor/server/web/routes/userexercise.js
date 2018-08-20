@@ -275,6 +275,8 @@ internals.applyRoutes = function (server, next) {
           }
         }
 
+        console.log(exerciseId);
+        console.log(patientId);
         return reply.view('userexercise/setting', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
