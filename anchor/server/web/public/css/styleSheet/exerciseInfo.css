@@ -16,12 +16,13 @@ h1 {
 }
 
 li.text {
-  margin-top: 30px;
+  margin-top: 50px;
+  margin-right: 50px;
 }
 
 .button-wrapper {
   /* margin-left: 45px; */
-  margin-top: 100px;
+  margin-top: 10px;
   text-align: center;
 
 }
