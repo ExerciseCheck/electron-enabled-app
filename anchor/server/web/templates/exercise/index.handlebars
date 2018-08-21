@@ -14,6 +14,13 @@
                 <th>Exercise Name</th>
                 <th>Description</th>
                 <th>Created At</th>
+                <th>numSessions</th>
+                <th>numRepetition</th>
+                <th>impJoint</th>
+                <th>impAxis</th>
+                <th>direction</th>
+                <th>lowerJoint</th>
+                <th>upperJoint</th>
                 {{#role user 'clinician'}}
                   <th>ID</th>
                   <th>Edit</th>
@@ -31,7 +38,7 @@
 <script>
   var table;
   $(document).ready(function () {
-    
+
     table = $('#table').DataTable({
       processing: true,
       serverSide: true,
@@ -46,7 +53,7 @@
       ajax: {
         url: "../api/table/exercise",
         data: function (d) {
-          d.fields = "exerciseName description createdAt";
+          d.fields = "exerciseName description createdAt numSessions numRepetition impJoint impAxis direction lowerJoint upperJoint";
         }
       },
       columns: [
@@ -65,11 +72,43 @@
             return date.toDateString() + ' ' + date.toLocaleTimeString('en-us');
           }
         },
+        {
+          data: "numSessions",
+          defaultContent: ""
+        },
+        {
+          data: "numRepetition",
+          defaultContent: ""
+        },
+        {
+          data: "impJoint",
+          defaultContent: ""
+        },
+        {
+          data: "impAxis",
+          defaultContent: ""
+        },
+        {
+          data: "direction",
+          defaultContent: ""
+        },
+        {
+          data: "lowerJoint",
+          defaultContent: ""
+        },
+        {
+          data: "upperJoint",
+          defaultContent: ""
+        },
+        {
+          data: "type",
+          defaultContent: ""
+        },
         {{#role user 'clinician'}}
           {
             data: "_id",
             defaultContent: ""
-          }, 
+          },
           {
             data: "_id",
             render: function (data, type, row) {
@@ -88,6 +127,6 @@
       ]
     });
   });
-  
+
 </script>
 <script type="text/javascript" src="../../public/scripts/exercise/index.js"></script>
