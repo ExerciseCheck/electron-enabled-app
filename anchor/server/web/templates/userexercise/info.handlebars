@@ -1,25 +1,33 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div id="mainContent">
 
-    <h1>How To: {{exerciseName}}</h1>
+        <h1>How To: {{exerciseName}}</h1>
 
 
-<div class="instructions">
-<ol>
-    {{#each instructions}}
-        <li class="text"> {{this.text}} </li>
-    {{/each}}
-</ol>
+        <div class="instructions">
+          <ol>
+            {{#each instructions}}
+            <li class="text"> {{this.text}} </li>
+            {{/each}}
+          </ol>
+        </div>
+
+
+        <div> patient id: {{patientId}} </div>
+        <div> ex id: {{exerciseId}} </div>
+        <div class="button-wrapper">
+          <a href ='/userexercise/setting/{{this.exerciseId}}{{../patientId}}'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
+        </div>
+
+        <br><br>
+      </div>
+    </div>
+  </div>
 </div>
-
-<div> patient id: {{patientId}} </div>
-<div> ex id: {{exerciseId}} </div>
-
-<div class="button-wrapper">
-<a href ='/userexercise/setting/{{exerciseId}}{{patientId}}'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
-</div>
-
-
-
 
 <link rel="stylesheet" href="/public/css/styleSheet/exerciseInfo.css">
-<!-- <script type="text/javascript" src="../public/scripts/userexercise/exerciseinfo.js"></script> -->
-<!-- <script type="text/javascript" src="../public/scripts/clinician.js"></script> -->
+<script type="text/javascript" src="../public/scripts/userexercise/setting.js"></script>
+<script type="text/javascript" src="../public/scripts/clinician.js"></script>
