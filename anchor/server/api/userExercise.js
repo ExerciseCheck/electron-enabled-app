@@ -943,7 +943,7 @@ internals.applyRoutes = function (server, next) {
           let prac_impt_joint_Z = [];
           let prac_impt_joint; // the chosen axis
           let prac_impt_joint_XYZ = [];
-          for (var i=0; i<requestPayload.bodyFrames.length; ++i) {
+          for (let i=0; i<requestPayload.bodyFrames.length; ++i) {
             prac_impt_joint_X.push(requestPayload.bodyFrames[i].joints[theJoint]["depthX"]);
             prac_impt_joint_Y.push(requestPayload.bodyFrames[i].joints[theJoint]["depthY"]);
             prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"]);
@@ -954,24 +954,79 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint_Z = [];
           let ref_impt_joint;
           let ref_impt_joint_XYZ = [];
-          for (var i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
+          for (let i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
             ref_impt_joint_X.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"]);
             ref_impt_joint_Y.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"]);
             ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"]);
           }
 
-          //TODO: smoothing here
-          let prac_impt_joint_X_smoothed = prac_impt_joint_X;
-          let prac_impt_joint_Y_smoothed = prac_impt_joint_Y;
-          let prac_impt_joint_Z_smoothed = prac_impt_joint_Z;
-          for (var i=0; i<prac_impt_joint_X.length; ++i) {
+          //smoothing functions here
+          //use Gaussian
+          function add(a,b) {
+            return a+b;
+          }
+
+          function smoothAvg (list, degree) {
+            let i;
+            let smoothed = [];
+            let len = list.length - degree + 1;
+            for (i=0; i<len; i++){
+              let avg = list.slice(i, i+degree).reduce(add,0) / degree;
+              //console.log("avg: " + avg);
+              smoothed.push(avg);
+            }
+            return smoothed;
+          }
+
+          function smoothTri (list, degree){
+            let i, j, sum;
+            let weight=[];
+            let window=degree*2-1;
+            for (i=1;i<window+1;i++){
+              weight.push(degree-Math.abs(degree-i))
+            }
+            let smoothed=[];
+            let len = list.length-window;
+            for (i=0;i<len;i++){
+              sum=0;
+              for(j=0;j<window;j++)
+                sum+=list[i+j]*weight[j];
+              smoothed[i]=sum/weight.reduce(add, 0);
+            }
+            return smoothed;
+          }
+
+          function smoothGauss(list,degree){
+            let i, j, sum;
+            let weight=[];
+            let window=degree*2-1;
+            for (i=0;i<window;i++){
+              weight.push(1/(Math.exp((4*(i-degree+1)/window)**2)));
+            }
+            let smoothed=[];
+            let len = list.length-window;
+            for (i=0;i<len;i++){
+              sum=0;
+              for(j=0;j<window;j++)
+                sum+=list[i+j]*weight[j];
+              smoothed[i]=sum/weight.reduce(add,0);
+            }
+            return smoothed;
+          }
+
+          let prac_impt_joint_X_smoothed = smoothGauss(prac_impt_joint_X, 5);
+          let prac_impt_joint_Y_smoothed = smoothGauss(prac_impt_joint_Y, 5);
+          let prac_impt_joint_Z_smoothed = smoothGauss(prac_impt_joint_Z, 5);
+          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
             prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
           }
-          let ref_impt_joint_X_smoothed = ref_impt_joint_X;
-          let ref_impt_joint_Y_smoothed = ref_impt_joint_Y;
-          let ref_impt_joint_Z_smoothed = ref_impt_joint_Z;
-          for (var i=0; i<ref_impt_joint_X.length; ++i) {
+          let ref_impt_joint_X_smoothed = smoothGauss(ref_impt_joint_X, 5);
+          let ref_impt_joint_Y_smoothed = smoothGauss(ref_impt_joint_Y, 5);
+          let ref_impt_joint_Z_smoothed = smoothGauss(ref_impt_joint_Z, 5);
+          let std_impt_joint = []; // for establishing the max cost in dtw
+          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
+            std_impt_joint.push(ref_impt_joint_X_smoothed[0], ref_impt_joint_Y_smoothed[0], ref_impt_joint_Z_smoothed[0]);
           }
 
 
@@ -997,7 +1052,7 @@ internals.applyRoutes = function (server, next) {
           console.log("ifIncreased: " + ifIncreased);
 
           let prac_idx=[];
-          for (var i=0; i<prac_impt_joint.length - 1; i++) {
+          for (let i=0; i<prac_impt_joint.length - 1; i++) {
             let v = prac_impt_joint[i+1] - prac_impt_joint[i];
             if(v >= 0) {
               if (ifIncreased) {
@@ -1020,7 +1075,7 @@ internals.applyRoutes = function (server, next) {
           let prac_ed=[];
           let timing = [];
           let ifFirst = true;
-          for (var ii=0; ii<prac_idx.length-1; ii++) {
+          for (let ii=0; ii<prac_idx.length-1; ii++) {
             if(prac_idx[ii][1] && ifFirst) {
               prac_st.push(prac_idx[ii][0]);
               ifFirst = false;
@@ -1035,7 +1090,7 @@ internals.applyRoutes = function (server, next) {
           console.log(prac_st);
           console.log(prac_ed);
 
-          for (var j=0; j<prac_st.length; j++) {
+          for (let j=0; j<prac_st.length; j++) {
             let delta = prac_ed[j] - prac_st[j];
             if(delta >= time_thresh) {
               timing.push(delta);
@@ -1045,36 +1100,39 @@ internals.applyRoutes = function (server, next) {
 
           //TODO:same thing for reference exercise
           //TODO:but for now, we compare total time for speed analysis
-          let prac_ttl;
-          let n = requestPayload.repEvals.length; //number of reps
-          for (var i=0; i<n; i++){
-            prac_ttl =+ requestPayload.repEvals[i].speed;
-          }
-          let ref_ttl = results.findMostRecentReference[0].refTime;
+          // let prac_ttl;
+          // let n = requestPayload.repEvals.length; //number of reps
+          // for (let i=0; i<n; i++){
+          //   prac_ttl =+ requestPayload.repEvals[i].speed; // cannot handle when repEvals.speed = 0
+          // }
+          // let ref_ttl = results.findMostRecentReference[0].refTime;
+          let nFrames_prac = requestPayload.bodyFrames.length;
+          let prac_ttl = Math.round(nFrames_prac/30);
+          let nFrames_ref = results.findMostRecentReference[0].bodyFrames.length;
+          let ref_ttl = Math.round(nFrames_ref/30);
+
           let msg_speed = "You have done " + n + " repititions for this set.\nIt takes you " + prac_ttl + " seconds to complete.\nYour reference time is " + ref_ttl + " seconds.\n"
           console.log(msg_speed);
 
-          //dtw
-          // 'squaredEuclidean' is the default option. It has been modified for >1 dimension
-          // the other two ('manhattan' | 'euclidean') are for 1 dim only
-          // var dtw_impt_joint = new DTW(['euclidean']);
-          // var cost = dtw_impt_joint.compute(ref_impt_joint, prac_impt_joint);
-          // var path = dtw_impt_joint.path();
-          // let msg_dtw = "DTW (1 dim) cost: " + cost + '\n';
-          // console.log(msg_dtw);
-          // console.log("Path: ");
-          // console.log(path);
 
-          var dtw_impt_joint_XYZ = new DTW();
 
-          var cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
-          var path_XYZ = dtw_impt_joint_XYZ.path();
-          let msg_dtw_XYZ = "DTW_XYZ cost: " + cost_XYZ + '\n';
+          let dtw_impt_joint_XYZ = new DTW();
+          let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
+          //let path_XYZ = dtw_impt_joint_XYZ.path();
+
+          let dtw_maxCost = new DTW();
+          let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint);
+
+          let acc = cost_XYZ / cost_max;
+
+          let msg_dtw_XYZ = "DTW cost: " + cost_XYZ + '\n';
+          let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
           console.log(msg_dtw_XYZ);
-          console.log("Path_XYZ: ");
-          console.log(path_XYZ);
+          console.log(msg_dtw_max);
+          console.log("Accuracy: " + acc);
 
-          let analysis = msg_speed + msg_dtw_XYZ;
+          // TODO:
+          let analysis = {"accuracy": acc, "speed": 123 };
 
           let update = {
             $addToSet: {
@@ -1237,6 +1295,165 @@ internals.applyRoutes = function (server, next) {
         }
 
         reply({ message: 'Success.' });
+      });
+    }
+  });
+
+  // TODO: for smoothing test
+  server.route({
+    method: 'GET',
+    path: '/userexercise/smoothingtest/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+      }
+    },
+    handler: function (request, reply) {
+
+      let smoothingResult = {};
+      let patientId = '';
+      //logged in user is a clinician
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      //Logged in user is a patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+      Async.auto({
+
+        //first we need to find the referenceId of the exercise
+        //finding one document matching the query is enough
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findExercise:['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        smoothingTest: ['findExercise', function(results, done) {
+          let reference = results.findMostRecentReference[0];
+          let exercise = results.findExercise;
+
+          let theJoint = exercise.joint;
+
+          let ref_impt_joint_X = [];
+          let ref_impt_joint_Y = [];
+          let ref_impt_joint_Z = [];
+
+          for (let i=0; i< reference.bodyFrames.length; ++i) {
+            ref_impt_joint_X.push(reference.bodyFrames[i].joints[theJoint]["depthX"]);
+            ref_impt_joint_Y.push(reference.bodyFrames[i].joints[theJoint]["depthY"]);
+            ref_impt_joint_Z.push(reference.bodyFrames[i].joints[theJoint]["cameraZ"]);
+          }
+          //console.log(ref_impt_joint_Y);
+
+          //helper function: st (incl), ed (excl) are numbers
+          function getRange(st, ed) {
+            let retLs = [];
+            for (let i=st; i<ed; i++) {
+              retLs.push(i);
+            }
+            return retLs;
+          }
+
+          function add(a,b) {
+            return a+b;
+          }
+
+          function smoothAvg (list, degree) {
+            let smoothed = [];
+            let len = list.length - degree + 1;
+            for (let i=0; i<len; i++){
+              let avg = list.slice(i, i+degree).reduce(add,0) / degree;
+              //console.log("avg: " + avg);
+              smoothed.push(avg);
+            }
+            return smoothed;
+          }
+
+          function smoothTri (list, degree){
+            let i;
+            let j;
+            let sum;
+            let weight=[];
+            let window=degree*2-1;
+            for (i=1;i<window+1;i++){
+              weight.push(degree-Math.abs(degree-i))
+            }
+            let smoothed=[];
+            for (i=0;i<list.length-window;i++){
+              smoothed.push(0);
+            }
+            for (i=0;i<smoothed.length;i++){
+              sum=0;
+              for(j=0;j<window;j++)
+                sum+=list[i+j]*weight[j];
+              smoothed[i]=sum/weight.reduce(add, 0);
+            }
+            return smoothed;
+          }
+
+          function smoothGauss(list,degree){
+            let i;
+            let j;
+            let sum;
+            let weight=[];
+            let window=degree*2-1;
+            for (i=0;i<window;i++){
+              weight.push(1/(Math.exp((4*(i-degree+1)/window)**2)));
+            }
+            let smoothed=[];
+            for (i=0;i<list.length-window;i++){
+              smoothed.push(0);
+            }
+            for (i=0;i<smoothed.length;i++){
+              sum=0;
+              for(j=0;j<window;j++)
+                sum+=list[i+j]*weight[j];
+              smoothed[i]=sum/weight.reduce(add,0);
+            }
+            return smoothed;
+          }
+
+          let t = getRange(0, ref_impt_joint_Y.length);
+          console.log("t: " + t);
+          console.log("raw: " + ref_impt_joint_Y);
+
+          let ref_Y_smoothedAvg = smoothAvg(ref_impt_joint_Y, 10);
+          let ref_Y_smoothedTri = smoothTri(ref_impt_joint_Y, 5);
+          let ref_Y_smoothedGauss = smoothGauss(ref_impt_joint_Y, 5);
+
+          smoothingResult['t'] = t;
+          smoothingResult['raw'] = ref_impt_joint_Y;
+          smoothingResult['smoothedAvg'] = ref_Y_smoothedAvg;
+          smoothingResult['smoothedTri'] = ref_Y_smoothedTri;
+          smoothingResult['smoothedGauss'] = ref_Y_smoothedGauss;
+
+          //console.log("smoothed: " + smoothingResult.smoothedAvg);
+          done();
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference) {
+        return reply(Boom.notFound('Document not found.'));
+        }
+        return reply(smoothingResult);
+
       });
     }
   });

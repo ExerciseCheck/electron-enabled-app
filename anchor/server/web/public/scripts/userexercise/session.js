@@ -262,19 +262,20 @@ function goToExercises() {
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;
-    //threshold_flag = data.direction;
-    //group: (down, L2R) +; (up, R2L) -
-    if(data.direction === 'L2R') {
-      direction = "down";
-      threshold_flag = "down";
-    } else if (data.direction === 'R2L') {
-      direction = "up";
-      threshold_flag = "up";
-    } else {
-      direction = data.direction;
-      threshold_flag = data.direction;
-    }
   });
+
+  //threshold_flag = data.direction;
+  //group: (down, L2R) +; (up, R2L) -
+  if(dataForCntReps.direction === 'L2R') {
+    direction = "down";
+    threshold_flag = "down";
+  } else if (dataForCntReps.direction === 'R2L') {
+    direction = "up";
+    threshold_flag = "up";
+  } else {
+    direction = dataForCntReps.direction;
+    threshold_flag = dataForCntReps.direction;
+  }
   // time pt for speed evaluation
   var st, ed;
 
