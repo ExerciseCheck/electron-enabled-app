@@ -66,16 +66,16 @@ function action(nextMode, type) {
 
     //Because current functionality is set such that each step of session ("play", stop, review)
     //opens on a new url, we must load reference bodyFrame data from database accordingly.
-    function loadReferenceandRedirect() {
-      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-      (!parsedURL.patientId) ? url = url: url = url + patientId;
-      $.get(url, function(data){
-        let refEntry = {type: 'refFrames', body: data};
-        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
-        bodyFramesStore.put(refEntry);
-        redirect();
-      });
-    }
+//    function loadReferenceandRedirect() {
+//      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
+//      (!parsedURL.patientId) ? url = url: url = url + patientId;
+//      $.get(url, function(data){
+//        let refEntry = {type: 'refFrames', body: data};
+//        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+//        bodyFramesStore.put(refEntry);
+//        redirect();
+//      });
+//    }
 
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
@@ -91,7 +91,8 @@ function action(nextMode, type) {
       if(nextMode === 'stop') {
         let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
       }
-      loadReferenceandRedirect();
+//      loadReferenceandRedirect();
+      redirect();
     }
   });
 }
@@ -150,22 +151,29 @@ function savePractice() {
       if(patientId) {
         url = url + patientId;
       }
-      $.get(url, function(data){
-        openDB(function() {
-          let refEntry = {type: 'refFrames', body: data};
-          let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put(refEntry);
-          request.onsuccess = function(e) {
-            if(isComplete) {
-              window.location = '/userexercise/session/end/practice/' +
-                exerciseId + '/' + patientId;
-            }
-            else {
-              window.location = '/userexercise/session/start/practice/' +
-                exerciseId + '/' + patientId;
-            }
-          };
-        });
-      });
+//      $.get(url, function(data){
+//        openDB(function() {
+//          let refEntry = {type: 'refFrames', body: data};
+//          let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put(refEntry);
+//          request.onsuccess = function(e) {
+//            if(isComplete) {
+//              window.location = '/userexercise/session/end/practice/' +
+//                exerciseId + '/' + patientId;
+//            }
+//            else {
+//              window.location = '/userexercise/session/start/practice/' +
+//                exerciseId + '/' + patientId;
+//            }
+//          };
+//        });
+//      });
+        if(isComplete) {
+        window.location = '/userexercise/session/end/practice/' +
+          exerciseId + '/' + patientId;
+        } else {
+          window.location = '/userexercise/session/start/practice/' +
+            exerciseId + '/' + patientId;
+        }
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -249,10 +257,10 @@ $('.actionBtn').click(function() {
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
-          if(getref.result && getref.result.body.length !== 0) {
+          if(getref.result) {
             refFrames = getref.result.body;
-            console.log("refFrames loaded lcoally");
-            let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('refFrames');
+            console.log("refFrames loaded locally");
+//            let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('refFrames');
           }
           showCanvas();
           console.log("show canvas called after getting referenceFrames");
@@ -262,7 +270,7 @@ $('.actionBtn').click(function() {
         getrecent.onsuccess = function(e) {
           if(getrecent.result) {
             recentFrames = getrecent.result.body;
-            let deleterecent = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
+//            let deleterecent = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
           }
         }
       });
@@ -277,7 +285,7 @@ $('.actionBtn').click(function() {
   {
 
     //start of creating reference
-    if(parsedURL.mode === 'start' && refFrames === undefined)
+    if(parsedURL.mode === 'start' && refFrames.length === 0)
     {
       ref_index = 0;
       exe_index = 0;

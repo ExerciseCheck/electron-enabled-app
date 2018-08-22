@@ -30,7 +30,7 @@ function initialSetting(numSets, numReps, exerciseId, patientId, redirectToUrl) 
     success: function (result) {
         successAlert('Setting successfully updated');
         if(redirectToUrl) {
-          window.location = redirectToUrl;
+          loadReferenceandStart('reference');
         }
     },
     error: function (result) {
@@ -119,7 +119,7 @@ function createRef() {
   $.get(url, function(data){
 
     if ( data.settingIsUpdated ) {
-      window.location = redirectToUrl;
+      loadReferenceandStart('reference');
     }
 
     else {
