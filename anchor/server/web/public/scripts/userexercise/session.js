@@ -637,7 +637,7 @@ function goToExercises() {
 
     exe_ctx.font="30px MS";
     //exe_ctx.fillStyle = "red";
-    exe_ctx.fillStyle = "#428bca";
+    exe_ctx.fillStyle = "#7BE39F";
     exe_ctx.textAlign = "center";
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
     drawGrids(exe_ctx);
