@@ -7,6 +7,9 @@ let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
 let refStart, refEnd; //not used
 let repEvals = [];
+let liveBodyColor="#23D160";
+let commonBlue = "#1E89FB"
+let refJointColor = "#FF6786"
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -296,7 +299,7 @@ function goToExercises() {
       liveFrames = [];
       recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
       localStorage.removeItem('liveFrames');
-      // window.Bridge.eStartKinect();
+      window.Bridge.eStartKinect();
       showCanvas();
       //checks what type of "mode" page is currently on && if reference exist
     });
@@ -429,20 +432,17 @@ function goToExercises() {
     let p = -0.5; // padding
     let count = 0;
     for (let x = 0; x <= bh; x += 100.3) {
-      if(count <= 3){
         ctx.moveTo(p, x + p);
         ctx.lineTo(bw + p, x + p);
-      }
-      count++;
     }
-    ctx.lineWidth=1;
-    ctx.strokeStyle = "grey";
+    ctx.lineWidth=0.5;
+    ctx.strokeStyle = "#525B74";
     ctx.stroke();
   }
 
   function drawFloorPlane(ctx) {
-    //ctx.strokeStyle = "black";
-    ctx.fillStyle = '#999999';
+    ctx.strokeStyle = "none";
+    ctx.fillStyle = '#F0F0F2';
     ctx.beginPath();
     ctx.moveTo(0, 500);
     ctx.lineTo(100, 400);
@@ -475,11 +475,11 @@ function goToExercises() {
   }
 
   //function that draws the body skeleton
-  function drawBody(parameters, ctx, drawCircle = true){
+  function drawBody(parameters, ctx, color, jointColor, drawCircle = true){
 
     let body = parameters;
     jointType.forEach(function(jointType){
-      drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx);
+      drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx, jointColor);
     });
     if(drawCircle)
     {
@@ -496,20 +496,20 @@ function goToExercises() {
     });
 
     ctx.lineWidth=8;
-    ctx.strokeStyle='blue';
+    ctx.strokeStyle=color;
     ctx.stroke();
     ctx.closePath();
   }
 
   //function that draws each joint as a yellow round dot
-  function drawJoints(parameters, ctx){
+  function drawJoints(parameters, ctx, color){
 
     let cx = parameters.cx;
     let cy = parameters.cy;
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI*2); //radius is a global variable defined at the beginning
     ctx.closePath();
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = color;
     ctx.fill();
   }
 
@@ -609,38 +609,11 @@ function goToExercises() {
   //only start drawing with a body frame is detected
   //even though
 
-  // $(document).ready(function(){
-  //   const parsedURL = parseURL(window.location.pathname);
-  //   //clear out the canvas so that the previous frame will not overlap
-  //   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  //   ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
-  //   exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
-  //   //tag the canvas
-  //   ctx.font="30px MS";
-  //   (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
-  //   ctx.textAlign = "center";
-  //   ctx.fillText("Live", canvas.width/2, canvas.height/20);
-  //   drawGrids(ctx);
-  //   drawFloorPlane(ctx);
-  //
-  //   ref_ctx.font="30px MS";
-  //   //ref_ctx.fillStyle = "red";
-  //   ref_ctx.fillStyle = "#428bca";
-  //   ref_ctx.textAlign = "center";
-  //   ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
-  //   drawGrids(ref_ctx);
-  //   drawFloorPlane(ref_ctx);
-  //
-  //   exe_ctx.font="30px MS";
-  //   //exe_ctx.fillStyle = "red";
-  //   exe_ctx.fillStyle = "#428bca";
-  //   exe_ctx.textAlign = "center";
-  //   exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
-  //   drawGrids(exe_ctx);
-  //   drawFloorPlane(exe_ctx);
-  // });
+
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
+
+
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -648,15 +621,15 @@ function goToExercises() {
     exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
     //tag the canvas
     ctx.font="30px MS";
-    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
+    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#23D160";
     ctx.textAlign = "center";
-    ctx.fillText("Live", canvas.width/2, canvas.height/20);
+    ctx.fillText("Curren Set", canvas.width/2, canvas.height/20);
     drawGrids(ctx);
     drawFloorPlane(ctx);
 
     ref_ctx.font="30px MS";
     //ref_ctx.fillStyle = "red";
-    ref_ctx.fillStyle = "#428bca";
+    ref_ctx.fillStyle = "#1E89FB";
     ref_ctx.textAlign = "center";
     ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
     drawGrids(ref_ctx);
@@ -683,7 +656,7 @@ function goToExercises() {
         let neck_y = body.joints[2].depthY;
 
         //draw the body skeleton in live canvas
-        drawBody(body,ctx);
+        drawBody(body,ctx, liveBodyColor, commonBlue);
 
         document.addEventListener('timer-done', function(evt){
           console.log("timer done", evt.detail);
@@ -752,7 +725,7 @@ function goToExercises() {
     if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
 
       //draw in the reference canvas
-        drawBody(refFrames[ref_index], ref_ctx, false);
+        drawBody(refFrames[ref_index], ref_ctx,commonBlue,refJointColor, false);
         //display one frame of reference every 2 frames of live frame captured
         //we can manipulate the number to control the display speed
         if (live_counter >= 3)
@@ -775,11 +748,11 @@ function goToExercises() {
     )
     {
       //draw in the reference canvas
-      drawBody(refFrames[ref_index], ref_ctx, false);
+      drawBody(refFrames[ref_index], ref_ctx,commonBlue, refJointColor, false);
       //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
       if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
       {
-        drawBody(recentFrames[exe_index], exe_ctx, false);
+        drawBody(recentFrames[exe_index], exe_ctx,liveBodyColor,commonBlue ,false);
       }
       //display one frame of reference every 2 frames of live frame captured
       //we can manipulate the number to control the display speed
