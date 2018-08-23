@@ -623,7 +623,7 @@ function goToExercises() {
     ctx.font="30px MS";
     (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#23D160";
     ctx.textAlign = "center";
-    ctx.fillText("Curren Set", canvas.width/2, canvas.height/20);
+    ctx.fillText("Current Set", canvas.width/2, canvas.height/20);
     drawGrids(ctx);
     drawFloorPlane(ctx);
 
