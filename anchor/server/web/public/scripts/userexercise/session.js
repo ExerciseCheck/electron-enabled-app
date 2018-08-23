@@ -120,6 +120,7 @@ function saveReference() {
   values.neckX = refFrames[0].joints[2].depthX;
   values.neckY = refFrames[0].joints[2].depthY;
   var mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
+  console.log(mm);
   values.refMin = mm.min;
   values.refMax = mm.max;
   values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
@@ -418,6 +419,7 @@ function goToExercises() {
     let bh = 500; // canvas.height
     let p = -0.5; // padding
     let count = 0;
+    ctx.beginPath();
     for (let x = 0; x <= bh; x += 100.3) {
         ctx.moveTo(p, x + p);
         ctx.lineTo(bw + p, x + p);
@@ -425,6 +427,7 @@ function goToExercises() {
     ctx.lineWidth=0.5;
     ctx.strokeStyle = "#525B74";
     ctx.stroke();
+    ctx.closePath();
   }
 
   function drawFloorPlane(ctx) {
@@ -432,8 +435,8 @@ function goToExercises() {
     ctx.fillStyle = '#F0F0F2';
     ctx.beginPath();
     ctx.moveTo(0, 500);
-    ctx.lineTo(100, 400);
-    ctx.lineTo(400, 400);
+    ctx.lineTo(100, 406);
+    ctx.lineTo(400, 406);
     ctx.lineTo(500, 500);
     ctx.fill();
 
@@ -607,14 +610,14 @@ function goToExercises() {
     ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
     exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
     //tag the canvas
-    ctx.font="30px MS";
+    ctx.font="20px Arial";
     (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#23D160";
     ctx.textAlign = "center";
     ctx.fillText("Current Set", canvas.width/2, canvas.height/20);
     drawGrids(ctx);
     drawFloorPlane(ctx);
 
-    ref_ctx.font="30px MS";
+    ref_ctx.font="20px Arial";
     //ref_ctx.fillStyle = "red";
     ref_ctx.fillStyle = "#1E89FB";
     ref_ctx.textAlign = "center";
@@ -622,7 +625,7 @@ function goToExercises() {
     drawGrids(ref_ctx);
     drawFloorPlane(ref_ctx);
 
-    exe_ctx.font="30px MS";
+    exe_ctx.font="20px Arial";
     //exe_ctx.fillStyle = "red";
     exe_ctx.fillStyle = "#7BE39F";
     exe_ctx.textAlign = "center";
