@@ -74,6 +74,13 @@ function action(nextMode, type) {
           redirect();
         }
     }
+    else if(nextMode === 'start' && type === 'reference') {
+      let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: []});
+      deleteref.onsuccess = function(e) {
+        redirect();
+      }
+    }
+
     else {
       if(nextMode === 'stop') {
         let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
@@ -478,7 +485,7 @@ $('.actionBtn').click(function() {
     //4. end of practice
     //in theses cases, the in-position will not be checked
     else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
-      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames.length > 0) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
