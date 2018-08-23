@@ -4,6 +4,7 @@
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames;
+let req, db;
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -52,40 +53,34 @@ function parseURL(url)
   };
 }
 
-function action(nextMode, type)
-{
+function action(nextMode, type) {
+  openDB(function() {
+    const parsedURL = parseURL(window.location.pathname);
+    var patientId = parsedURL.patientId;
+    var exerciseId = parsedURL.exerciseId;
 
-  const parsedURL = parseURL(window.location.pathname);
-  var patientId = parsedURL.patientId;
-  var exerciseId = parsedURL.exerciseId;
-
-  function redirect() {
-    var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
-    window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
-  }
-
-  //Because current functionality is set such that each step of session ("play", stop, review)
-  //opens on a new url, we must load reference bodyFrame data from database accordingly.
-  function loadReferenceandRedirect() {
-    let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-    (!parsedURL.patientId) ? url = url: url = url + patientId;
-    $.get(url, function(data){
-      localStorage.setItem("refFrames", JSON.stringify(data));
-      redirect();
-    });
-  }
-  //This condition describes the end of an update or create reference.
-  //The refFrames data in local storage gets set to the most recent/live frames.
-  if(nextMode === 'stop' && type === 'reference') {
-    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
-    redirect();
-  }
-  else {
-    if(nextMode === 'stop') {
-      localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+    function redirect() {
+      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
-    loadReferenceandRedirect();
-  }
+
+    //This condition describes the end of an update or create reference.
+    //The refFrames data in local storage gets set to the most recent frames.
+    if(nextMode === 'stop' && type === 'reference') {
+        let updatedRef = {type: 'refFrames', body: liveFrames};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedRef);
+        request.onsuccess = function(event) {
+          redirect();
+        }
+    }
+    else {
+      if(nextMode === 'stop') {
+        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      }
+      redirect();
+    }
+  });
 }
 
 function saveReference() {
@@ -138,21 +133,13 @@ function savePractice() {
     data: values,
     success: function (result) {
 
-      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-      if(patientId) {
-        url = url + patientId;
-      }
-      $.get(url, function(data){
-        localStorage.setItem("refFrames", JSON.stringify(data));
         if(isComplete) {
-          window.location = '/userexercise/session/end/practice/' +
-            exerciseId + '/' + patientId;
-        }
-        else {
+        window.location = '/userexercise/session/end/practice/' +
+          exerciseId + '/' + patientId;
+        } else {
           window.location = '/userexercise/session/start/practice/' +
             exerciseId + '/' + patientId;
         }
-      });
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -170,6 +157,24 @@ function goToExercises() {
   window.location = '/clinician/patientexercises/' + patientId;
 }
 
+window.onbeforeunload = (e) => {
+
+  if (actionBtn) {
+    return;
+  }
+
+  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
+    return;
+  }
+  else {
+    // electron treats any return value that is not 'null' as intent to stay on the page
+    return false;
+  }
+};
+
+$('.actionBtn').click(function() {
+  actionBtn = true;
+});
 
 (function ()
 {
@@ -190,7 +195,7 @@ function goToExercises() {
   let exe_index = 0;
   // number of live frame captured from kinect
   let live_counter = 0;
-  let inPosition = false;
+
   let parsedURL = parseURL(window.location.pathname);
 
   if (isElectron())
@@ -209,22 +214,28 @@ function goToExercises() {
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
+      liveFrames = [];
       localStorage.setItem('canStartRecording', false);
 
-      // because a 'create reference' will still load essentially empty reference data from the
-      // database, we should disregard such incomplete data and only access reference bodyframes when they
-      // actually exist, i.e. length !== 0.
-      if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
-        //alert("No reference frames in localStorage");
-        refFrames = JSON.parse(localStorage.getItem('refFrames'));
-        localStorage.removeItem('refFrames');
-      }
-      liveFrames = [];
-      recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
-      localStorage.removeItem('liveFrames');
+      openDB(function() {
+        let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
+        getref.onsuccess = function(e) {
+          if(getref.result) {
+            refFrames = getref.result.body;
+            console.log("refFrames loaded locally");
+          }
+          showCanvas();
+          console.log("show canvas called after getting referenceFrames");
+        }
+
+        let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        getrecent.onsuccess = function(e) {
+          if(getrecent.result) {
+            recentFrames = getrecent.result.body;
+          }
+        }
+      });
       window.Bridge.eStartKinect();
-      showCanvas();
-      //checks what type of "mode" page is currently on && if reference exist
     });
   }
 
@@ -235,7 +246,7 @@ function goToExercises() {
   {
 
     //start of creating reference
-    if(parsedURL.mode === 'start' && refFrames === undefined)
+    if(parsedURL.mode === 'start' && refFrames.length === 0)
     {
       ref_index = 0;
       exe_index = 0;
@@ -325,7 +336,7 @@ function goToExercises() {
   }
 
   //function that draws the body skeleton
-  function drawBody(parameters, ctx, drawCircle = true){
+  function drawBody(parameters, ctx, drawCircle = true) {
 
     let body = parameters;
     jointType.forEach(function(jointType){
@@ -352,7 +363,7 @@ function goToExercises() {
   }
 
   //function that draws each joint as a yellow round dot
-  function drawJoints(parameters, ctx){
+  function drawJoints(parameters, ctx) {
 
     let cx = parameters.cx;
     let cy = parameters.cy;
@@ -364,7 +375,7 @@ function goToExercises() {
   }
 
   // Draw the red Center Circle in ctx1 (canvasSKLT)
-  function drawCenterCircle(parameters, ctx){
+  function drawCenterCircle(parameters, ctx) {
 
     //coordinate of the red circle
     let x = parameters.x;
@@ -437,12 +448,6 @@ function goToExercises() {
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
-        // check in-position status whenever kinect captures a body
-        if(!inPosition) {
-          if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
-            inPosition = true;
-          }
-        }
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
@@ -452,6 +457,7 @@ function goToExercises() {
     });
 
     //if the patient is in position and doing a practice session
+
     if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
 
       //draw in the reference canvas

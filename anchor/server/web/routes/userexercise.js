@@ -113,7 +113,6 @@ internals.applyRoutes = function (server, next) {
       else {
         patientId = request.auth.credentials.user._id.toString();
       }
-      let isComplete = false;
       let setNumber = 0;
 
       Async.auto({
@@ -165,8 +164,8 @@ internals.applyRoutes = function (server, next) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          isComplete = results.findNumPractices[0].isComplete;
-          (isComplete) ? setNumber = results.findNumPractices[0].numSetsCompleted :
+          results.findNumPractices[0].isComplete ?
+            setNumber = results.findNumPractices[0].numSetsCompleted :
             setNumber = results.findNumPractices[0].numSetsCompleted + 1;
         }
 
@@ -188,7 +187,6 @@ internals.applyRoutes = function (server, next) {
           exercise : results.findExercise,
           mode: request.params.mode,
           type: request.params.type,
-          isComplete
         });
       });
     }

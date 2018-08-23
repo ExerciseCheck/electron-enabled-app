@@ -25,6 +25,27 @@ function createStorageObject(storage, key, val) {
   }
 }
 
+function openDB(callback) {
+  req = window.indexedDB.open("bodyFrames", 1);
+
+  req.onupgradeneeded = function(e) {
+    console.log("Upgrade event triggered");
+    db = e.target.result;
+    let newObjectStore = db.createObjectStore('bodyFrames', {keyPath: 'type'});
+  };
+
+  req.onerror = (e) => {
+    console.log('Database failed to open');
+  };
+
+  req.onsuccess = (e) => {
+    console.log('Database opened successfully');
+    db = req.result;
+    callback();
+  };
+
+}
+
 Date.prototype.getWeekNumber = function(){
   var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
   var dayNum = d.getUTCDay() || 7;
