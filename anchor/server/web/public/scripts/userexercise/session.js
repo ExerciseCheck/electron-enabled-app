@@ -64,19 +64,6 @@ function action(nextMode, type) {
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
 
-    //Because current functionality is set such that each step of session ("play", stop, review)
-    //opens on a new url, we must load reference bodyFrame data from database accordingly.
-//    function loadReferenceandRedirect() {
-//      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-//      (!parsedURL.patientId) ? url = url: url = url + patientId;
-//      $.get(url, function(data){
-//        let refEntry = {type: 'refFrames', body: data};
-//        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
-//        bodyFramesStore.put(refEntry);
-//        redirect();
-//      });
-//    }
-
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
@@ -91,7 +78,6 @@ function action(nextMode, type) {
       if(nextMode === 'stop') {
         let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
       }
-//      loadReferenceandRedirect();
       redirect();
     }
   });
@@ -147,26 +133,6 @@ function savePractice() {
     data: values,
     success: function (result) {
 
-      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-      if(patientId) {
-        url = url + patientId;
-      }
-//      $.get(url, function(data){
-//        openDB(function() {
-//          let refEntry = {type: 'refFrames', body: data};
-//          let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put(refEntry);
-//          request.onsuccess = function(e) {
-//            if(isComplete) {
-//              window.location = '/userexercise/session/end/practice/' +
-//                exerciseId + '/' + patientId;
-//            }
-//            else {
-//              window.location = '/userexercise/session/start/practice/' +
-//                exerciseId + '/' + patientId;
-//            }
-//          };
-//        });
-//      });
         if(isComplete) {
         window.location = '/userexercise/session/end/practice/' +
           exerciseId + '/' + patientId;
