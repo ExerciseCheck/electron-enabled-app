@@ -7,7 +7,7 @@ let liveFrames, refFrames, recentFrames;
 let dataForCntReps = {};
 let refStart, refEnd; //not used
 let repEvals = [];
-let liveBodyColor="#23D160";
+let liveBodyColor="#7BE39F";
 let commonBlue = "#1E89FB"
 let refJointColor = "#FF6786"
 window.actionBtn = false;
