@@ -28,7 +28,7 @@
             {{/compare}}
           </div>
         </div>
-        {{#if isComplete}}
+        {{#compare mode 'end'}}
           <div class="curiousBlueColor secondSection">
             <p>Congratulations!</p>
             <p>You completed all your sets!</p>
@@ -39,7 +39,7 @@
           {{else}}
             <button type="button" class="btn btn-primary curiousBlue white actionBtn" onclick="goTodashBoard()">Go to Exercises page</button>
           {{/if}}
-        {{else}}
+        {{/compare}}
         <div class="curiousBlueColor secondSection">
           {{#compare mode 'start'}}
             <p>To begin the set,</p>
@@ -77,7 +77,6 @@
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}
         </div>
-        {{/if}}
       </div>
     </div>
   </div>

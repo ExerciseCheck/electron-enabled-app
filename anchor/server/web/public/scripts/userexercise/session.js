@@ -4,6 +4,7 @@
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames;
+let req, db;
 let dataForCntReps = {};
 let refStart, refEnd; //not used
 let repEvals = [];
@@ -58,47 +59,36 @@ function parseURL(url)
   };
 }
 
-function action(nextMode, type)
-{
-  const parsedURL = parseURL(window.location.pathname);
-  var patientId = parsedURL.patientId;
-  var exerciseId = parsedURL.exerciseId;
+function action(nextMode, type) {
+  openDB(function() {
+    const parsedURL = parseURL(window.location.pathname);
+    var patientId = parsedURL.patientId;
+    var exerciseId = parsedURL.exerciseId;
 
-  function redirect() {
-    var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
-    window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
-  }
-
-  //Because current functionality is set such that each step of session ("play", stop, review)
-  //opens on a new url, we must load reference bodyFrame data from database accordingly.
-  function loadReferenceandRedirect() {
-    let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-    (!parsedURL.patientId) ? url = url: url = url + patientId;
-    $.get(url, function(data){
-      localStorage.setItem("refFrames", JSON.stringify(data));
-      redirect();
-    });
-  }
-
-  //This condition describes the end of an update or create reference.
-  //The refFrames data in local storage gets set to the most recent/live frames.
-  if(nextMode === 'stop' && type === 'reference') {
-    var ref_ed = new Date().getTime();
-    localStorage.setItem("refEnd", ref_ed);
-
-    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
-
-    redirect();
-  }
-  else {
-    if(nextMode === 'stop') {
-      localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+    function redirect() {
+      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
-    loadReferenceandRedirect();
-  }
-  if(nextMode === 'play' && type === 'practice') {
-    console.log("start practice");
-  }
+
+    //This condition describes the end of an update or create reference.
+    //The refFrames data in local storage gets set to the most recent frames.
+    if(nextMode === 'stop' && type === 'reference') {
+        var ref_ed = new Date().getTime();
+        localStorage.setItem("refEnd", ref_ed);
+        let updatedRef = {type: 'refFrames', body: liveFrames};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedRef);
+        request.onsuccess = function(event) {
+          redirect();
+        }
+    }
+    else {
+      if(nextMode === 'stop') {
+        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      }
+      redirect();
+    }
+  });
 }
 
 // helper function for calculating the refMax, refMin
@@ -181,25 +171,13 @@ function savePractice() {
     data: values,
     success: function (result) {
 
-      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-      if(patientId) {
-        url = url + patientId;
-      }
-      $.get(url, function(data){
-        localStorage.setItem("refFrames", JSON.stringify(data));
-
+      if(isComplete) {
+      window.location = '/userexercise/session/end/practice/' +
+        exerciseId + '/' + patientId;
+      } else {
         window.location = '/userexercise/session/start/practice/' +
-          parsedURL.exerciseId + '/' + patientId;
-
-        if(isComplete) {
-          window.location = '/userexercise/session/end/practice/' +
-            exerciseId + '/' + patientId;
-        }
-        else {
-          window.location = '/userexercise/session/start/practice/' +
-            exerciseId + '/' + patientId;
-        }
-      });
+          exerciseId + '/' + patientId;
+      }
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -233,9 +211,6 @@ function goToExercises() {
   let ref_index = 0;
   // index of exercise frame
   let exe_index = 0;
-  // number of live frame captured from kinect
-  let live_counter = 0;
-
   let parsedURL = parseURL(window.location.pathname);
 
   // value for countReps
@@ -286,22 +261,28 @@ function goToExercises() {
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
+      liveFrames = [];
       localStorage.setItem('canStartRecording', false);
 
-      // because a 'create reference' will still load essentially empty reference data from the
-      // database, we should disregard such incomplete data and only access reference bodyframes when they
-      // actually exist, i.e. length !== 0.
-      if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
-        //alert("No reference frames in localStorage");
-        refFrames = JSON.parse(localStorage.getItem('refFrames'));
-        localStorage.removeItem('refFrames');
-      }
-      liveFrames = [];
-      recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
-      localStorage.removeItem('liveFrames');
+      openDB(function() {
+        let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
+        getref.onsuccess = function(e) {
+          if(getref.result) {
+            refFrames = getref.result.body;
+            console.log("refFrames loaded locally");
+          }
+          showCanvas();
+          console.log("show canvas called after getting referenceFrames");
+        }
+
+        let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        getrecent.onsuccess = function(e) {
+          if(getrecent.result) {
+            recentFrames = getrecent.result.body;
+          }
+        }
+      });
       window.Bridge.eStartKinect();
-      showCanvas();
-      //checks what type of "mode" page is currently on && if reference exist
     });
   }
 
@@ -315,7 +296,7 @@ function goToExercises() {
     let outputCanvas = document.getElementById("outputCanvas");
 
     //start of creating reference
-    if(parsedURL.mode === 'start' && refFrames === undefined)
+    if(parsedURL.mode === 'start' && refFrames.length === 0)
     {
       ref_index = 0;
       exe_index = 0;
@@ -514,7 +495,7 @@ function goToExercises() {
   }
 
   //function that draws the red Center Circle in ctx1 (canvasSKLT)
-  function drawCenterCircle(parameters, ctx){
+  function drawCenterCircle (parameters, ctx){
 
     //coordinate of the red circle
     let x = parameters.x;
@@ -648,9 +629,6 @@ function goToExercises() {
     {
       if (body.tracked)
       {
-        //increment the live counter
-        live_counter = live_counter + 1;
-
         //location of the neck
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
@@ -718,21 +696,17 @@ function goToExercises() {
           }
         }
       }
-      //live_counter = live_counter + 1;
     });
 
     //if the patient is in position and doing a practice session
+
     if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
 
       //draw in the reference canvas
         drawBody(refFrames[ref_index], ref_ctx,commonBlue,refJointColor, false);
         //display one frame of reference every 2 frames of live frame captured
         //we can manipulate the number to control the display speed
-        if (live_counter >= 3)
-        {
-          ref_index = (ref_index + 1) % refFrames.length;
-          live_counter = 0;
-        }
+        ref_index = (ref_index + 1) % refFrames.length;
     }
 
     //check if it is in the state of displaying reference, if reference exists
@@ -754,16 +728,9 @@ function goToExercises() {
       {
         drawBody(recentFrames[exe_index], exe_ctx,liveBodyColor,commonBlue ,false);
       }
-      //display one frame of reference every 2 frames of live frame captured
-      //we can manipulate the number to control the display speed
-      if (live_counter >= 3)
-      {
-        ref_index = (ref_index + 1) % refFrames.length;
-        if(recentFrames)
-        {
-          exe_index = (exe_index + 1) % recentFrames.length;
-        }
-        live_counter = 0;
+      ref_index = (ref_index + 1) % refFrames.length;
+      if(recentFrames) {
+        exe_index = (exe_index + 1) % recentFrames.length;
       }
     }
   };
