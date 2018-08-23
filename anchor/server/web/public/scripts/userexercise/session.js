@@ -217,16 +217,12 @@ $('.actionBtn').click(function() {
       liveFrames = [];
       localStorage.setItem('canStartRecording', false);
 
-      // because a 'create reference' will still load essentially empty reference data from the
-      // database, we should disregard such incomplete data and only access reference bodyframes when they
-      // actually exist, i.e. length !== 0.
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
           if(getref.result) {
             refFrames = getref.result.body;
             console.log("refFrames loaded locally");
-//            let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('refFrames');
           }
           showCanvas();
           console.log("show canvas called after getting referenceFrames");
@@ -236,7 +232,6 @@ $('.actionBtn').click(function() {
         getrecent.onsuccess = function(e) {
           if(getrecent.result) {
             recentFrames = getrecent.result.body;
-//            let deleterecent = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
           }
         }
       });
@@ -341,7 +336,7 @@ $('.actionBtn').click(function() {
   }
 
   //function that draws the body skeleton
-  function drawBody(parameters, ctx, drawCircle = true){
+  function drawBody(parameters, ctx, drawCircle = true) {
 
     let body = parameters;
     jointType.forEach(function(jointType){
@@ -368,7 +363,7 @@ $('.actionBtn').click(function() {
   }
 
   //function that draws each joint as a yellow round dot
-  function drawJoints(parameters, ctx){
+  function drawJoints(parameters, ctx) {
 
     let cx = parameters.cx;
     let cy = parameters.cy;
@@ -380,7 +375,7 @@ $('.actionBtn').click(function() {
   }
 
   // Draw the red Center Circle in ctx1 (canvasSKLT)
-  function drawCenterCircle(parameters, ctx){
+  function drawCenterCircle(parameters, ctx) {
 
     //coordinate of the red circle
     let x = parameters.x;
