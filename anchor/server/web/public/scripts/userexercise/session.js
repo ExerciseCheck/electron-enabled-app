@@ -260,7 +260,7 @@ function goToExercises() {
   // time for speed evaluation
   var st, ed;
 
-  if (true)
+  if (isElectron())
   {
     document.addEventListener('DOMContentLoaded', function() {
       processing = false;
@@ -609,38 +609,7 @@ function goToExercises() {
   //only start drawing with a body frame is detected
   //even though
 
-  $(document).ready(function(){
-    const parsedURL = parseURL(window.location.pathname);
-    //clear out the canvas so that the previous frame will not overlap
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
-    exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
-    //tag the canvas
-    ctx.font="30px MS";
-    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
-    ctx.textAlign = "center";
-    ctx.fillText("Live", canvas.width/2, canvas.height/20);
-    drawGrids(ctx);
-    drawFloorPlane(ctx);
-
-    ref_ctx.font="30px MS";
-    //ref_ctx.fillStyle = "red";
-    ref_ctx.fillStyle = "#428bca";
-    ref_ctx.textAlign = "center";
-    ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
-    drawGrids(ref_ctx);
-    drawFloorPlane(ref_ctx);
-
-    exe_ctx.font="30px MS";
-    //exe_ctx.fillStyle = "red";
-    exe_ctx.fillStyle = "#428bca";
-    exe_ctx.textAlign = "center";
-    exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
-    drawGrids(exe_ctx);
-    drawFloorPlane(exe_ctx);
-  });
-  // window.Bridge.aOnBodyFrame = (bodyFrame) =>
-  // {
+  // $(document).ready(function(){
   //   const parsedURL = parseURL(window.location.pathname);
   //   //clear out the canvas so that the previous frame will not overlap
   //   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -669,131 +638,162 @@ function goToExercises() {
   //   exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
   //   drawGrids(exe_ctx);
   //   drawFloorPlane(exe_ctx);
-  //
-  //   //draw each joint circles when a body is tracked
-  //   bodyFrame.bodies.forEach(function (body)
-  //   {
-  //     if (body.tracked)
-  //     {
-  //       //increment the live counter
-  //       live_counter = live_counter + 1;
-  //
-  //       //location of the neck
-  //       let neck_x = body.joints[2].depthX;
-  //       let neck_y = body.joints[2].depthY;
-  //
-  //       //draw the body skeleton in live canvas
-  //       drawBody(body,ctx);
-  //
-  //       document.addEventListener('timer-done', function(evt){
-  //         console.log("timer done", evt.detail);
-  //         nx_1stFrame = neck_x;
-  //         ny_1stFrame = neck_y;
-  //         neck_z = body.joints[2].cameraZ;
-  //
-  //         console.log("neck position in the first frame recorded");
-  //         st = new Date().getTime();
-  //         if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
-  //           localStorage.setItem("refStart", st);
-  //         }
-  //       });
-  //
-  //       // check in-position status whenever kinect captures a body
-  //       // if(!inPosition) {
-  //       //   if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
-  //       //     inPosition = true;
-  //       //     //TODO: if there is timer, may need to move this
-  //       //     //record the neck position for norm once inPosition
-  //       //     nx_1stFrame = neck_x;
-  //       //     ny_1stFrame = neck_y;
-  //       //     neck_z = body.joints[2].cameraZ;
-  //       //
-  //       //     console.log("neck position in the first frame recorded");
-  //       //     st = new Date().getTime();
-  //       //     if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
-  //       //       localStorage.setItem("refStart", st);
-  //       //     }
-  //       //   }
-  //       // }
-  //
-  //       if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
-  //       {
-  //         liveFrames.push(body);
-  //         if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
-  //           // countReps and timing
-  //           var tempCnt = countReps(body, threshold_flag,
-  //             dataForCntReps.rangeScale, dataForCntReps.topThresh, dataForCntReps.bottomThresh);
-  //
-  //           threshold_flag = tempCnt[1];
-  //           document.getElementById("cntReps").innerHTML =
-  //             parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
-  //
-  //           if (tempCnt[0] === 1) {
-  //             ed = new Date().getTime();
-  //             console.log("end time: ", ed);
-  //             var diff = Math.round((ed - st) / 1000);
-  //             var speedEval = "It takes " + diff + " s";
-  //             var repItem = {"speed": diff};
-  //             repEvals.push(repItem);
-  //             localStorage.setItem("repEvals", JSON.stringify((repEvals)));
-  //             console.log(repEvals);
-  //             console.log(JSON.parse(localStorage.getItem("repEvals")));
-  //             document.getElementById("speedEval").innerHTML = speedEval;
-  //             st = ed;
-  //             console.log("start time: ", st);
-  //           }
-  //         }
-  //       }
-  //     }
-  //     //live_counter = live_counter + 1;
-  //   });
-  //
-  //   //if the patient is in position and doing a practice session
-  //   if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
-  //
-  //     //draw in the reference canvas
-  //       drawBody(refFrames[ref_index], ref_ctx, false);
-  //       //display one frame of reference every 2 frames of live frame captured
-  //       //we can manipulate the number to control the display speed
-  //       if (live_counter >= 3)
-  //       {
-  //         ref_index = (ref_index + 1) % refFrames.length;
-  //         live_counter = 0;
-  //       }
-  //   }
-  //
-  //   //check if it is in the state of displaying reference, if reference exists
-  //   //1. end of creating reference and end of updating
-  //   //2. start of updating
-  //   //3. start of practice
-  //   //4. end of practice
-  //   //in theses cases, the in-position will not be checked
-  //   else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
-  //     ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
-  //     ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
-  //     ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
-  //   )
-  //   {
-  //     //draw in the reference canvas
-  //     drawBody(refFrames[ref_index], ref_ctx, false);
-  //     //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
-  //     if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
-  //     {
-  //       drawBody(recentFrames[exe_index], exe_ctx, false);
-  //     }
-  //     //display one frame of reference every 2 frames of live frame captured
-  //     //we can manipulate the number to control the display speed
-  //     if (live_counter >= 3)
-  //     {
-  //       ref_index = (ref_index + 1) % refFrames.length;
-  //       if(recentFrames)
-  //       {
-  //         exe_index = (exe_index + 1) % recentFrames.length;
-  //       }
-  //       live_counter = 0;
-  //     }
-  //   }
-  // };
+  // });
+  window.Bridge.aOnBodyFrame = (bodyFrame) =>
+  {
+    const parsedURL = parseURL(window.location.pathname);
+    //clear out the canvas so that the previous frame will not overlap
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
+    exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
+    //tag the canvas
+    ctx.font="30px MS";
+    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
+    ctx.textAlign = "center";
+    ctx.fillText("Live", canvas.width/2, canvas.height/20);
+    drawGrids(ctx);
+    drawFloorPlane(ctx);
+
+    ref_ctx.font="30px MS";
+    //ref_ctx.fillStyle = "red";
+    ref_ctx.fillStyle = "#428bca";
+    ref_ctx.textAlign = "center";
+    ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
+    drawGrids(ref_ctx);
+    drawFloorPlane(ref_ctx);
+
+    exe_ctx.font="30px MS";
+    //exe_ctx.fillStyle = "red";
+    exe_ctx.fillStyle = "#428bca";
+    exe_ctx.textAlign = "center";
+    exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
+    drawGrids(exe_ctx);
+    drawFloorPlane(exe_ctx);
+
+    //draw each joint circles when a body is tracked
+    bodyFrame.bodies.forEach(function (body)
+    {
+      if (body.tracked)
+      {
+        //increment the live counter
+        live_counter = live_counter + 1;
+
+        //location of the neck
+        let neck_x = body.joints[2].depthX;
+        let neck_y = body.joints[2].depthY;
+
+        //draw the body skeleton in live canvas
+        drawBody(body,ctx);
+
+        document.addEventListener('timer-done', function(evt){
+          console.log("timer done", evt.detail);
+          nx_1stFrame = neck_x;
+          ny_1stFrame = neck_y;
+          neck_z = body.joints[2].cameraZ;
+
+          console.log("neck position in the first frame recorded");
+          st = new Date().getTime();
+          if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
+            localStorage.setItem("refStart", st);
+          }
+        });
+
+        // check in-position status whenever kinect captures a body
+        // if(!inPosition) {
+        //   if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
+        //     inPosition = true;
+        //     //TODO: if there is timer, may need to move this
+        //     //record the neck position for norm once inPosition
+        //     nx_1stFrame = neck_x;
+        //     ny_1stFrame = neck_y;
+        //     neck_z = body.joints[2].cameraZ;
+        //
+        //     console.log("neck position in the first frame recorded");
+        //     st = new Date().getTime();
+        //     if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
+        //       localStorage.setItem("refStart", st);
+        //     }
+        //   }
+        // }
+
+        if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
+        {
+          liveFrames.push(body);
+          if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
+            // countReps and timing
+            var tempCnt = countReps(body, threshold_flag,
+              dataForCntReps.rangeScale, dataForCntReps.topThresh, dataForCntReps.bottomThresh);
+
+            threshold_flag = tempCnt[1];
+            document.getElementById("cntReps").innerHTML =
+              parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+
+            if (tempCnt[0] === 1) {
+              ed = new Date().getTime();
+              console.log("end time: ", ed);
+              var diff = Math.round((ed - st) / 1000);
+              var speedEval = "It takes " + diff + " s";
+              var repItem = {"speed": diff};
+              repEvals.push(repItem);
+              localStorage.setItem("repEvals", JSON.stringify((repEvals)));
+              console.log(repEvals);
+              console.log(JSON.parse(localStorage.getItem("repEvals")));
+              document.getElementById("speedEval").innerHTML = speedEval;
+              st = ed;
+              console.log("start time: ", st);
+            }
+          }
+        }
+      }
+      //live_counter = live_counter + 1;
+    });
+
+    //if the patient is in position and doing a practice session
+    if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
+
+      //draw in the reference canvas
+        drawBody(refFrames[ref_index], ref_ctx, false);
+        //display one frame of reference every 2 frames of live frame captured
+        //we can manipulate the number to control the display speed
+        if (live_counter >= 3)
+        {
+          ref_index = (ref_index + 1) % refFrames.length;
+          live_counter = 0;
+        }
+    }
+
+    //check if it is in the state of displaying reference, if reference exists
+    //1. end of creating reference and end of updating
+    //2. start of updating
+    //3. start of practice
+    //4. end of practice
+    //in theses cases, the in-position will not be checked
+    else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
+      ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
+      ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
+    )
+    {
+      //draw in the reference canvas
+      drawBody(refFrames[ref_index], ref_ctx, false);
+      //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
+      if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
+      {
+        drawBody(recentFrames[exe_index], exe_ctx, false);
+      }
+      //display one frame of reference every 2 frames of live frame captured
+      //we can manipulate the number to control the display speed
+      if (live_counter >= 3)
+      {
+        ref_index = (ref_index + 1) % refFrames.length;
+        if(recentFrames)
+        {
+          exe_index = (exe_index + 1) % recentFrames.length;
+        }
+        live_counter = 0;
+      }
+    }
+  };
 
   function isElectron() {
     return 'Bridge' in window;
