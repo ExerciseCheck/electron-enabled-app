@@ -210,7 +210,7 @@ function goToExercises() {
   let width = 0;
   let height = 0;
   let radius=9; //radius of joint circle
-  let circle_radius = 50//radius of calibration circle
+  let circle_radius = 30//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   let notAligned = true; // whether person has aligned in circle for the first time or not
   let useTimer = true; // whether or not to use the startTimer() function
@@ -474,15 +474,21 @@ function goToExercises() {
     if(drawCircle)
     {
       drawCenterCircle({
-        x: width / 2, y: 130, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
+        x: width / 2, y: 200, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
       },ctx);
     }
     //connect all the joints with the order defined in jointType
+
     ctx.beginPath();
     ctx.moveTo(body.joints[7].depthX * width, body.joints[7].depthY * height);
     jointType.forEach(function(jointType){
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
+//      ctx.shadowColor = "red";
+//      ctx.shadowOffsetX = 2;
+//      ctx.shadowOffsetY = 4;
+//      ctx.shadowBlur = 8;
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
+
     });
 
     ctx.lineWidth=8;
