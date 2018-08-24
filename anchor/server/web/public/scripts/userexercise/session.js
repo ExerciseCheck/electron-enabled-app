@@ -120,7 +120,6 @@ function saveReference() {
   values.neckX = refFrames[0].joints[2].depthX;
   values.neckY = refFrames[0].joints[2].depthY;
   var mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
-  console.log(mm);
   values.refMin = mm.min;
   values.refMax = mm.max;
   values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
