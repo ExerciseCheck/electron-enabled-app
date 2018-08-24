@@ -4,9 +4,13 @@
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames;
+let req, db;
 let dataForCntReps = {};
 //let refStart, refEnd; //not used
 let repEvals = [];
+let liveBodyColor="#7BE39F";
+let commonBlue = "#1E89FB"
+let refJointColor = "#FF6786"
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -55,48 +59,57 @@ function parseURL(url)
   };
 }
 
-function action(nextMode, type)
-{
-  const parsedURL = parseURL(window.location.pathname);
-  var patientId = parsedURL.patientId;
-  var exerciseId = parsedURL.exerciseId;
+function action(nextMode, type) {
+  openDB(function() {
+    const parsedURL = parseURL(window.location.pathname);
+    var patientId = parsedURL.patientId;
+    var exerciseId = parsedURL.exerciseId;
 
-  function redirect() {
-    var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
-    window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
-  }
-
-  //Because current functionality is set such that each step of session ("play", stop, review)
-  //opens on a new url, we must load reference bodyFrame data from database accordingly.
-  function loadReferenceandRedirect() {
-    let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-    (!parsedURL.patientId) ? url = url: url = url + patientId;
-    $.get(url, function(data){
-      localStorage.setItem("refFrames", JSON.stringify(data));
-      redirect();
-    });
-  }
-
-  //This condition describes the end of an update or create reference.
-  //The refFrames data in local storage gets set to the most recent/live frames.
-  if(nextMode === 'stop' && type === 'reference') {
-    var ref_ed = new Date().getTime();
-    localStorage.setItem("refEnd", ref_ed);
-
-    localStorage.setItem("refFrames", JSON.stringify(liveFrames));
-
-    redirect();
-  }
-  else {
-    if(nextMode === 'stop') {
-      localStorage.setItem('liveFrames', JSON.stringify(liveFrames));
+    function redirect() {
+      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
-    loadReferenceandRedirect();
-  }
-  if(nextMode === 'play' && type === 'practice') {
-    console.log("start practice");
 
-  }
+    //This condition describes the end of an update or create reference.
+    //The refFrames data in local storage gets set to the most recent frames.
+    if(nextMode === 'stop' && type === 'reference') {
+        var ref_ed = new Date().getTime();
+        localStorage.setItem("refEnd", ref_ed);
+        let updatedRef = {type: 'refFrames', body: liveFrames};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedRef);
+        request.onsuccess = function(event) {
+          redirect();
+        }
+    }
+
+    //"Discard Reference Recording"
+    else if(nextMode === 'start' && type === 'reference') {
+      //hacky delete
+      let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: []});
+      deleteref.onsuccess = function(e) {
+        redirect();
+      }
+    }
+
+    //End of doing a practice session. Live Frames get saved temporarily to indexedDB
+    else if(nextMode === 'stop' && type === 'practice') {
+      let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      request.onsuccess = function(e) {
+        redirect();
+      }
+    }
+    //"Discard Practice Recording"
+    else if(nextMode === 'start' && type === 'practice') {
+      let deleterecent = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
+      deleterecent.onsuccess = function(e) {
+        redirect();
+      }
+    }
+    else {
+      redirect();
+    }
+  });
 }
 
 // helper function for calculating the refMax, refMin
@@ -184,6 +197,7 @@ function savePractice() {
     success: function (result) {
 
       //popup the analysis result:
+      //TODO: change alert msg to Sabrina's window
       let url_analysis = '/api/userexercise/practiceanalysis/' + exerciseId + '/';
       if(patientId) {
         url_analysis = url_analysis + patientId;
@@ -195,25 +209,13 @@ function savePractice() {
       let msg = localStorage.getItem("feedback");
       alert(msg);
 
-      let url = '/api/userexercise/loadreference/' + exerciseId + '/';
-      if(patientId) {
-        url = url + patientId;
-      }
-      $.get(url, function(data){
-        localStorage.setItem("refFrames", JSON.stringify(data));
-
+      if(isComplete) {
+      	window.location = '/userexercise/session/end/practice/' +
+          exerciseId + '/' + patientId;
+      } else {
         window.location = '/userexercise/session/start/practice/' +
-          parsedURL.exerciseId + '/' + patientId;
-
-        if(isComplete) {
-          window.location = '/userexercise/session/end/practice/' +
-            exerciseId + '/' + patientId;
-        }
-        else {
-          window.location = '/userexercise/session/start/practice/' +
-            exerciseId + '/' + patientId;
-        }
-      });
+          exerciseId + '/' + patientId;
+      }
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -239,7 +241,7 @@ function goToExercises() {
   let width = 0;
   let height = 0;
   let radius=9; //radius of joint circle
-  let circle_radius = 50//radius of calibration circle
+  let circle_radius = 30//radius of calibration circle
   let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
   let notAligned = true; // whether person has aligned in circle for the first time or not
   let useTimer = true; // whether or not to use the startTimer() function
@@ -247,10 +249,6 @@ function goToExercises() {
   let ref_index = 0;
   // index of exercise frame
   let exe_index = 0;
-  // number of live frame captured from kinect
-  let live_counter = 0;
-
-  let inPosition = false; //not used
   let parsedURL = parseURL(window.location.pathname);
 
   // value for countReps
@@ -302,22 +300,28 @@ function goToExercises() {
       //get the canvas dimension
       width = canvas.width;
       height = canvas.height;
+      liveFrames = [];
       localStorage.setItem('canStartRecording', false);
 
-      // because a 'create reference' will still load essentially empty reference data from the
-      // database, we should disregard such incomplete data and only access reference bodyframes when they
-      // actually exist, i.e. length !== 0.
-      if(localStorage.getItem("refFrames") !== null && JSON.parse(localStorage.getItem("refFrames")).length !== 0){
-        //alert("No reference frames in localStorage");
-        refFrames = JSON.parse(localStorage.getItem('refFrames'));
-        localStorage.removeItem('refFrames');
-      }
-      liveFrames = [];
-      recentFrames = JSON.parse(localStorage.getItem('liveFrames'));
-      localStorage.removeItem('liveFrames');
+      openDB(function() {
+        let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
+        getref.onsuccess = function(e) {
+          if(getref.result) {
+            refFrames = getref.result.body; //CHECk WHAT refFRAMES IS on the start page of "recording new reference"
+            console.log("refFrames loaded locally");
+          }
+          showCanvas();
+          console.log("show canvas called after getting referenceFrames");
+        }
+
+        let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        getrecent.onsuccess = function(e) {
+          if(getrecent.result) {
+            recentFrames = getrecent.result.body;
+          }
+        }
+      });
       window.Bridge.eStartKinect();
-      showCanvas();
-      //checks what type of "mode" page is currently on && if reference exist
     });
   }
 
@@ -331,7 +335,7 @@ function goToExercises() {
     let outputCanvas = document.getElementById("outputCanvas");
 
     //start of creating reference
-    if(parsedURL.mode === 'start' && refFrames === undefined)
+    if(parsedURL.mode === 'start' && refFrames.length === 0)
     {
       ref_index = 0;
       exe_index = 0;
@@ -446,22 +450,25 @@ function goToExercises() {
     let bw = 500; // canvas.width
     let bh = 500; // canvas.height
     let p = -0.5; // padding
+    let count = 0;
+    ctx.beginPath();
     for (let x = 0; x <= bh; x += 100.3) {
-      ctx.moveTo(p, x + p);
-      ctx.lineTo(bw + p, x + p);
+        ctx.moveTo(p, x + p);
+        ctx.lineTo(bw + p, x + p);
     }
-    ctx.lineWidth=1;
-    ctx.strokeStyle = "black";
+    ctx.lineWidth=0.5;
+    ctx.strokeStyle = "#525B74";
     ctx.stroke();
+    ctx.closePath();
   }
 
   function drawFloorPlane(ctx) {
-    //ctx.strokeStyle = "black";
-    ctx.fillStyle = '#c0c0c0';
+    ctx.strokeStyle = "none";
+    ctx.fillStyle = '#F0F0F2';
     ctx.beginPath();
     ctx.moveTo(0, 500);
-    ctx.lineTo(100, 400);
-    ctx.lineTo(400, 400);
+    ctx.lineTo(100, 406);
+    ctx.lineTo(400, 406);
     ctx.lineTo(500, 500);
     ctx.fill();
 
@@ -490,46 +497,52 @@ function goToExercises() {
   }
 
   //function that draws the body skeleton
-  function drawBody(parameters, ctx, drawCircle = true){
+  function drawBody(parameters, ctx, color, jointColor, drawCircle = true){
 
     let body = parameters;
     jointType.forEach(function(jointType){
-      drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx);
+      drawJoints({cx: body.joints[jointType].depthX * width, cy: body.joints[jointType].depthY * height},ctx, jointColor);
     });
     if(drawCircle)
     {
       drawCenterCircle({
-        x: width / 2, y: 130, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
+        x: width / 2, y: 200, r: circle_radius, nx: body.joints[2].depthX * width, ny: body.joints[2].depthY * height
       },ctx);
     }
     //connect all the joints with the order defined in jointType
+
     ctx.beginPath();
     ctx.moveTo(body.joints[7].depthX * width, body.joints[7].depthY * height);
     jointType.forEach(function(jointType){
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
+//      ctx.shadowColor = "red";
+//      ctx.shadowOffsetX = 2;
+//      ctx.shadowOffsetY = 4;
+//      ctx.shadowBlur = 8;
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
+
     });
 
     ctx.lineWidth=8;
-    ctx.strokeStyle='blue';
+    ctx.strokeStyle=color;
     ctx.stroke();
     ctx.closePath();
   }
 
   //function that draws each joint as a yellow round dot
-  function drawJoints(parameters, ctx){
+  function drawJoints(parameters, ctx, color){
 
     let cx = parameters.cx;
     let cy = parameters.cy;
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI*2); //radius is a global variable defined at the beginning
     ctx.closePath();
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = color;
     ctx.fill();
   }
 
   //function that draws the red Center Circle in ctx1 (canvasSKLT)
-  function drawCenterCircle(parameters, ctx){
+  function drawCenterCircle (parameters, ctx){
 
     //coordinate of the red circle
     let x = parameters.x;
@@ -623,32 +636,36 @@ function goToExercises() {
 
   //only start drawing with a body frame is detected
   //even though
+
+
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
+
+
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ref_ctx.clearRect(0, 0, ref_canvas.width, ref_canvas.height);
     exe_ctx.clearRect(0, 0, exe_canvas.width, exe_canvas.height);
     //tag the canvas
-    ctx.font="30px MS";
-    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#3de562";
+    ctx.font="20px Arial";
+    (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#23D160";
     ctx.textAlign = "center";
-    ctx.fillText("Live", canvas.width/2, canvas.height/20);
+    ctx.fillText("Current Set", canvas.width/2, canvas.height/20);
     drawGrids(ctx);
     drawFloorPlane(ctx);
 
-    ref_ctx.font="30px MS";
+    ref_ctx.font="20px Arial";
     //ref_ctx.fillStyle = "red";
-    ref_ctx.fillStyle = "#428bca";
+    ref_ctx.fillStyle = "#1E89FB";
     ref_ctx.textAlign = "center";
     ref_ctx.fillText("Reference", canvas.width/2, canvas.height/20);
     drawGrids(ref_ctx);
     drawFloorPlane(ref_ctx);
 
-    exe_ctx.font="30px MS";
+    exe_ctx.font="20px Arial";
     //exe_ctx.fillStyle = "red";
-    exe_ctx.fillStyle = "#428bca";
+    exe_ctx.fillStyle = "#7BE39F";
     exe_ctx.textAlign = "center";
     exe_ctx.fillText("Exercise", canvas.width/2, canvas.height/20);
     drawGrids(exe_ctx);
@@ -659,15 +676,12 @@ function goToExercises() {
     {
       if (body.tracked)
       {
-        //increment the live counter
-        live_counter = live_counter + 1;
-
         //location of the neck
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
         //draw the body skeleton in live canvas
-        drawBody(body,ctx);
+        drawBody(body,ctx, liveBodyColor, commonBlue);
 
         document.addEventListener('timer-done', function(evt){
           console.log("timer done", evt.detail);
@@ -720,7 +734,7 @@ function goToExercises() {
               var diff = Math.round((ed - st) / 1000);
               var speedEval = "It takes " + diff + " s";
 
-              //TODO: online speed, not accurate, not to be stored
+              //TODO: online speed, not accurate
               var repItem = {"speed": diff};
               repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify((repEvals)));
@@ -734,21 +748,17 @@ function goToExercises() {
           }
         }
       }
-      //live_counter = live_counter + 1;
     });
 
     //if the patient is in position and doing a practice session
+
     if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
 
       //draw in the reference canvas
-        drawBody(refFrames[ref_index], ref_ctx, false);
+        drawBody(refFrames[ref_index], ref_ctx,commonBlue,refJointColor, false);
         //display one frame of reference every 2 frames of live frame captured
         //we can manipulate the number to control the display speed
-        if (live_counter >= 3)
-        {
-          ref_index = (ref_index + 1) % refFrames.length;
-          live_counter = 0;
-        }
+        ref_index = (ref_index + 1) % refFrames.length;
     }
 
     //check if it is in the state of displaying reference, if reference exists
@@ -758,28 +768,21 @@ function goToExercises() {
     //4. end of practice
     //in theses cases, the in-position will not be checked
     else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
-      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames !== undefined) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && (refFrames.length > 0)) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
     {
       //draw in the reference canvas
-      drawBody(refFrames[ref_index], ref_ctx, false);
+      drawBody(refFrames[ref_index], ref_ctx,commonBlue, refJointColor, false);
       //if in the end of practice state, we will also display the latest exercise, with the same frequency as the reference
       if((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
       {
-        drawBody(recentFrames[exe_index], exe_ctx, false);
+        drawBody(recentFrames[exe_index], exe_ctx,liveBodyColor,commonBlue ,false);
       }
-      //display one frame of reference every 2 frames of live frame captured
-      //we can manipulate the number to control the display speed
-      if (live_counter >= 3)
-      {
-        ref_index = (ref_index + 1) % refFrames.length;
-        if(recentFrames)
-        {
-          exe_index = (exe_index + 1) % recentFrames.length;
-        }
-        live_counter = 0;
+      ref_index = (ref_index + 1) % refFrames.length;
+      if(recentFrames) {
+        exe_index = (exe_index + 1) % recentFrames.length;
       }
     }
   };

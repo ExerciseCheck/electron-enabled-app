@@ -651,7 +651,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: PracticeExercise.practicePayload
       },
-      payload:{ maxBytes: 1048576 * 5 }
+      payload:{ maxBytes: 1048576 * 100 }
     },
     handler: function (request, reply) {
 
@@ -816,7 +816,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: ReferenceExercise.dataPayload
       },
-      payload:{ maxBytes: 1048576 * 5 }
+      payload:{ maxBytes: 1048576 * 100 }
     },
     handler: function (request, reply) {
 
@@ -880,7 +880,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: PracticeExercise.dataPayload
       },
-      payload:{ maxBytes: 1048576 * 5 }
+      payload:{ maxBytes: 1048576 * 100 }
     },
     handler: function (request, reply) {
 

@@ -1,5 +1,7 @@
 'use strict';
 
+let req, db;
+
 function getExerciseId() {
 
   return (window.location.pathname.split('/'))[3];
@@ -45,7 +47,7 @@ function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, red
     success: function (result) {
         successAlert('Setting successfully updated');
         if(redirectToUrl) {
-          window.location = redirectToUrl;
+          loadReferenceandStart('reference');
         }
     },
     error: function (result) {
@@ -140,7 +142,7 @@ function createRef() {
   $.get(url, function(data){
 
     if ( data.settingIsUpdated ) {
-      window.location = redirectToUrl;
+      loadReferenceandStart('reference');
     }
 
     else {
@@ -165,10 +167,14 @@ function updateReference() {
     getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
-    localStorage.setItem("refFrames", JSON.stringify(data));
-    //initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), redirectToUrl);
-    updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
-    window.location = redirectToUrl;
+    openDB(function() {
+      let refEntry = {type: 'refFrames', body: data};
+      let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+      let req = bodyFramesStore.put(refEntry);
+      req.onsuccess = function(e) {
+        initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), redirectToUrl);
+      };
+    });
   });
 }
 
@@ -190,8 +196,14 @@ function StartPracticeSession() {
 function loadReferenceandStart(type) {
   const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data){
-    localStorage.setItem("refFrames", JSON.stringify(data));
-    redirect(type);
+    openDB(function() {
+      let refEntry = {type: 'refFrames', body: data};
+      let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+      let req = bodyFramesStore.put(refEntry);
+      req.onsuccess = function(e) {
+        redirect(type);
+      };
+    });
   });
 }
 
