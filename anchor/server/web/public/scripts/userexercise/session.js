@@ -82,16 +82,31 @@ function action(nextMode, type) {
           redirect();
         }
     }
+
+    //"Discard Reference Recording"
     else if(nextMode === 'start' && type === 'reference') {
+      //hacky delete
       let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: []});
       deleteref.onsuccess = function(e) {
         redirect();
       }
     }
-    else {
-      if(nextMode === 'stop') {
-        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+
+    //End of doing a practice session. Live Frames get saved temporarily to indexedDB
+    else if(nextMode === 'stop' && type === 'practice') {
+      let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      request.onsuccess = function(e) {
+        redirect();
       }
+    }
+    //"Discard Practice Recording"
+    else if(nextMode === 'start' && type === 'practice') {
+      let deleterecent = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').delete('liveFrames');
+      deleterecent.onsuccess = function(e) {
+        redirect();
+      }
+    }
+    else {
       redirect();
     }
   });
@@ -274,7 +289,7 @@ function goToExercises() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
           if(getref.result) {
-            refFrames = getref.result.body;
+            refFrames = getref.result.body; //CHECk wHAT refFRAMES IS on the start page of "recording new reference"
             console.log("refFrames loaded locally");
           }
           showCanvas();
@@ -730,7 +745,7 @@ function goToExercises() {
     //4. end of practice
     //in theses cases, the in-position will not be checked
     else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
-      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && refFrames.length > 0) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && (refFrames.length > 0)) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
