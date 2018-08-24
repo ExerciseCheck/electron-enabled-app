@@ -3,7 +3,7 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames;
+let liveFrames, refFrames, recentFrames, liveFrames_compressed;
 let req, db;
 window.actionBtn = false;
 
@@ -67,7 +67,10 @@ function action(nextMode, type) {
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
-        let updatedRef = {type: 'refFrames', body: liveFrames};
+        console.log("liveFrames before compression=", (JSON.stringify(liveFrames).length*2) / 1048576, "MB");
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        console.log("liveFrames after compression=", (JSON.stringify(liveFrames_compressed).length*2) / 1048576, "MB")
+        let updatedRef = {type: 'refFrames', body: liveFrames_compressed};
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         let request = bodyFramesStore.put(updatedRef);
         request.onsuccess = function(event) {
@@ -76,7 +79,7 @@ function action(nextMode, type) {
     }
     else {
       if(nextMode === 'stop') {
-        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames_compressed});
       }
       redirect();
     }
@@ -90,7 +93,9 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
+  console.log("refFrames size=", Object.keys(refFrames).length, (refFrames.length * JSON.stringify(refFrames[0]).length*2) / 1048576, "MB" );
   values.bodyFrames = JSON.stringify(refFrames);
+  // values.bodyFrames = refFrames;
   values.neckX = 2;
   values.neckY = 2;
   values.refMin = 2;
@@ -219,9 +224,15 @@ $('.actionBtn').click(function() {
 
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
+        console.log("getref=", getref);
         getref.onsuccess = function(e) {
-          if(getref.result) {
-            refFrames = getref.result.body;
+          if(getref.result.body) {
+            // refFrames = getref.result.body;
+            try {
+              refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
+            } catch (err) {
+              console.log(err);
+            }
             console.log("refFrames loaded locally");
           }
           showCanvas();
@@ -229,9 +240,16 @@ $('.actionBtn').click(function() {
         }
 
         let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        console.log("getrecent=", getrecent);
         getrecent.onsuccess = function(e) {
-          if(getrecent.result) {
-            recentFrames = getrecent.result.body;
+          if(getrecent.result.body) {
+            // recentFrames = getrecent.result.body;
+            try {
+              recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));
+            } catch (err) {
+              console.log(err);
+            }
+
           }
         }
       });
