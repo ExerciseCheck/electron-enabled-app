@@ -13,6 +13,9 @@ function getPatientId() {
 
 //for smoothing test
 function plotData() {
+
+  window.location = '/userexercise/smoothing/' + getExerciseId() + '/' + getPatientId();
+
   let smoothingResult = {};
 
   $.get('/api/userexercise/smoothingtest/' + getExerciseId() + '/' + getPatientId(), function(data){

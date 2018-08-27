@@ -12,13 +12,14 @@ function getPatientId() {
   return (window.location.pathname.split('/'))[4];
 }
 
-Date.prototype.getWeekNumber = function(){
-  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-  var dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
-};
+// not needed? since already declared in the helperMethod.js
+// Date.prototype.getWeekNumber = function(){
+//   var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+//   var dayNum = d.getUTCDay() || 7;
+//   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+//   var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+//   return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+// };
 
 function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, redirectToUrl) {
 
@@ -32,13 +33,6 @@ function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, red
   values.rangeScale = rangeScale;
   values.topThresh = 0.25; // default values
   values.bottomThresh = 0.75; // defalut values
-  // values.neckX = -1,
-  // values.neckY = -1,
-  // values.refMin = -1,
-  // values.refMax = -1,
-  // values.refLowerJoint = -1,
-  // values.refUpperJoint = -1,
-  // values.refTime = -1,
 
   $.ajax({
     type: 'POST',
@@ -109,7 +103,7 @@ function changeSetting() {
   //const rangeScale = $("rangeScale").val();
   const rangeScale = 0.7; //TODO: comment this out
 
-  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
+  //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
   $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
@@ -129,8 +123,8 @@ function update() {
   const numReps = $("#numReps").val();
   //const rangeScale = $("rangeScale").val();
   const rangeScale = 0.7; //TODO: comment this out
-  const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
-  updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), url); //TODO: no url??
+  //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
+  updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
 }
 
 function createRef() {
@@ -211,57 +205,3 @@ function redirect(type) {
   window.location = '/userexercise/session/start/' + type + '/' +
     getExerciseId() + '/' + getPatientId();
 }
-
-
-
-// //for smoothing test
-// function plotData() {
-//   let smoothingResult = {};
-//
-//   $.get('/api/userexercise/smoothingtest/' + getExerciseId() + '/' + getPatientId(), function(data){
-//     smoothingResult = data;
-//     localStorage.setItem("smoothingResult", JSON.stringify(data));
-//   });
-//
-//   //TODO: WHY???
-//   console.log("smoothing result: " + smoothingResult); //returns [object object]
-//   console.log("result_str: " + JSON.stringify(smoothingResult)); //returns {}
-//   console.log("smoothed: " + smoothingResult.t); //returns undefined
-//   console.log("smoothed_str: " + JSON.stringify(smoothingResult.t)); //returns undefined
-//
-//   let smoothingLocalStg = JSON.parse(localStorage.getItem("smoothingResult"));
-//   //console.log("result from localStorage: " + smoothingLocalStg.smoothed);
-//
-//   var trace0 = {
-//     x: smoothingLocalStg.t,
-//     y: smoothingLocalStg.raw,
-//     type: 'scatter'
-//   };
-//   var trace1 = {
-//     x: smoothingLocalStg.t,
-//     y: smoothingLocalStg.smoothedAvg,
-//     type: 'scatter'
-//   };
-//   var trace2 = {
-//     x: smoothingLocalStg.t,
-//     y: smoothingLocalStg.smoothedTri,
-//     type: 'scatter'
-//   };
-//   var trace3 = {
-//     x: smoothingLocalStg.t,
-//     y: smoothingLocalStg.smoothedGauss,
-//     type: 'scatter'
-//   };
-//
-//   console.log(trace0.t);
-//   var data = [trace0, trace1, trace2, trace3];
-//
-//   var layout = {
-//     yaxis: {rangemode: 'tozero',
-//       showline: true,
-//       zeroline: true}
-//   };
-//
-//   Plotly.newPlot('plot', data, layout);
-//
-// }

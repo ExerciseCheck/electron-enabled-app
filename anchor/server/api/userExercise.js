@@ -3,7 +3,7 @@ const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
 const DTW = require('dtw');
-
+const helperMethods = require('../helpermethods');
 
 const internals = {};
 
@@ -894,6 +894,7 @@ internals.applyRoutes = function (server, next) {
         patientId = request.auth.credentials.user._id.toString();
       }
 
+      let requestPayload = request.payload;
       Async.auto({
 
         findMostRecentReference: function (done) {
@@ -922,17 +923,8 @@ internals.applyRoutes = function (server, next) {
           };
           PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
         }],
-        findPracticeandUpdate: ['findPracticeExercise', function(results, done) {
-
-          const query = {
-            userId: patientId,
-            exerciseId: request.params.exerciseId,
-            referenceId: results.findMostRecentReference[0]._id.toString()
-          };
-
-          let requestPayload = request.payload;
+        analyzePractice: ['findPracticeExercise', function(results, done) {
           //TODO: currently only one joint is used for the accuracy
-          //analysis
           let theJoint = results.findExercise.joint;
           let theAxis = results.findExercise.axis;
           let theDirection = results.findExercise.direction;
@@ -960,146 +952,96 @@ internals.applyRoutes = function (server, next) {
             ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"]);
           }
 
-          //smoothing functions here
-          //use Gaussian
-          function add(a,b) {
-            return a+b;
-          }
-
-          function smoothAvg (list, degree) {
-            let i;
-            let smoothed = [];
-            let len = list.length - degree + 1;
-            for (i=0; i<len; i++){
-              let avg = list.slice(i, i+degree).reduce(add,0) / degree;
-              //console.log("avg: " + avg);
-              smoothed.push(avg);
-            }
-            return smoothed;
-          }
-
-          function smoothTri (list, degree){
-            let i, j, sum;
-            let weight=[];
-            let window=degree*2-1;
-            for (i=1;i<window+1;i++){
-              weight.push(degree-Math.abs(degree-i))
-            }
-            let smoothed=[];
-            let len = list.length-window;
-            for (i=0;i<len;i++){
-              sum=0;
-              for(j=0;j<window;j++)
-                sum+=list[i+j]*weight[j];
-              smoothed[i]=sum/weight.reduce(add, 0);
-            }
-            return smoothed;
-          }
-
-          function smoothGauss(list,degree){
-            let i, j, sum;
-            let weight=[];
-            let window=degree*2-1;
-            for (i=0;i<window;i++){
-              weight.push(1/(Math.exp((4*(i-degree+1)/window)**2)));
-            }
-            let smoothed=[];
-            let len = list.length-window;
-            for (i=0;i<len;i++){
-              sum=0;
-              for(j=0;j<window;j++)
-                sum+=list[i+j]*weight[j];
-              smoothed[i]=sum/weight.reduce(add,0);
-            }
-            return smoothed;
-          }
 
           let prac_impt_joint_X_smoothed = smoothGauss(prac_impt_joint_X, 5);
           let prac_impt_joint_Y_smoothed = smoothGauss(prac_impt_joint_Y, 5);
           let prac_impt_joint_Z_smoothed = smoothGauss(prac_impt_joint_Z, 5);
+          let std_impt_joint = []; // for establishing the max cost in dtw
           for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
             prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
+            std_impt_joint.push(prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]);
           }
+
           let ref_impt_joint_X_smoothed = smoothGauss(ref_impt_joint_X, 5);
           let ref_impt_joint_Y_smoothed = smoothGauss(ref_impt_joint_Y, 5);
           let ref_impt_joint_Z_smoothed = smoothGauss(ref_impt_joint_Z, 5);
-          let std_impt_joint = []; // for establishing the max cost in dtw
           for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
-            std_impt_joint.push(ref_impt_joint_X_smoothed[0], ref_impt_joint_Y_smoothed[0], ref_impt_joint_Z_smoothed[0]);
           }
-
 
           //do we need to consider exercise moving in the Z?
           if (theAxis === "depthX") {
-            prac_impt_joint = prac_impt_joint_X;
-            ref_impt_joint = ref_impt_joint_X;
+            prac_impt_joint = prac_impt_joint_X_smoothed;
+            ref_impt_joint = ref_impt_joint_X_smoothed;
           } else if (theAxis === "depthY") {
-            prac_impt_joint = prac_impt_joint_Y;
-            ref_impt_joint = ref_impt_joint_Y;
+            prac_impt_joint = prac_impt_joint_Y_smoothed;
+            ref_impt_joint = ref_impt_joint_Y_smoothed;
           }
 
-          //offline speed analysis, could also be used for segmentation
-          let time_thresh = 30; // 1 sec
-          let ifIncreased; // direction flag
-          if(theDirection === 'L2R' || theDirection === 'down') {
-            ifIncreased = true;
-          } else if (theDirection === 'R2L' || theDirection === 'up') {
-            ifIncreased = false;
-          } else {
-            console.log("You should not see this")
-          }
-          console.log("ifIncreased: " + ifIncreased);
+          // //offline speed analysis, could also be used for segmentation
+          // let time_thresh = 30; // 1 sec
+          // let ifIncreased; // direction flag
+          // if(theDirection === 'L2R' || theDirection === 'down') {
+          //   ifIncreased = true;
+          // } else if (theDirection === 'R2L' || theDirection === 'up') {
+          //   ifIncreased = false;
+          // } else {
+          //   console.log("You should not see this")
+          // }
+          // console.log("ifIncreased: " + ifIncreased);
+          //
+          // let prac_idx=[];
+          // for (let i=0; i<prac_impt_joint.length - 1; i++) {
+          //   let v = prac_impt_joint[i+1] - prac_impt_joint[i];
+          //   if(v >= 0) {
+          //     if (ifIncreased) {
+          //       prac_idx.push([i, true]); // true means moving in the same direction as the exercise
+          //       // prac_idx.push([i, (v>=0) === ifIncreased]);
+          //     } else {
+          //       prac_idx.push([i, false]);
+          //     }
+          //   } else {
+          //     if (ifIncreased) {
+          //       prac_idx.push([i, false]);
+          //     } else {
+          //       prac_idx.push([i, true]);
+          //     }
+          //   }
+          // }
+          // console.log(prac_idx);
+          //
+          // let prac_st=[];
+          // let prac_ed=[];
+          // let timing = [];
+          // let ifFirst = true;
+          // for (let ii=0; ii<prac_idx.length-1; ii++) {
+          //   if(prac_idx[ii][1] && ifFirst) {
+          //     prac_st.push(prac_idx[ii][0]);
+          //     ifFirst = false;
+          //   } else if (prac_idx[ii][1] === false && prac_idx[ii+1][1]) {
+          //     prac_ed.push(prac_idx[ii][0]);
+          //     ifFirst = true;
+          //   }
+          // }
+          // if (prac_idx[prac_idx.length-1][1] === false) {
+          //   prac_ed.push(prac_idx[prac_idx.length-1][0]);
+          // }
+          // console.log(prac_st);
+          // console.log(prac_ed);
+          //
+          // for (let j=0; j<prac_st.length; j++) {
+          //   let delta = prac_ed[j] - prac_st[j];
+          //   if(delta >= time_thresh) {
+          //     timing.push(delta);
+          //   }
+          // }
+          // console.log("timing array:" + timing); //TODO: output is empty, sth wrong
+          let prac_timing = getSegmentation(prac_impt_joint, theDirection, 30);
+          let ref_timing = getSegmentation(ref_impt_joint, theDirection, 30);
+          console.log("prac timing: " + prac_timing);
+          console.log("ref timing: " + ref_timing);
 
-          let prac_idx=[];
-          for (let i=0; i<prac_impt_joint.length - 1; i++) {
-            let v = prac_impt_joint[i+1] - prac_impt_joint[i];
-            if(v >= 0) {
-              if (ifIncreased) {
-                prac_idx.push([i, true]); // true means moving in the same direction as the exercise
-                // prac_idx.push([i, (v>=0) === ifIncreased]);
-              } else {
-                prac_idx.push([i, false]);
-              }
-            } else {
-              if (ifIncreased) {
-                prac_idx.push([i, false]);
-              } else {
-                prac_idx.push([i, true]);
-              }
-            }
-          }
-          console.log(prac_idx);
-
-          let prac_st=[];
-          let prac_ed=[];
-          let timing = [];
-          let ifFirst = true;
-          for (let ii=0; ii<prac_idx.length-1; ii++) {
-            if(prac_idx[ii][1] && ifFirst) {
-              prac_st.push(prac_idx[ii][0]);
-              ifFirst = false;
-            } else if (prac_idx[ii][1] === false && prac_idx[ii+1][1]) {
-              prac_ed.push(prac_idx[ii][0]);
-              ifFirst = true;
-            }
-          }
-          if (prac_idx[prac_idx.length-1][1] === false) {
-            prac_ed.push(prac_idx[prac_idx.length-1][0]);
-          }
-          console.log(prac_st);
-          console.log(prac_ed);
-
-          for (let j=0; j<prac_st.length; j++) {
-            let delta = prac_ed[j] - prac_st[j];
-            if(delta >= time_thresh) {
-              timing.push(delta);
-            }
-          }
-          console.log("timing array:" + timing); //TODO: output is empty, sth wrong
-
-          //TODO:same thing for reference exercise
-          //TODO:but for now, we compare total time for speed analysis
+          //TODO: Or we compare total time for speed analysis
           // let prac_ttl;
           // let n = requestPayload.repEvals.length; //number of reps
           // for (let i=0; i<n; i++){
@@ -1133,12 +1075,21 @@ internals.applyRoutes = function (server, next) {
 
           // TODO:
           let analysis = {"accuracy": acc, "speed": 123 };
+          done();
+        }],
+        findPracticeandUpdate: ['analyzePractice', function(results, done) {
+          console.log("results.analyzePractice = " + results.analyzePractice);
+          const query = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+            referenceId: results.findMostRecentReference[0]._id.toString()
+          };
 
           let update = {
             $addToSet: {
               sets: {date: new Date(),
                 onlineSpeed: requestPayload.repEvals,
-                analysis: analysis,
+                analysis: results.analyzePractice,
                 bodyFrames: requestPayload.bodyFrames}
             },
             $inc: {
@@ -1155,7 +1106,7 @@ internals.applyRoutes = function (server, next) {
               $addToSet: {
                 sets: {date: new Date(),
                   onlineSpeed: requestPayload.repEvals,
-                  analysis: analysis,
+                  analysis: results.analyzePractice,
                   bodyFrames: requestPayload.bodyFrames}
               },
               $inc: {
@@ -1299,7 +1250,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  // TODO: for smoothing test
+  // for smoothing test
   server.route({
     method: 'GET',
     path: '/userexercise/smoothingtest/{exerciseId}/{patientId?}',
@@ -1358,74 +1309,6 @@ internals.applyRoutes = function (server, next) {
             ref_impt_joint_Z.push(reference.bodyFrames[i].joints[theJoint]["cameraZ"]);
           }
           //console.log(ref_impt_joint_Y);
-
-          //helper function: st (incl), ed (excl) are numbers
-          function getRange(st, ed) {
-            let retLs = [];
-            for (let i=st; i<ed; i++) {
-              retLs.push(i);
-            }
-            return retLs;
-          }
-
-          function add(a,b) {
-            return a+b;
-          }
-
-          function smoothAvg (list, degree) {
-            let smoothed = [];
-            let len = list.length - degree + 1;
-            for (let i=0; i<len; i++){
-              let avg = list.slice(i, i+degree).reduce(add,0) / degree;
-              //console.log("avg: " + avg);
-              smoothed.push(avg);
-            }
-            return smoothed;
-          }
-
-          function smoothTri (list, degree){
-            let i;
-            let j;
-            let sum;
-            let weight=[];
-            let window=degree*2-1;
-            for (i=1;i<window+1;i++){
-              weight.push(degree-Math.abs(degree-i))
-            }
-            let smoothed=[];
-            for (i=0;i<list.length-window;i++){
-              smoothed.push(0);
-            }
-            for (i=0;i<smoothed.length;i++){
-              sum=0;
-              for(j=0;j<window;j++)
-                sum+=list[i+j]*weight[j];
-              smoothed[i]=sum/weight.reduce(add, 0);
-            }
-            return smoothed;
-          }
-
-          function smoothGauss(list,degree){
-            let i;
-            let j;
-            let sum;
-            let weight=[];
-            let window=degree*2-1;
-            for (i=0;i<window;i++){
-              weight.push(1/(Math.exp((4*(i-degree+1)/window)**2)));
-            }
-            let smoothed=[];
-            for (i=0;i<list.length-window;i++){
-              smoothed.push(0);
-            }
-            for (i=0;i<smoothed.length;i++){
-              sum=0;
-              for(j=0;j<window;j++)
-                sum+=list[i+j]*weight[j];
-              smoothed[i]=sum/weight.reduce(add,0);
-            }
-            return smoothed;
-          }
 
           let t = getRange(0, ref_impt_joint_Y.length);
           console.log("t: " + t);
