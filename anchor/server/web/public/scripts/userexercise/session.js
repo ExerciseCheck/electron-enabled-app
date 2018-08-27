@@ -3,7 +3,7 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames, liveFrames_compressed;
+let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
 let req, db;
 window.actionBtn = false;
 
@@ -69,7 +69,8 @@ function action(nextMode, type) {
     if(nextMode === 'stop' && type === 'reference') {
         console.log("liveFrames before compression=", (JSON.stringify(liveFrames).length*2) / 1048576, "MB");
         liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
-        console.log("liveFrames after compression=", (JSON.stringify(liveFrames_compressed).length*2) / 1048576, "MB")
+        console.log("liveFrames after compression=", (JSON.stringify(liveFrames_compressed).length*2) / 1048576, "MB");
+
         let updatedRef = {type: 'refFrames', body: liveFrames_compressed};
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         let request = bodyFramesStore.put(updatedRef);
@@ -79,7 +80,10 @@ function action(nextMode, type) {
     }
     else {
       if(nextMode === 'stop') {
-        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames_compressed});
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        let updatedLiveFrames = {type: 'liveFrames', body: liveFrames_compressed};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedLiveFrames);
       }
       redirect();
     }
@@ -93,9 +97,8 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
-  console.log("refFrames size=", Object.keys(refFrames).length, (refFrames.length * JSON.stringify(refFrames[0]).length*2) / 1048576, "MB" );
-  values.bodyFrames = JSON.stringify(refFrames);
-  // values.bodyFrames = refFrames;
+  // console.log("refFrames size=", Object.keys(refFrames).length, (refFrames.length * JSON.stringify(refFrames[0]).length*2) / 1048576, "MB" );
+  values.bodyFrames = refFrames_compressed;
   values.neckX = 2;
   values.neckY = 2;
   values.refMin = 2;
@@ -123,7 +126,8 @@ function savePractice() {
   let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
-  values.bodyFrames = JSON.stringify(recentFrames);
+  // console.log("recentFrames size=", Object.keys(recentFrames).length, (recentFrames.length * JSON.stringify(recentFrames[0]).length*2) / 1048576, "MB" );
+  values.bodyFrames = recentFrames_compressed;
 
   if (patientId) {
     url = url + patientId;
@@ -227,8 +231,9 @@ $('.actionBtn').click(function() {
         console.log("getref=", getref);
         getref.onsuccess = function(e) {
           if(getref.result.body) {
-            // refFrames = getref.result.body;
             try {
+              // console.log("typeof getref.result.body=", typeof getref.result.body)
+              refFrames_compressed = getref.result.body;
               refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
             } catch (err) {
               console.log(err);
@@ -243,9 +248,11 @@ $('.actionBtn').click(function() {
         console.log("getrecent=", getrecent);
         getrecent.onsuccess = function(e) {
           if(getrecent.result.body) {
-            // recentFrames = getrecent.result.body;
             try {
+              recentFrames_compressed = getrecent.result.body;
               recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));
+              console.log("recentFrames_compressed=", typeof recentFrames_compressed);
+              console.log("recentFrames=", typeof recentFrames);
             } catch (err) {
               console.log(err);
             }
@@ -469,6 +476,7 @@ $('.actionBtn').click(function() {
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
           liveFrames.push(body);
+          console.log("liveFrame counter=", liveFrames.length);
         }
       }
       live_counter = live_counter + 1;
