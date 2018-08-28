@@ -3,7 +3,8 @@ const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
 const DTW = require('dtw');
-const helperMethods = require('../helpermethods');
+const Smoothing = require('../web/helpers/smoothingMethod');
+const Segs = require('../web/helpers/segmentation');
 
 const internals = {};
 
@@ -953,18 +954,18 @@ internals.applyRoutes = function (server, next) {
           }
 
 
-          let prac_impt_joint_X_smoothed = smoothGauss(prac_impt_joint_X, 5);
-          let prac_impt_joint_Y_smoothed = smoothGauss(prac_impt_joint_Y, 5);
-          let prac_impt_joint_Z_smoothed = smoothGauss(prac_impt_joint_Z, 5);
+          let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
+          let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
+          let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
           let std_impt_joint = []; // for establishing the max cost in dtw
           for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
             prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
             std_impt_joint.push(prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]);
           }
 
-          let ref_impt_joint_X_smoothed = smoothGauss(ref_impt_joint_X, 5);
-          let ref_impt_joint_Y_smoothed = smoothGauss(ref_impt_joint_Y, 5);
-          let ref_impt_joint_Z_smoothed = smoothGauss(ref_impt_joint_Z, 5);
+          let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
+          let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
+          let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
           for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
           }
@@ -1036,8 +1037,8 @@ internals.applyRoutes = function (server, next) {
           //   }
           // }
           // console.log("timing array:" + timing); //TODO: output is empty, sth wrong
-          let prac_timing = getSegmentation(prac_impt_joint, theDirection, 30);
-          let ref_timing = getSegmentation(ref_impt_joint, theDirection, 30);
+          let prac_timing = Segs(prac_impt_joint, theDirection, 30);
+          let ref_timing = Segs(ref_impt_joint, theDirection, 30);
           console.log("prac timing: " + prac_timing);
           console.log("ref timing: " + ref_timing);
 
@@ -1246,97 +1247,6 @@ internals.applyRoutes = function (server, next) {
         }
 
         reply({ message: 'Success.' });
-      });
-    }
-  });
-
-  // for smoothing test
-  server.route({
-    method: 'GET',
-    path: '/userexercise/smoothingtest/{exerciseId}/{patientId?}',
-    config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session'],
-      }
-    },
-    handler: function (request, reply) {
-
-      let smoothingResult = {};
-      let patientId = '';
-      //logged in user is a clinician
-      if (request.params.patientId) {
-        patientId = request.params.patientId;
-      }
-      //Logged in user is a patient
-      else {
-        patientId = request.auth.credentials.user._id.toString();
-      }
-      Async.auto({
-
-        //first we need to find the referenceId of the exercise
-        //finding one document matching the query is enough
-        findMostRecentReference: function (done) {
-
-          const filter = {
-            userId: patientId,
-            exerciseId: request.params.exerciseId,
-          };
-
-          const pipeLine = [
-            { '$match': filter },
-            { '$sort': { createdAt: -1 } },
-            { '$limit': 1 }
-          ];
-          ReferenceExercise.aggregate(pipeLine, done);
-        },
-        findExercise:['findMostRecentReference', function (results, done) {
-
-          Exercise.findById(request.params.exerciseId, done);
-        }],
-        smoothingTest: ['findExercise', function(results, done) {
-          let reference = results.findMostRecentReference[0];
-          let exercise = results.findExercise;
-
-          let theJoint = exercise.joint;
-
-          let ref_impt_joint_X = [];
-          let ref_impt_joint_Y = [];
-          let ref_impt_joint_Z = [];
-
-          for (let i=0; i< reference.bodyFrames.length; ++i) {
-            ref_impt_joint_X.push(reference.bodyFrames[i].joints[theJoint]["depthX"]);
-            ref_impt_joint_Y.push(reference.bodyFrames[i].joints[theJoint]["depthY"]);
-            ref_impt_joint_Z.push(reference.bodyFrames[i].joints[theJoint]["cameraZ"]);
-          }
-          //console.log(ref_impt_joint_Y);
-
-          let t = getRange(0, ref_impt_joint_Y.length);
-          console.log("t: " + t);
-          console.log("raw: " + ref_impt_joint_Y);
-
-          let ref_Y_smoothedAvg = smoothAvg(ref_impt_joint_Y, 10);
-          let ref_Y_smoothedTri = smoothTri(ref_impt_joint_Y, 5);
-          let ref_Y_smoothedGauss = smoothGauss(ref_impt_joint_Y, 5);
-
-          smoothingResult['t'] = t;
-          smoothingResult['raw'] = ref_impt_joint_Y;
-          smoothingResult['smoothedAvg'] = ref_Y_smoothedAvg;
-          smoothingResult['smoothedTri'] = ref_Y_smoothedTri;
-          smoothingResult['smoothedGauss'] = ref_Y_smoothedGauss;
-
-          //console.log("smoothed: " + smoothingResult.smoothedAvg);
-          done();
-        }]
-      }, (err, results) => {
-
-        if (err) {
-          return reply(err);
-        }
-        if (!results.findMostRecentReference) {
-        return reply(Boom.notFound('Document not found.'));
-        }
-        return reply(smoothingResult);
-
       });
     }
   });
