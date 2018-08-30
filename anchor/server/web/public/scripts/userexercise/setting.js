@@ -23,8 +23,6 @@ function getPatientId() {
 
 function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, redirectToUrl) {
 
-  rangeScale = 0.7 // comment this out
-
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
@@ -71,7 +69,6 @@ function initializePractice() {
 
 function updateSetting(numSets, numReps, rangeScale, exerciseId, patientId) {
 
-  rangeScale = 0.7 // comment this out
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
@@ -100,8 +97,7 @@ function changeSetting() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  //const rangeScale = $("rangeScale").val();
-  const rangeScale = 0.7; //TODO: comment this out
+  const rangeScale = $("#rangeScale").val();
 
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
@@ -121,8 +117,8 @@ function update() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  //const rangeScale = $("rangeScale").val();
-  const rangeScale = 0.7; //TODO: comment this out
+  const rangeScale = $("#rangeScale").val();
+
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
   updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
 }
@@ -140,7 +136,7 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, 0.7, getExerciseId(), getPatientId(), redirectToUrl);
+      initialSetting(1, 1, 0.5, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
 }
@@ -153,8 +149,7 @@ function viewReferences() {
 function updateReference() {
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  //const rangeScale = $("rangeScale").val();
-  const rangeScale = 0.7; //TODO: comment this out
+  const rangeScale = $("#rangeScale").val();
 
   const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +

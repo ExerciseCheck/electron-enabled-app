@@ -936,10 +936,10 @@ internals.applyRoutes = function (server, next) {
           let prac_impt_joint_Z = [];
           let prac_impt_joint; // the chosen axis
           let prac_impt_joint_XYZ = [];
-          for (let i=0; i<requestPayload.bodyFrames.length; ++i) {
-            prac_impt_joint_X.push(requestPayload.bodyFrames[i].joints[theJoint]["depthX"]);
-            prac_impt_joint_Y.push(requestPayload.bodyFrames[i].joints[theJoint]["depthY"]);
-            prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"]);
+          for (var i=0; i<requestPayload.bodyFrames.length; ++i) {
+            prac_impt_joint_X.push(requestPayload.bodyFrames[i].joints[theJoint]["depthX"] - requestPayload.bodyFrames[0].joints[2]["depthX"]);
+            prac_impt_joint_Y.push(requestPayload.bodyFrames[i].joints[theJoint]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"]);
+            prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"] - requestPayload.bodyFrames[0].joints[2]["cameraZ"]);
           }
 
           let ref_impt_joint_X = [];
@@ -947,30 +947,29 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint_Z = [];
           let ref_impt_joint;
           let ref_impt_joint_XYZ = [];
-          for (let i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
-            ref_impt_joint_X.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"]);
-            ref_impt_joint_Y.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"]);
-            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"]);
+          for (var i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
+            ref_impt_joint_X.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX);
+            ref_impt_joint_Y.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY);
+            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
+              results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
           }
-
 
           let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
           let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
           let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
-          let std_impt_joint = []; // for establishing the max cost in dtw
-          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
+          let std_impt_joint_XYZ = []; // for establishing the max cost in dtw
+          for (var i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
             prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
-            std_impt_joint.push(prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]);
+            std_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]]);
           }
 
           let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
           let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
           let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
-          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
+          for (var i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
           }
 
-          //do we need to consider exercise moving in the Z?
           if (theAxis === "depthX") {
             prac_impt_joint = prac_impt_joint_X_smoothed;
             ref_impt_joint = ref_impt_joint_X_smoothed;
@@ -978,84 +977,37 @@ internals.applyRoutes = function (server, next) {
             prac_impt_joint = prac_impt_joint_Y_smoothed;
             ref_impt_joint = ref_impt_joint_Y_smoothed;
           }
+          // assuming each repetition if any exercise takes >= 1 sec
+          let prac_timing = Segs(prac_impt_joint, theDirection, 20);
+          let ref_timing = Segs(ref_impt_joint, theDirection, 20);
 
-          // //offline speed analysis, could also be used for segmentation
-          // let time_thresh = 30; // 1 sec
-          // let ifIncreased; // direction flag
-          // if(theDirection === 'L2R' || theDirection === 'down') {
-          //   ifIncreased = true;
-          // } else if (theDirection === 'R2L' || theDirection === 'up') {
-          //   ifIncreased = false;
-          // } else {
-          //   console.log("You should not see this")
-          // }
-          // console.log("ifIncreased: " + ifIncreased);
-          //
-          // let prac_idx=[];
-          // for (let i=0; i<prac_impt_joint.length - 1; i++) {
-          //   let v = prac_impt_joint[i+1] - prac_impt_joint[i];
-          //   if(v >= 0) {
-          //     if (ifIncreased) {
-          //       prac_idx.push([i, true]); // true means moving in the same direction as the exercise
-          //       // prac_idx.push([i, (v>=0) === ifIncreased]);
-          //     } else {
-          //       prac_idx.push([i, false]);
-          //     }
-          //   } else {
-          //     if (ifIncreased) {
-          //       prac_idx.push([i, false]);
-          //     } else {
-          //       prac_idx.push([i, true]);
-          //     }
-          //   }
-          // }
-          // console.log(prac_idx);
-          //
-          // let prac_st=[];
-          // let prac_ed=[];
-          // let timing = [];
-          // let ifFirst = true;
-          // for (let ii=0; ii<prac_idx.length-1; ii++) {
-          //   if(prac_idx[ii][1] && ifFirst) {
-          //     prac_st.push(prac_idx[ii][0]);
-          //     ifFirst = false;
-          //   } else if (prac_idx[ii][1] === false && prac_idx[ii+1][1]) {
-          //     prac_ed.push(prac_idx[ii][0]);
-          //     ifFirst = true;
-          //   }
-          // }
-          // if (prac_idx[prac_idx.length-1][1] === false) {
-          //   prac_ed.push(prac_idx[prac_idx.length-1][0]);
-          // }
-          // console.log(prac_st);
-          // console.log(prac_ed);
-          //
-          // for (let j=0; j<prac_st.length; j++) {
-          //   let delta = prac_ed[j] - prac_st[j];
-          //   if(delta >= time_thresh) {
-          //     timing.push(delta);
-          //   }
-          // }
-          // console.log("timing array:" + timing); //TODO: output is empty, sth wrong
-          let prac_timing = Segs(prac_impt_joint, theDirection, 30);
-          let ref_timing = Segs(ref_impt_joint, theDirection, 30);
-          console.log("prac timing: " + prac_timing);
-          console.log("ref timing: " + ref_timing);
+          let prac_ttl = prac_timing.reduce((a,b) => a+b, 0);
+          let ref_ttl = ref_timing.reduce((a,b) => a+b, 0);
 
-          //TODO: Or we compare total time for speed analysis
-          // let prac_ttl;
-          // let n = requestPayload.repEvals.length; //number of reps
+          console.log("prac timing: " + prac_timing + "\t" + prac_ttl);
+          console.log("ref timing: " + ref_timing + "\t" + ref_ttl);
+          //Note: The reference part can actually be done during the saveReference(),
+          //but that requires to update a the referenceExercise model
+
+          //TODO: There are a number of other different ways for speed analysis
+          // // 1) the simplest: use the total number of bodyFrames
+          // let nFrames_prac = requestPayload.bodyFrames.length;
+          // let prac_ttl = Math.round(nFrames_prac/30);
+          // let nFrames_ref = results.findMostRecentReference[0].bodyFrames.length;
+          // let ref_ttl = Math.round(nFrames_ref/30);
+
+          // // 2) the sum of the online timing, but that does not handle it well when no repetition detected online
+          // let n = 0; //number of counted reps
+          // if(requestPayload.repEvals[0].speed !== -1 ) {
+          //   n = requestPayload.repEvals.length
+          // };
+          // console.log(n);
           // for (let i=0; i<n; i++){
-          //   prac_ttl =+ requestPayload.repEvals[i].speed; // cannot handle when repEvals.speed = 0
+          //   prac_ttl =+ requestPayload.repEvals[i].speed;
           // }
           // let ref_ttl = results.findMostRecentReference[0].refTime;
-          let nFrames_prac = requestPayload.bodyFrames.length;
-          let prac_ttl = Math.round(nFrames_prac/30);
-          let nFrames_ref = results.findMostRecentReference[0].bodyFrames.length;
-          let ref_ttl = Math.round(nFrames_ref/30);
-
-          let msg_speed = "You have done " + n + " repititions for this set.\nIt takes you " + prac_ttl + " seconds to complete.\nYour reference time is " + ref_ttl + " seconds.\n"
-          console.log(msg_speed);
+          // let msg_speed = "You have done " + n + " good repititions for this set.\nIt takes you " + prac_ttl + " seconds to complete.\nYour reference time is " + ref_ttl + " seconds.\n"
+          // console.log(msg_speed);
 
 
 
@@ -1064,9 +1016,9 @@ internals.applyRoutes = function (server, next) {
           //let path_XYZ = dtw_impt_joint_XYZ.path();
 
           let dtw_maxCost = new DTW();
-          let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint);
+          let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint_XYZ);
 
-          let acc = cost_XYZ / cost_max;
+          let acc = 1 - cost_XYZ / cost_max;
 
           let msg_dtw_XYZ = "DTW cost: " + cost_XYZ + '\n';
           let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
@@ -1074,12 +1026,15 @@ internals.applyRoutes = function (server, next) {
           console.log(msg_dtw_max);
           console.log("Accuracy: " + acc);
 
-          // TODO:
-          let analysis = {"accuracy": acc, "speed": 123 };
-          done();
+          let analysis = {"accuracy": acc, "speed": prac_ttl/ref_ttl };
+          done(null, analysis);
         }],
         findPracticeandUpdate: ['analyzePractice', function(results, done) {
-          console.log("results.analyzePractice = " + results.analyzePractice);
+
+          // console.log("results.analyzePractice: " + results.analyzePractice); //[object object]
+          // console.log("stringify: " + JSON.stringify(results.analyzePractice)); //{"accuracy": 0.945..., "speed": 0.729...}
+          // console.log("results.analyzePractice.accuracy: " + results.analyzePractice.accuracy); //0.945...
+
           const query = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
@@ -1130,7 +1085,7 @@ internals.applyRoutes = function (server, next) {
         if (!results.findMostRecentReference[0]) {
           return reply(Boom.notFound('Document not found.'));
         }
-        reply(results.findPracticeandUpdate);
+        reply(results.analyzePractice);
       });
     }
   });
