@@ -198,12 +198,12 @@ function savePractice() {
 
       //popup the analysis result:
       //TODO: change alert msg to Sabrina's window
+      //let url_analysis = url; // seems not working, but why?
       let url_analysis = '/api/userexercise/practiceanalysis/' + exerciseId + '/';
       if(patientId) {
         url_analysis = url_analysis + patientId;
       }
       $.get(url_analysis, function(data) {
-        alert(data); // did not pop up...
         localStorage.setItem("feedback", JSON.stringify(data));
       });
       let msg = localStorage.getItem("feedback");
