@@ -310,6 +310,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+
   // for smoothing test
   server.route({
     method: 'GET',

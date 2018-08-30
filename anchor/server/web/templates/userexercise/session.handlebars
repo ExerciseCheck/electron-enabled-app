@@ -73,6 +73,18 @@
             {{/compare}}
             {{#compare type 'practice'}}
               <button class="btn btn-primary blueBackground white actionBtn" onclick="savePractice()">SAVE SET</button>
+              <div id="fdbkModal" class="modal">
+                <div class="modal-content">
+                  <div style="padding: 10px">
+                    <span class="close">&times;</span>
+                    <p style= "display: inline; margin-left: 20px; margin-right: 40px;"> Your average repitition accuracy:</p>
+                    <p style= "display: inline;"> Your average repitition speed:</p>
+                  </div>
+                  <canvas id="accuracy-chart-container" height="350" width="350"></canvas>
+                  <canvas id="speed-chart-container" height="350" width="350"></canvas>
+                </div>
+              </div>
+              </div>
             {{/compare}}
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}
@@ -85,6 +97,7 @@
 <link rel="stylesheet" href="/public/css/styleSheet/session.css">
 <link rel="stylesheet" href="/public/css/styleSheet/color.css">
 <link rel="stylesheet" href="/public/css/styleSheet/genericStyles.css">
+
 <script>
   //handlebars variables to pass into session.js
   let setNumber = {{setNumber}};
@@ -93,3 +106,5 @@
 <script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
 <script src="/public/data.js"></script>
 <script src="/public/bundle.js"></script>
+
+

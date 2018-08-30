@@ -165,11 +165,134 @@ function saveReference() {
 
 }
 
+function showFeedback(accuracy, speed) {
+
+  let speedProgress = Math.round(speed * 100);
+  let accuracyProgress = Math.round(accuracy * 100);
+  //console.log(speedProgress + "\t" + accuracyProgress);
+
+  let accColor;
+  //setting accuracy progress bar color based on patient performance
+  if(accuracyProgress >= 70){
+    accColor = '#23D160'
+  }
+  else if(accuracyProgress >= 45){
+    accColor = '#ffdf71'
+  }
+  else{
+    accColor = '#FF3860'
+  }
+  var speedColor;
+//setting speed progress bar color based on patient speed
+  if(speedProgress >= 70){
+    speedColor = '#23D160'
+  }
+  else if(speedProgress > 45){
+    speedColor = '#ffdf71'
+  }
+  else{
+    speedColor = '#FF3860'
+  }
+
+  // Get the modal
+  var modal = document.getElementById('fdbkModal');
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+  // Open Modal
+  modal.style.display = "block";
+  // Close Modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+  //chart data
+  $(modal).ready(function () {
+    var pieData = [
+      {
+        value : accuracyProgress,
+        color: accColor
+      },
+
+      {
+        value: 100 - accuracyProgress,
+        color:"#e6e6e6"
+      }
+    ];
+    var pieData2 = [
+      {
+        value : speedProgress,
+        color: speedColor
+      },
+
+      {
+        value: 100 - speedProgress,
+        color:"#e6e6e6"
+      }
+    ];
+
+    var myPie = new Chart(document.getElementById("accuracy-chart-container").getContext("2d")).Doughnut(pieData,{
+      //how thick progress bar is for accuracy chart
+      percentageInnerCutout : 85,
+    });
+    var myPie2 = new Chart(document.getElementById("speed-chart-container").getContext("2d")).Doughnut(pieData2,{
+      //how thick progress bar is for speed chart
+      percentageInnerCutout : 85,
+      //add text in chart
+      onAnimationComplete: addText
+    });
+
+    //add text in chart
+    function addText() {
+      var speedCanvas = document.getElementById("speed-chart-container");
+      var ctx = document.getElementById("speed-chart-container").getContext("2d");
+
+      var speedLocX = speedCanvas.width / 3.5;
+      var speedLocY = speedCanvas.height / 3.35;
+      var cx = speedCanvas.width / 2.5;
+      var cy = speedCanvas.height / 3;
+      var timerLocX = speedCanvas.width / 10;
+      var timerLocY = speedCanvas.height / 5;
+
+      var accuracyCanvas = document.getElementById("accuracy-chart-container");
+      var ctx2 = document.getElementById("accuracy-chart-container").getContext("2d");
+      var checkLocX = accuracyCanvas.width / 6;
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.font = '30px Open Sans';
+      ctx.fillStyle = '#428BCA';
+      ctx.fillText(sessionSpeed, speedLocX, speedLocY);
+      ctx.font = '14px Open Sans';
+      ctx.fillText( "seconds per repition", cx, cy);
+      ctx2.textAlign = 'center';
+      ctx2.textBaseline = 'bottom';
+      ctx2.font = '30px Open Sans';
+      ctx2.fillStyle = '#428BCA';
+      ctx2.fillText( accuracyProgress + "%", cx, speedLocY);
+      ctx.font = "900 100px fontAwesome";
+      ctx.fillText(timer, timerLocX, speedLocY);
+      ctx2.font = "900 100px fontAwesome";
+      ctx2.fillText(accuracyCheck, checkLocX, speedLocY);
+
+    }
+  });
+
+
+}
+
 function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
   let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  //logged-in user is clinician
+  if (patientId) {
+    url = url + patientId;
+  }
   let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
@@ -182,10 +305,6 @@ function savePractice() {
   console.log(values.repEvals);
   localStorage.removeItem("repEvals");
 
-  //logged-in user is clinician
-  if (patientId) {
-    url = url + patientId;
-  }
   if(setNumber === numSets) {
     values.weekEnd = new Date().getWeekNumber();
     isComplete = true;
@@ -196,18 +315,22 @@ function savePractice() {
     data: values,
     success: function (result) {
 
-      //popup the analysis result:
-      //TODO: change alert msg to Sabrina's window
+      //Modal popup of analysis result:
+      //let url_analysis = url; //TODO: using the same route seems not working, but why?
       let url_analysis = '/api/userexercise/practiceanalysis/' + exerciseId + '/';
       if(patientId) {
         url_analysis = url_analysis + patientId;
       }
       $.get(url_analysis, function(data) {
-        alert(data); // did not pop up...
         localStorage.setItem("feedback", JSON.stringify(data));
       });
       let msg = localStorage.getItem("feedback");
-      alert(msg);
+      localStorage.removeItem("feedback");
+      alert("feedback: " + msg);
+      let acc = JSON.parse(msg).accuracy;
+      let spd = JSON.parse(msg).speed;
+      console.log("acc: " + acc + "\nspd: " + spd);
+      showFeedback(acc, spd);
 
       if(isComplete) {
       	window.location = '/userexercise/session/end/practice/' +
