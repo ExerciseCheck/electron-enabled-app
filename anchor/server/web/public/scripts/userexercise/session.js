@@ -4,6 +4,7 @@
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
+let frames_exceeded_limit = false;
 let req, db;
 window.actionBtn = false;
 
@@ -473,10 +474,14 @@ $('.actionBtn').click(function() {
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
-        if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
+        if(JSON.parse(localStorage.getItem('canStartRecording')) === true && frames_exceeded_limit === false)
         {
           liveFrames.push(body);
-          console.log("liveFrame counter=", liveFrames.length);
+          if(liveFrames.length >= 4400)
+          {
+            frames_exceeded_limit = true;
+            errorAlert("liveFrame data capacity of 4,400 bodyFrames has been reached.")
+          }
         }
       }
       live_counter = live_counter + 1;
