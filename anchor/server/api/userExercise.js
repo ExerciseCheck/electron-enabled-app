@@ -1019,7 +1019,6 @@ internals.applyRoutes = function (server, next) {
           let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint_XYZ);
 
           let acc = 1 - cost_XYZ / cost_max;
-          if(acc < 0) acc=0;
 
           let msg_dtw_XYZ = "DTW cost: " + cost_XYZ + '\n';
           let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
