@@ -1,0 +1,64 @@
+{
+  "_from": "dtw",
+  "_id": "dtw@0.0.3",
+  "_inBundle": false,
+  "_integrity": "sha1-5z87hu7IPssqc/TZOXMrAfy1dQo=",
+  "_location": "/dtw",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "dtw",
+    "name": "dtw",
+    "escapedName": "dtw",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/dtw/-/dtw-0.0.3.tgz",
+  "_shasum": "e73f3b86eec83ecb2a73f4d939732b01fcb5750a",
+  "_spec": "dtw",
+  "_where": "C:\\Users\\Yiwen\\Documents\\GitHub\\electron-enabled-app\\anchor",
+  "author": {
+    "name": "Elmar Langholz",
+    "email": "langholz@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/langholz/dtw/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "debug": ">= 0.7.3"
+  },
+  "deprecated": false,
+  "description": "Dynamic time warping",
+  "devDependencies": {
+    "jsdox": "*",
+    "mocha": "*",
+    "should": "*"
+  },
+  "homepage": "https://github.com/langholz/dtw",
+  "keywords": [
+    "signal",
+    "processing",
+    "dynamic",
+    "time",
+    "warping"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "dtw",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/langholz/dtw.git"
+  },
+  "scripts": {
+    "doc": "jsdox lib/dtw.js --output doc/api/",
+    "test": "mocha tests/*.js"
+  },
+  "version": "0.0.3"
+}
