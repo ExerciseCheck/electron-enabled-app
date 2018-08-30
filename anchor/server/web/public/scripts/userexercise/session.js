@@ -60,9 +60,8 @@ Ladda.bind('.ladda-button', {
       callback: function( instance ) {
         var progress = 0;
         var interval = setInterval( function() {
-          var x = Math.random();
-          progress = Math.min( progress + x * 0.1, 1 );
-          console.log(progress)
+          var multiplier = Math.random() * 0.1;
+          progress = Math.min( progress + multiplier, 1 );
           instance.setProgress( progress );
 
           if( progress === 1 ) {
