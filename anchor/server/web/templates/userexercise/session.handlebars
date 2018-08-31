@@ -13,10 +13,11 @@
           <p class="large">Current Exercise</p>
           <div class= "small" style="line-height: 15px;">
             {{#compare type 'practice'}}
-              <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
+              <p>{{formatName exercise.exerciseName}}</p>
               <p>Set {{setNumber}} of {{numSets}}</p>
+              <p>{{numRepetition}} Repetitions</p>
               {{#compare mode 'play'}}
-                  <p id="cntReps" style="color: darkred; font-size: 120%">0</p>
+                  <p id="cntReps" class="commonBlue repsFont">0</p>
                   <p>repetitions completed.</p>
                   <p id="speedEval" style="color: grey"></p>
               {{/compare}}
