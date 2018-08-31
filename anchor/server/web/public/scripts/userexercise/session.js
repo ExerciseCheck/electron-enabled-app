@@ -54,6 +54,22 @@ function parseURL(url)
   };
 }
 
+Ladda.bind('.ladda-button', {
+      callback: function( instance ) {
+        var progress = 0;
+        var interval = setInterval( function() {
+          var multiplier = Math.random() * 0.1;
+          progress = Math.min( progress + multiplier, 1 );
+          instance.setProgress( progress );
+
+          if( progress === 1 ) {
+            instance.stop();
+            clearInterval( interval );
+          }
+        }, 200 );
+      }
+    });
+
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
