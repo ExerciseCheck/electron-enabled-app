@@ -4,7 +4,8 @@
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
-let frames_exceeded_limit = false;
+let MAX_BODYFRAMES_STORED = 4400;
+let framesExceededLimit = false;
 let req, db;
 window.actionBtn = false;
 
@@ -114,7 +115,6 @@ function saveReference() {
   const patientId = pathToArray[6];
   const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
   let values = {};
-  // console.log("refFrames size=", Object.keys(refFrames).length, (refFrames.length * JSON.stringify(refFrames[0]).length*2) / 1048576, "MB" );
   values.bodyFrames = refFrames_compressed;
   values.neckX = 2;
   values.neckY = 2;
@@ -143,7 +143,6 @@ function savePractice() {
   let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
-  // console.log("recentFrames size=", Object.keys(recentFrames).length, (recentFrames.length * JSON.stringify(recentFrames[0]).length*2) / 1048576, "MB" );
   values.bodyFrames = recentFrames_compressed;
 
   if (patientId) {
@@ -245,11 +244,9 @@ $('.actionBtn').click(function() {
 
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
-        console.log("getref=", getref);
         getref.onsuccess = function(e) {
           if(getref.result.body) {
             try {
-              // console.log("typeof getref.result.body=", typeof getref.result.body)
               refFrames_compressed = getref.result.body;
               refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
             } catch (err) {
@@ -268,8 +265,6 @@ $('.actionBtn').click(function() {
             try {
               recentFrames_compressed = getrecent.result.body;
               recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));
-              console.log("recentFrames_compressed=", typeof recentFrames_compressed);
-              console.log("recentFrames=", typeof recentFrames);
             } catch (err) {
               console.log(err);
             }
@@ -490,12 +485,12 @@ $('.actionBtn').click(function() {
         let neck_x = body.joints[2].depthX;
         let neck_y = body.joints[2].depthY;
 
-        if(JSON.parse(localStorage.getItem('canStartRecording')) === true && frames_exceeded_limit === false)
+        if(JSON.parse(localStorage.getItem('canStartRecording')) && !framesExceededLimit)
         {
           liveFrames.push(body);
-          if(liveFrames.length >= 4400)
+          if(liveFrames.length >= MAX_BODYFRAMES_STORED)
           {
-            frames_exceeded_limit = true;
+            framesExceededLimit = true;
             errorAlert("liveFrame data capacity of 4,400 bodyFrames has been reached.")
           }
         }
