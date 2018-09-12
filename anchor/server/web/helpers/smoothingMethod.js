@@ -37,7 +37,7 @@ function smoothGauss(list,degree){
   let weight=[];
   let window=degree*2-1;
   for (i=0;i<window;i++){
-    weight.push(1/(Math.exp((4*(i-degree+1)/window)**2)));
+    weight.push(1/(Math.exp(Math.pow((4*(i-degree+1)/window),2))));
   }
   let smoothed=[];
   let len = list.length-window;
