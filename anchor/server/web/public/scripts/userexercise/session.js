@@ -11,6 +11,9 @@ let repEvals = [];
 let liveBodyColor="#7BE39F";
 let commonBlue = "#1E89FB"
 let refJointColor = "#FF6786"
+let MAX_BODYFRAMES_STORED = 4400;
+let framesExceededLimit = false;
+
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -59,6 +62,22 @@ function parseURL(url)
   };
 }
 
+Ladda.bind('.ladda-button', {
+      callback: function( instance ) {
+        let progress = 0;
+        let interval = setInterval( function() {
+          let multiplier = Math.random() * 0.1;
+          progress = Math.min( progress + multiplier, 1 );
+          instance.setProgress( progress );
+
+          if( progress === 1 ) {
+            instance.stop();
+            clearInterval( interval );
+          }
+        }, 200 );
+      }
+    });
+
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
@@ -73,8 +92,13 @@ function action(nextMode, type) {
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
-        var ref_ed = new Date().getTime();
+        console.log("liveFrames before compression=", (JSON.stringify(liveFrames).length*2) / 1048576, "MB");
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        console.log("liveFrames after compression=", (JSON.stringify(liveFrames_compressed).length*2) / 1048576, "MB");
+
+        let ref_ed = new Date().getTime();
         localStorage.setItem("refEnd", ref_ed);
+
         let updatedRef = {type: 'refFrames', body: liveFrames};
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         let request = bodyFramesStore.put(updatedRef);
@@ -107,6 +131,12 @@ function action(nextMode, type) {
       }
     }
     else {
+      if(nextMode === 'stop') {
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        let updatedLiveFrames = {type: 'liveFrames', body: liveFrames_compressed};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedLiveFrames);
+      }
       redirect();
     }
   });
@@ -162,7 +192,6 @@ function saveReference() {
       errorAlert(result.responseJSON.message);
     }
   });
-
 }
 
 function savePractice() {
@@ -172,7 +201,7 @@ function savePractice() {
   let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
-  values.bodyFrames = JSON.stringify(recentFrames);
+  values.bodyFrames = recentFrames_compressed;
 
   // if no good repitition detected
   values.repEvals = localStorage.getItem("repEvals");
@@ -232,6 +261,25 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
+
+window.onbeforeunload = (e) => {
+
+  if (actionBtn) {
+    return;
+  }
+
+  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
+    return;
+  }
+  else {
+    // electron treats any return value that is not 'null' as intent to stay on the page
+    return false;
+  }
+};
+
+$('.actionBtn').click(function() {
+  actionBtn = true;
+});
 
 (function ()
 {
@@ -305,8 +353,13 @@ function goToExercises() {
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
-          if(getref.result) {
-            refFrames = getref.result.body; //CHECk WHAT refFRAMES IS on the start page of "recording new reference"
+          if(getref.result.body) {
+            try {
+              refFrames_compressed = getref.result.body;
+              refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
+            } catch (err) {
+              console.log(err);
+            }
             console.log("refFrames loaded locally");
           }
           showCanvas();
@@ -314,9 +367,16 @@ function goToExercises() {
         }
 
         let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        console.log("getrecent=", getrecent);
         getrecent.onsuccess = function(e) {
-          if(getrecent.result) {
-            recentFrames = getrecent.result.body;
+          if(getrecent.result.body) {
+            try {
+              recentFrames_compressed = getrecent.result.body;
+              recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));
+            } catch (err) {
+              console.log(err);
+            }
+
           }
         }
       });
@@ -519,7 +579,6 @@ function goToExercises() {
 //      ctx.shadowOffsetY = 4;
 //      ctx.shadowBlur = 8;
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
-
     });
 
     ctx.lineWidth=8;
@@ -648,8 +707,6 @@ function goToExercises() {
 
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
-
-
     const parsedURL = parseURL(window.location.pathname);
     //clear out the canvas so that the previous frame will not overlap
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -709,6 +766,11 @@ function goToExercises() {
           //filter joints, remove fingertips and spineShoulder for they are not used
           body.joints.splice(20,5);
           liveFrames.push(body);
+          if(liveFrames.length >= MAX_BODYFRAMES_STORED)
+          {
+            framesExceededLimit = true;
+            errorAlert("liveFrame data capacity of 4,400 bodyFrames has been reached.")
+          }
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
             console.log("Here: " + dataForCntReps.rangeScale + "\t" + threshold_flag);
@@ -725,7 +787,7 @@ function goToExercises() {
               var diff = Math.round((ed - st) / 1000);
               var speedEval = "It takes " + diff + " s";
 
-              //TODO: online speed, not accurate
+              //Note: online speed is not very accurate
               var repItem = {"speed": diff};
               repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify((repEvals)));

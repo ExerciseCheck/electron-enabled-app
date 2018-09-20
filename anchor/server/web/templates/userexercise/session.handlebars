@@ -66,14 +66,14 @@
             <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play','{{type}}')">START</button>
           {{/compare}}
           {{#compare mode 'play'}}
-              <button type="button" class="red white actionBtn btn btn-primary actionBtn" onclick="action('stop', '{{type}}')">STOP</button>
+              <button type="button" id="stop" class="red white actionBtn btn btn-primary actionBtn ladda-button" data-style="expand-right" onclick="action('stop', '{{type}}')">STOP</button>
           {{/compare}}
           {{#compare mode 'stop'}}
             {{#compare type 'reference'}}
-              <button class="btn btn-primary blueBackground white actionBtn" onclick="saveReference()">SAVE REFERENCE</button>
+              <button class="btn btn-primary blueBackground white actionBtn ladda-button" onclick="saveReference()">SAVE REFERENCE</button>
             {{/compare}}
             {{#compare type 'practice'}}
-              <button class="btn btn-primary blueBackground white actionBtn" onclick="savePractice()">SAVE SET</button>
+              <button class="btn btn-primary blueBackground white actionBtn ladda-button" onclick="savePractice()">SAVE SET</button>
             {{/compare}}
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}
