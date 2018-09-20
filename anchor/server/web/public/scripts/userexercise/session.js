@@ -598,7 +598,8 @@ function goToExercises() {
     //var range = (ref_lower_joint - ref_upper_joint) * range_scale;
 
     var ref_max = dataForCntReps.refMax - ref_norm;
-    var ref_min = dataForCntReps.refMin - ref_norm;
+    var ref_min = dataForCntReps.refMin - ref_norm;// only increase reps when moving against the exercise direction:
+
     var range = (ref_max - ref_min) * range_scale;
 
     // Normalize current point by range and current neck value
@@ -607,15 +608,23 @@ function goToExercises() {
     // direction group: (down, right), (up, left)
     if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
       // goes up and pass the top_thresh
-      // only increase reps when moving against the exercise direction:
-      if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+      // // only increase reps when moving against the exercise direction:
+      // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+      //   reps++;
+      // }
+      // only increase reps when moving in the same direction as defined in the exercise:
+      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
         reps++;
       }
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
       // goes down and pass the bottom_thresh
-      // only increase reps when moving against the exercise direction:
-      if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+      // // only increase reps when moving against the exercise direction:
+      // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+      //   reps++;
+      // }
+      // only increase reps when moving in the same direction as defined in the exercise:
+      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
         reps++;
       }
       return [reps, 'up'];
@@ -721,9 +730,7 @@ function goToExercises() {
               repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify((repEvals)));
 
-              //console.log(repEvals);
-              //console.log(JSON.parse(localStorage.getItem("repEvals")));
-              document.getElementById("speedEval").innerHTML = speedEval;
+              //document.getElementById("speedEval").innerHTML = speedEval;
               st = ed;
               console.log("start time: ", st);
             }

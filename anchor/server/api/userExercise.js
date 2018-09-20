@@ -936,9 +936,14 @@ internals.applyRoutes = function (server, next) {
           let prac_impt_joint_Z = [];
           let prac_impt_joint; // the chosen axis
           let prac_impt_joint_XYZ = [];
+          // For normalization:
+          let prac_shoulderL2R = requestPayload.bodyFrames[0].joints[8]["depthX"] - requestPayload.bodyFrames[0].joints[4]["depthX"];
+          let prac_neck2base = requestPayload.bodyFrames[0].joints[0]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"];
+          //let prac_depth = ??
+
           for (var i=0; i<requestPayload.bodyFrames.length; ++i) {
-            prac_impt_joint_X.push(requestPayload.bodyFrames[i].joints[theJoint]["depthX"] - requestPayload.bodyFrames[0].joints[2]["depthX"]);
-            prac_impt_joint_Y.push(requestPayload.bodyFrames[i].joints[theJoint]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"]);
+            prac_impt_joint_X.push((requestPayload.bodyFrames[i].joints[theJoint]["depthX"] - requestPayload.bodyFrames[0].joints[2]["depthX"]) / prac_shoulderL2R);
+            prac_impt_joint_Y.push((requestPayload.bodyFrames[i].joints[theJoint]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"]) / prac_neck2base);
             prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"] - requestPayload.bodyFrames[0].joints[2]["cameraZ"]);
           }
 
@@ -947,9 +952,14 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint_Z = [];
           let ref_impt_joint;
           let ref_impt_joint_XYZ = [];
+          // For normalization:
+          let ref_shoulderL2R = results.findMostRecentReference[0].bodyFrames[0].joints[8]["depthX"] - results.findMostRecentReference[0].bodyFrames[0].joints[4]["depthX"];
+          let ref_neck2base = results.findMostRecentReference[0].bodyFrames[0].joints[0]["depthY"] - results.findMostRecentReference[0].bodyFrames[0].joints[2]["depthY"];
+          //let ref_depth = ??
+
           for (var i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
-            ref_impt_joint_X.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX);
-            ref_impt_joint_Y.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY);
+            ref_impt_joint_X.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
+            ref_impt_joint_Y.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
             ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
               results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
           }
@@ -1020,14 +1030,16 @@ internals.applyRoutes = function (server, next) {
 
           let acc = 1 - cost_XYZ / cost_max;
           if(acc<0) acc=0;
+          let acc_str = (acc*100).toString() + "%";
 
           let msg_dtw_XYZ = "DTW cost: " + cost_XYZ + '\n';
           let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
           console.log(msg_dtw_XYZ);
           console.log(msg_dtw_max);
-          console.log("Accuracy: " + acc);
 
-          let analysis = {"accuracy": acc, "speed": prac_ttl/ref_ttl };
+          let spd_str = (ref_ttl/prac_ttl*100).toString() + "%";
+
+          let analysis = {"accuracy": acc_str, "speed": spd_str };
           done(null, analysis);
         }],
         findPracticeandUpdate: ['analyzePractice', function(results, done) {

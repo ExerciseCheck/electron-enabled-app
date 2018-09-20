@@ -12,12 +12,13 @@ module.exports = function getSegmentation(x, theDirection, time_thresh) {
     console.log("You should not see this")
   }
 
+  let v_thresh = 0.02;
   let idx=[];
   for (let i=0; i<x.length - 1; i++) {
     let v = x[i+1] - x[i];
-    if(v >= 0) {
+    if(v > v_thresh) {
       idx.push([i, ifIncreased]); //true if moving in the same direction as the exercise
-    } else {
+    } else if(v < (-1)*v_thresh) {
       idx.push([i, !ifIncreased]);
     }
   }
