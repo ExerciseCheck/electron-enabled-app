@@ -880,6 +880,15 @@ internals.applyRoutes = function (server, next) {
             prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"] - requestPayload.bodyFrames[0].joints[2]["cameraZ"]);
           }
 
+          let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
+          let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
+          let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
+          let std_impt_joint_XYZ = []; // for establishing the max cost in dtw
+          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
+            prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
+            std_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]]);
+          }
+
           let ref_impt_joint_X = [];
           let ref_impt_joint_Y = [];
           let ref_impt_joint_Z = [];
@@ -890,53 +899,48 @@ internals.applyRoutes = function (server, next) {
           let ref_neck2base = results.findMostRecentReference[0].bodyFrames[0].joints[0]["depthY"] - results.findMostRecentReference[0].bodyFrames[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          // Assumption:
-          // 1) patient does 1 repetition per referenceExercise
-          // 2) referenceExercise always has a clean stop (clinician clicks the STOP button for the patient)
-          // 3) so we multiply the rep by numRep required
-          for (let j=0; j<results.findMostRecentReference[0].numRepetition; ++j) {
-            for (let i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
-              ref_impt_joint_X.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
-              ref_impt_joint_Y.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
-              ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
-                results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
-            }
-          }
-
-          let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
-          let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
-          let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
-          let std_impt_joint_XYZ = []; // for establishing the max cost in dtw
-          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
-            prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
-            std_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]]);
+          for (let i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
+            ref_impt_joint_X.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
+            ref_impt_joint_Y.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
+            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
+              results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
           }
 
           let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
           let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
           let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
-          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
-            ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
+          // Assumption:
+          // 1) patient does 1 repetition per referenceExercise
+          // 2) referenceExercise always has a clean stop (clinician clicks the STOP button for the patient)
+          // 3) so we multiply the rep by numRep required
+          // 4) no need to segment referenceExercise in such case
+          for (let j=0; j<results.findMostRecentReference[0].numRepetition; ++j) {
+            for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
+              ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
+            }
           }
 
           if (theAxis === "depthX") {
             prac_impt_joint = prac_impt_joint_X_smoothed;
-            ref_impt_joint = ref_impt_joint_X_smoothed;
+            //ref_impt_joint = ref_impt_joint_X_smoothed;
           } else if (theAxis === "depthY") {
             prac_impt_joint = prac_impt_joint_Y_smoothed;
-            ref_impt_joint = ref_impt_joint_Y_smoothed;
+            //ref_impt_joint = ref_impt_joint_Y_smoothed;
           }
-          // assuming each repetition if any exercise takes >= 1 sec
+          // assuming each repetition for any exercise takes >= 1 sec
           let prac_timing = Segs(prac_impt_joint, theDirection, 20);
-          let ref_timing = Segs(ref_impt_joint, theDirection, 20);
+          //let ref_timing = Segs(ref_impt_joint, theDirection, 20);
 
+          //let prac_ttl = prac_timing.reduce((a,b) => a+b, 0);
+          //let ref_ttl = ref_timing.reduce((a,b) => a+b, 0);
+
+          // use average timing for the practice here
           let prac_ttl = prac_timing.reduce((a,b) => a+b, 0);
-          let ref_ttl = ref_timing.reduce((a,b) => a+b, 0);
+          let prac_avg = prac_ttl / results.findMostRecentReference[0].numRepetition
+          let ref = results.findMostRecentReference[0].refTime
 
-          console.log("prac timing: " + prac_timing + "\t" + prac_ttl);
-          console.log("ref timing: " + ref_timing + "\t" + ref_ttl);
-          //Note: The reference part can actually be done during the saveReference(),
-          //but that requires to update a the referenceExercise model
+          console.log("prac timing: " + prac_timing + "\t" + prac_avg);
+          console.log("ref timing: " + ref);
 
           //TODO: There are a number of other different ways for speed analysis
           // // 1) the simplest: use the total number of bodyFrames
@@ -976,7 +980,7 @@ internals.applyRoutes = function (server, next) {
           console.log(msg_dtw_XYZ);
           console.log(msg_dtw_max);
 
-          let spd_str = (ref_ttl/prac_ttl*100).toString() + "%";
+          let spd_str = (ref/prac_avg*100).toString() + "%";
 
           let analysis = {"accuracy": acc_str, "speed": spd_str };
           done(null, analysis);
