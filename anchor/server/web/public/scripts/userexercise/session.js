@@ -630,10 +630,11 @@ $('.actionBtn').click(function() {
     else {
       ctx.strokeStyle="DimGray"; // circle turns into a dark grey color once countdown finishes
     }
+    ctx.lineWidth = 10;
     ctx.arc(x, y, r, 0, Math.PI*2);
     ctx.stroke();
     ctx.closePath();
-    ctx.strokeStyle="black";
+    //ctx.strokeStyle="black";
   }
 
   //function that counts repetitions

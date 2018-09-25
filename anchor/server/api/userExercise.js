@@ -874,7 +874,7 @@ internals.applyRoutes = function (server, next) {
           let prac_neck2base = requestPayload.bodyFrames[0].joints[0]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"];
           //let prac_depth = ??
 
-          for (var i=0; i<requestPayload.bodyFrames.length; ++i) {
+          for (let i=0; i<requestPayload.bodyFrames.length; ++i) {
             prac_impt_joint_X.push((requestPayload.bodyFrames[i].joints[theJoint]["depthX"] - requestPayload.bodyFrames[0].joints[2]["depthX"]) / prac_shoulderL2R);
             prac_impt_joint_Y.push((requestPayload.bodyFrames[i].joints[theJoint]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"]) / prac_neck2base);
             prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"] - requestPayload.bodyFrames[0].joints[2]["cameraZ"]);
@@ -890,18 +890,24 @@ internals.applyRoutes = function (server, next) {
           let ref_neck2base = results.findMostRecentReference[0].bodyFrames[0].joints[0]["depthY"] - results.findMostRecentReference[0].bodyFrames[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          for (var i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
-            ref_impt_joint_X.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
-            ref_impt_joint_Y.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
-            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
-              results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
+          // Assumption:
+          // 1) patient does 1 repetition per referenceExercise
+          // 2) referenceExercise always has a clean stop (clinician clicks the STOP button for the patient)
+          // 3) so we multiply the rep by numRep required
+          for (let j=0; j<results.findMostRecentReference[0].numRepetition; ++j) {
+            for (let i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
+              ref_impt_joint_X.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
+              ref_impt_joint_Y.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
+              ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
+                results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
+            }
           }
 
           let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
           let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
           let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
           let std_impt_joint_XYZ = []; // for establishing the max cost in dtw
-          for (var i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
+          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
             prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
             std_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]]);
           }
@@ -909,7 +915,7 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
           let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
           let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
-          for (var i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
+          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
           }
 
