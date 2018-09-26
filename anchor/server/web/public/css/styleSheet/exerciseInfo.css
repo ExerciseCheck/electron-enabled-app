@@ -1,5 +1,31 @@
+.body {margin:2rem;}
+
 .button {
   position: absolute;
+}
+
+
+.button-wrapper {
+  /* margin-left: 45px; */
+  margin-top: 50px;
+  text-align: center;
+
+}
+
+.close {
+  position:absolute;
+  right:-30px;
+  top:0;
+  z-index:999;
+  font-size:2rem;
+  font-weight: normal;
+  color:#fff;
+  opacity:1;
+
+.goal{
+  margin-top: 20px;
+  margin-left: 20px;
+  font-style: italic;
 }
 
 h1 {
@@ -20,9 +46,12 @@ li.text {
   margin-right: 50px;
 }
 
-.button-wrapper {
-  /* margin-left: 45px; */
-  margin-top: 10px;
-  text-align: center;
-
+.modal-body {
+  position:relative;
+  padding:0px;
 }
+
+.modal-dialog {
+      max-width: 800px;
+      margin: 30px auto;
+  }

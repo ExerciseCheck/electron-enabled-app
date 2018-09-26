@@ -2,7 +2,7 @@
       "squat":
       {
         "Level": 1,
-
+        "name": "squat",
         "Goal": "Strengthen the large muscles in your legs that help you stand up from a chair, walk, and climb stairs.",
 
         "Instructions": [
@@ -10,7 +10,7 @@
           {"text":"Stand with your heels about 6 inches in front of the chair and your feet hip distance (or slightly wider) apart."},
           {"text":"Lower yourself into a seated position. Make sure to keep equal weight on both feet."},
           {"text":"Slowly return to standing."},
-          {"text":"Perform 8-12 repetitions."}
+          {"text":"Perform the remaining number of repetitions."}
         ],
 
       "CommonMistakes": [
@@ -23,13 +23,13 @@
     {
 
     "Level": 1,
-
+    "name": "HeelRaise",
     "Goal": "Strengthen the muscles in your legs that help you walk and climb stairs.",
 
      "Instructions": [
       "Stand close to a wall and place your hands on the wall for balance.",
       "Raise yourself up onto your toes.",
-      "Perform 8-12 repetitions with a full range of motion."
+      "Perform the remaining number of repetitions with a full range of motion."
     ]
 
   }

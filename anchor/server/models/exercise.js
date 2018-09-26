@@ -4,11 +4,12 @@ const MongoModels = require('hicsail-mongo-models');
 
 class Exercise extends MongoModels {
 
-  static create(exerciseName, description, userId, callback) {
+  static create(exerciseName, description, instructions, userId, callback) {
 
     const document = {
       exerciseName,
       description,
+      instructions,
       userId,
       createdAt: new Date()
     };
@@ -32,14 +33,17 @@ Exercise.schema = Joi.object().keys({
   _id: Joi.object(),
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
-  //this is the userId of the person creating the exersice 
+  instructions: Joi.array().items(Joi.string().required()),
+  //this is the userId of the person creating the exersice
   userId: Joi.string().required(),
   createdAt: Joi.date().required()
 });
 
 Exercise.payload = Joi.object().keys({
   exerciseName: Joi.string().required(),
-  description: Joi.string().required()
+  description: Joi.string().required(),
+  instructions: Joi.array().items(Joi.string().required())
+
 });
 
 

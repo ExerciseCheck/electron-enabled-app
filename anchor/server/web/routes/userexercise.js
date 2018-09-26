@@ -470,20 +470,24 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise/info/{exerciseName}',
+    path: '/userexercise/info/{ExerciseName}',
     config: {
       auth: {
         strategy: 'session'
       }
     },
     handler: function (request, reply) {
+
+      //console.log("trying to find patient id and exercise id")
+      console.log(request.params)
       let exerciseName = request.params.exerciseName;
       return reply.view('userexercise/info', {
         user: request.auth.credentials.user,
         exerciseName: exerciseName,
         projectName: Config.get('/projectName'),
         title: exerciseName + ' Information',
-        instructions: Info[exerciseName]['Instructions']
+      //  instructions: Info[exerciseName]['Instructions'],
+        goal: Info[exerciseName]['Goal']
 
       });
     }
