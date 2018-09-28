@@ -3,7 +3,7 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames;
+let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
 let req, db;
 let dataForCntReps = {};
 //let refStart, refEnd; //not used
@@ -36,10 +36,10 @@ $('.actionBtn').click(function() {
 function parseURL(url)
 {
 
-  var exerciseId = null;
-  var patientId = null;
-  var mode = null;
-  var type = null;
+  let exerciseId = null;
+  let patientId = null;
+  let mode = null;
+  let type = null;
   const urlToArray = url.split('/');
 
   mode = urlToArray[3];
@@ -81,11 +81,11 @@ Ladda.bind('.ladda-button', {
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
-    var patientId = parsedURL.patientId;
-    var exerciseId = parsedURL.exerciseId;
+    let patientId = parsedURL.patientId;
+    let exerciseId = parsedURL.exerciseId;
 
     function redirect() {
-      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      let redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
 
@@ -145,7 +145,7 @@ function action(nextMode, type) {
 // helper function for calculating the refMax, refMin
 // axis is either 'depthX' or 'depthY'
 function getMinMax_joint(joint, array, axis) {
-  var out = [];
+  let out = [];
   array.forEach(function(el) {
     return out.push.apply(out, [el.joints[joint][axis]]);
   }, []);
@@ -163,15 +163,15 @@ function saveReference() {
   let values = {};
   // save to referenceExercise
   values.bodyFrames = JSON.stringify(refFrames);
-  values.neckX = refFrames[0].joints[2].depthX;
-  values.neckY = refFrames[0].joints[2].depthY;
-  var mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
+  let mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
   values.refMin = mm.min;
   values.refMax = mm.max;
   values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
   values.refUpperJoint = refFrames[0].joints[dataForCntReps.refUpperJointID][dataForCntReps.axis];
-  var ed = localStorage.getItem("refEnd");
-  var st = localStorage.getItem("refStart");
+  values.neck2spineBase = refFrames[0].joints[0]["depthY"] - refFrames[0].joints[2]["depthY"];
+  values.shoulder2shoulder = refFrames[0].joints[8]["depthX"] - refFrames[0].joints[4]["depthX"];
+  let ed = localStorage.getItem("refEnd");
+  let st = localStorage.getItem("refStart");
   localStorage.removeItem("refEnd");
   localStorage.removeItem("refStart");
   values.refTime = Math.round((ed - st) / 1000);
@@ -180,6 +180,9 @@ function saveReference() {
   dataForCntReps.refLowerJointPos = values.refLowerJoint;
   dataForCntReps.refUpperJointPos = values.refUpperJoint;
   dataForCntReps.refTime = values.refTime;
+  dataForCntReps.bodyHeight = values.neck2spineBase;
+  dataForCntReps.bodyWidth = values.shoulder2shoulder;
+  dataForCntReps.jointNeck = refFrames[0].joints[2];
 
   $.ajax({
     type: 'PUT',
@@ -300,8 +303,9 @@ $('.actionBtn').click(function() {
   let parsedURL = parseURL(window.location.pathname);
 
   // value for countReps
-  let nx_1stFrame, ny_1stFrame;
-  let nz_1stFrame; // distance to the camera sensor
+  let nx_1stFrame, ny_1stFrame, nz_1stFrame; // neck position
+  let bodyWidth; // shoulderLeft to shoulderRight
+  let bodyHeight; // neck to spineBase
   let threshold_flag, direction;
   // fetch data before start exercise
   let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
@@ -322,7 +326,7 @@ $('.actionBtn').click(function() {
   });
 
   // time pt for speed evaluation
-  var st, ed;
+  let st, ed;
 
   if (isElectron())
   {
@@ -617,7 +621,7 @@ $('.actionBtn').click(function() {
       if(dist <= r){
         //When person's neck enters green circle && mode is 'play', recording will start.
         ctx.strokeStyle="Lime";
-        var parsedURL = parseURL(window.location.pathname);
+        let parsedURL = parseURL(window.location.pathname);
         if(parsedURL.mode === 'play' && useTimer) {
           startTimer();
           useTimer = false;
@@ -638,35 +642,88 @@ $('.actionBtn').click(function() {
   }
 
   //function that counts repetitions
-  function countReps(body, threshold_flag, range_scale, top_thresh, bottom_thresh) {
+  // function countReps(body, threshold_flag, range_scale, top_thresh, bottom_thresh) {
+  //
+  //   let reps = 0;
+  //   let norm, ref_norm;
+  //   // This is set when user is correctly positioned in circle
+  //   // neck: 2
+  //   if (dataForCntReps.axis == 'depthY') {
+  //     ref_norm = dataForCntReps.neckY;
+  //     norm = ny_1stFrame;
+  //   } else if (dataForCntReps.axis == 'depthX') {
+  //     ref_norm = dataForCntReps.neckX;
+  //     norm = nx_1stFrame;
+  //   }
+  //
+  //   // Normalize reference points to neck
+  //   let ref_lower_joint = dataForCntReps.refLowerJointPos - ref_norm;
+  //   let ref_upper_joint = dataForCntReps.refUpperJointPos - ref_norm;
+  //   //let range = (ref_lower_joint - ref_upper_joint) * range_scale;
+  //
+  //   let ref_max = dataForCntReps.refMax - ref_norm;
+  //   let ref_min = dataForCntReps.refMin - ref_norm;// only increase reps when moving against the exercise direction:
+  //
+  //   let range = (ref_max - ref_min) * range_scale;
+  //
+  //   // Normalize current point by range and current neck value
+  //   let current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
+  //
+  //   // direction group: (down, right), (up, left)
+  //   if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
+  //     // goes up and pass the top_thresh
+  //     // // only increase reps when moving against the exercise direction:
+  //     // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+  //     //   reps++;
+  //     // }
+  //     // only increase reps when moving in the same direction as defined in the exercise:
+  //     if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+  //       reps++;
+  //     }
+  //     return [reps, 'down'];
+  //   } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
+  //     // goes down and pass the bottom_thresh
+  //     // // only increase reps when moving against the exercise direction:
+  //     // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+  //     //   reps++;
+  //     // }
+  //     // only increase reps when moving in the same direction as defined in the exercise:
+  //     if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+  //       reps++;
+  //     }
+  //     return [reps, 'up'];
+  //   } else {
+  //     // console.log("No flip");
+  //     return [reps, threshold_flag];
+  //   }
+  // }
+  function countReps(body, threshold_flag, diff_level, top_thresh, bottom_thresh) {
 
-    var reps = 0;
-    var norm, ref_norm;
+    let reps = 0;
+    let norm, ref_norm; // the position of the joint-for-norm
+    let d, ref_d; // the distance to the joint-for-norm in the corresponding axis
     // This is set when user is correctly positioned in circle
     // neck: 2
     if (dataForCntReps.axis == 'depthY') {
-      ref_norm = dataForCntReps.neckY;
+      ref_norm = dataForCntReps.jointNeck['depthY'];
       norm = ny_1stFrame;
+      ref_d = dataForCntReps.bodyHeight;
+      d = bodyHeight;
     } else if (dataForCntReps.axis == 'depthX') {
-      ref_norm = dataForCntReps.neckX;
-      norm = nx_1stFrame;
+      //should be close to leftShoulderX
+      ref_norm = dataForCntReps.jointNeck['depthX'] - dataForCntReps.bodyWidth / 2;
+      norm = nx_1stFrame - bodyWidth / 2;
+      ref_d = dataForCntReps.bodyWidth;
+      d = bodyWidth;
     }
 
-    // Normalize reference points to neck
-    var ref_lower_joint = dataForCntReps.refLowerJointPos - ref_norm;
-    var ref_upper_joint = dataForCntReps.refUpperJointPos - ref_norm;
-    //var range = (ref_lower_joint - ref_upper_joint) * range_scale;
+    let currR = ref_d / d * (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm) + ref_norm;
 
-    var ref_max = dataForCntReps.refMax - ref_norm;
-    var ref_min = dataForCntReps.refMin - ref_norm;// only increase reps when moving against the exercise direction:
-
-    var range = (ref_max - ref_min) * range_scale;
-
-    // Normalize current point by range and current neck value
-    var current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
+    let ref_max = dataForCntReps.refMax - ref_norm;
+    let ref_min = dataForCntReps.refMin - ref_norm;
 
     // direction group: (down, right), (up, left)
-    if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
+    if ((threshold_flag === 'up') && (currR < top_thresh)) {
       // goes up and pass the top_thresh
       // // only increase reps when moving against the exercise direction:
       // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
@@ -677,7 +734,7 @@ $('.actionBtn').click(function() {
         reps++;
       }
       return [reps, 'down'];
-    } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
+    } else if ((threshold_flag === 'down') && (currR > bottom_thresh)) {
       // goes down and pass the bottom_thresh
       // // only increase reps when moving against the exercise direction:
       // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
@@ -754,6 +811,8 @@ $('.actionBtn').click(function() {
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
           nz_1stFrame = body.joints[2].cameraZ;
+          bodyWidth = body.joints[8].depthX - body.joints[4].depthX;
+          bodyHeight = body.joints[0].depthY - body.joints[2].depthY;
 
           console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
           st = new Date().getTime();
@@ -774,9 +833,9 @@ $('.actionBtn').click(function() {
           }
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
-            console.log("Here: " + dataForCntReps.rangeScale + "\t" + threshold_flag);
-            var tempCnt = countReps(body, threshold_flag,
-              dataForCntReps.rangeScale, dataForCntReps.topThresh, dataForCntReps.bottomThresh);
+            console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
+            let tempCnt = countReps(body, threshold_flag,
+              dataForCntReps.diffLevel);
 
             threshold_flag = tempCnt[1];
             document.getElementById("cntReps").innerHTML =
@@ -785,11 +844,11 @@ $('.actionBtn').click(function() {
             if (tempCnt[0] === 1) {
               ed = new Date().getTime();
               console.log("end time: ", ed);
-              var diff = Math.round((ed - st) / 1000);
-              var speedEval = "It takes " + diff + " s";
+              let diff = Math.round((ed - st) / 1000);
+              let speedEval = "It takes " + diff + " s";
 
               //Note: online speed is not very accurate
-              var repItem = {"speed": diff};
+              let repItem = {"speed": diff};
               repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify((repEvals)));
 

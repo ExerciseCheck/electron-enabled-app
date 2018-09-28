@@ -19,13 +19,13 @@
               {{> axis}}
               <label for="direction" class="label">Starting Direction</label>
               {{> direction}}
-              <label for="lowerJoint" class="label">Reference Lower Joint</label>
+              <label for="upperJoint" class="label">Reference Upper/Left Joint</label>
+              <label for="lowerJoint" class="label">Reference Lower/Right Joint</label>
               <div class="form-group">
                 <select type="number" class="form-control" id="refLowerJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>
                   {{> jointList}}
                 </select>
               </div>
-              <label for="upperJoint" class="label">Reference Upper Joint</label>
               <div class="form-group">
                 <select type="number" class="form-control" id="refUpperJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>
                   {{> jointList}}

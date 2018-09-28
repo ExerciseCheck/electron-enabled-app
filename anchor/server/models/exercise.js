@@ -12,8 +12,8 @@ class Exercise extends MongoModels {
       joint,
       axis,
       direction,
-      refLowerJoint,
       refUpperJoint,
+      refLowerJoint,
       createdAt: new Date()
     };
 
