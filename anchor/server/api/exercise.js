@@ -157,16 +157,12 @@ internals.applyRoutes = function (server, next) {
       Exercise.create(
         request.payload.exerciseName,
         request.payload.description,
-<<<<<<< HEAD
-        request.payload.instructions,
-=======
         request.payload.joint,
         request.payload.axis,
         request.payload.direction,
         request.payload.refLowerJoint,
         request.payload.refUpperJoint,
 
->>>>>>> f83f0834c8c0da20144507947c7248333396d99a
         request.auth.credentials.user._id.toString(),
         (err, document) => {
 
@@ -199,9 +195,7 @@ internals.applyRoutes = function (server, next) {
       const update = {
         $set: {
           exerciseName: request.payload.exerciseName,
-          description: request.payload.description,
-          instructions: request.payload.instructions,
-
+          description: request.payload.description
         }
       };
 

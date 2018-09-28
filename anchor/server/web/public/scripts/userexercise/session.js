@@ -2,11 +2,11 @@
 
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
-// recentFrames refers to practicee exercise 'stop' page (liveFrames -> recentFrames)
+// recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
 let liveFrames, refFrames, recentFrames;
 let req, db;
 let dataForCntReps = {};
-let refStart, refEnd; //not used
+//let refStart, refEnd; //not used
 let repEvals = [];
 let liveBodyColor="#7BE39F";
 let commonBlue = "#1E89FB"
@@ -124,6 +124,7 @@ function getMinMax_joint(joint, array, axis) {
 
 // assuming the save button is clicked by someone else
 function saveReference() {
+
   const pathToArray = window.location.pathname.split('/');
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
@@ -161,10 +162,10 @@ function saveReference() {
       errorAlert(result.responseJSON.message);
     }
   });
+
 }
 
 function savePractice() {
-
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
@@ -172,13 +173,16 @@ function savePractice() {
   let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
-  //TODO: better ways than store to localStorage?
-  //values.repEvals = JSON.parse(localStorage.getItem("repEvals"));
-  values.repEvals = localStorage.getItem("repEvals");
-  console.log(values.repEvals);
-  //localStorage.removeItem("repEvals");
-  //logged-in user is clinician
 
+  // if no good repitition detected
+  values.repEvals = localStorage.getItem("repEvals");
+  if(!values.repEvals) {
+    values.repEvals=JSON.stringify([{"speed": -1}]);
+  }
+  console.log(values.repEvals);
+  localStorage.removeItem("repEvals");
+
+  //logged-in user is clinician
   if (patientId) {
     url = url + patientId;
   }
@@ -192,9 +196,22 @@ function savePractice() {
     data: values,
     success: function (result) {
 
+      //popup the analysis result:
+      //TODO: change alert msg to Sabrina's window
+      //let url_analysis = url; // seems not working, but why?
+      let url_analysis = '/api/userexercise/practiceanalysis/' + exerciseId + '/';
+      if(patientId) {
+        url_analysis = url_analysis + patientId;
+      }
+      $.get(url_analysis, function(data) {
+        localStorage.setItem("feedback", JSON.stringify(data));
+      });
+      let msg = localStorage.getItem("feedback");
+      alert(msg);
+
       if(isComplete) {
-      window.location = '/userexercise/session/end/practice/' +
-        exerciseId + '/' + patientId;
+      	window.location = '/userexercise/session/end/practice/' +
+          exerciseId + '/' + patientId;
       } else {
         window.location = '/userexercise/session/start/practice/' +
           exerciseId + '/' + patientId;
@@ -215,8 +232,6 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
-<<<<<<< HEAD
-=======
 
 (function ()
 {
@@ -238,27 +253,27 @@ function goToExercises() {
 
   // value for countReps
   let nx_1stFrame, ny_1stFrame;
-  let neck_z; // distance to the camera sensor
+  let nz_1stFrame; // distance to the camera sensor
   let threshold_flag, direction;
   // fetch data before start exercise
   let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;
-    //threshold_flag = data.direction;
-    //group: (down, L2R) +; (up, R2L) -
-    if(data.direction === 'L2R') {
+    //group: (down, L2R) + and (up, R2L) -
+    if(dataForCntReps.direction === 'L2R') {
       direction = "down";
       threshold_flag = "down";
-    } else if (data.direction === 'R2L') {
+    } else if (dataForCntReps.direction === 'R2L') {
       direction = "up";
       threshold_flag = "up";
     } else {
-      direction = data.direction;
-      threshold_flag = data.direction;
+      direction = dataForCntReps.direction;
+      threshold_flag = dataForCntReps.direction;
     }
   });
-  // time for speed evaluation
+
+  // time pt for speed evaluation
   var st, ed;
 
   if (isElectron())
@@ -291,7 +306,7 @@ function goToExercises() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
           if(getref.result) {
-            refFrames = getref.result.body; //CHECk wHAT refFRAMES IS on the start page of "recording new reference"
+            refFrames = getref.result.body; //CHECk WHAT refFRAMES IS on the start page of "recording new reference"
             console.log("refFrames loaded locally");
           }
           showCanvas();
@@ -580,11 +595,12 @@ function goToExercises() {
     // Normalize reference points to neck
     var ref_lower_joint = dataForCntReps.refLowerJointPos - ref_norm;
     var ref_upper_joint = dataForCntReps.refUpperJointPos - ref_norm;
-    var range = (ref_lower_joint - ref_upper_joint) * range_scale;
+    //var range = (ref_lower_joint - ref_upper_joint) * range_scale;
 
     var ref_max = dataForCntReps.refMax - ref_norm;
-    var ref_min = dataForCntReps.refMin - ref_norm;
-    //var range = (ref_max - ref_min) * range_scale;
+    var ref_min = dataForCntReps.refMin - ref_norm;// only increase reps when moving against the exercise direction:
+
+    var range = (ref_max - ref_min) * range_scale;
 
     // Normalize current point by range and current neck value
     var current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
@@ -592,15 +608,23 @@ function goToExercises() {
     // direction group: (down, right), (up, left)
     if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
       // goes up and pass the top_thresh
-      // only increase reps when moving against the exercise direction:
-      if (threshold_flag !== direction && isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
+      // // only increase reps when moving against the exercise direction:
+      // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+      //   reps++;
+      // }
+      // only increase reps when moving in the same direction as defined in the exercise:
+      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
         reps++;
       }
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
       // goes down and pass the bottom_thresh
-      // only increase reps when moving against the exercise direction:
-      if (threshold_flag !== direction && isBodyInPlane(neck_z, body.joints[2].cameraZ)) {
+      // // only increase reps when moving against the exercise direction:
+      // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+      //   reps++;
+      // }
+      // only increase reps when moving in the same direction as defined in the exercise:
+      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
         reps++;
       }
       return [reps, 'up'];
@@ -611,8 +635,8 @@ function goToExercises() {
   }
 
   // patient reaching out for button makes body NOT in plane
-  function isBodyInPlane(ref_neck, neck) {
-    if (ref_neck * 0.6 < neck && ref_neck * 1.2 > neck && neck >= 1.5){
+  function isBodyInPlane(init, curr) {
+    if (init * 0.6 < curr && init * 1.2 > curr){
       return true;
     }
     return false;
@@ -671,38 +695,23 @@ function goToExercises() {
           console.log("timer done", evt.detail);
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
-          neck_z = body.joints[2].cameraZ;
+          nz_1stFrame = body.joints[2].cameraZ;
 
-          console.log("neck position in the first frame recorded");
+          console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
           st = new Date().getTime();
           if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
             localStorage.setItem("refStart", st);
           }
         });
 
-        // check in-position status whenever kinect captures a body
-        // if(!inPosition) {
-        //   if((Math.sqrt(Math.pow(((neck_x - 0.5)* width),2) + Math.pow(((neck_y - 0.2)*height), 2))) <= circle_radius === true) {
-        //     inPosition = true;
-        //     //TODO: if there is timer, may need to move this
-        //     //record the neck position for norm once inPosition
-        //     nx_1stFrame = neck_x;
-        //     ny_1stFrame = neck_y;
-        //     neck_z = body.joints[2].cameraZ;
-        //
-        //     console.log("neck position in the first frame recorded");
-        //     st = new Date().getTime();
-        //     if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
-        //       localStorage.setItem("refStart", st);
-        //     }
-        //   }
-        // }
-
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
+          //filter joints, remove fingertips and spineShoulder for they are not used
+          body.joints.splice(20,5);
           liveFrames.push(body);
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
+            console.log("Here: " + dataForCntReps.rangeScale + "\t" + threshold_flag);
             var tempCnt = countReps(body, threshold_flag,
               dataForCntReps.rangeScale, dataForCntReps.topThresh, dataForCntReps.bottomThresh);
 
@@ -715,12 +724,13 @@ function goToExercises() {
               console.log("end time: ", ed);
               var diff = Math.round((ed - st) / 1000);
               var speedEval = "It takes " + diff + " s";
+
+              //TODO: online speed, not accurate
               var repItem = {"speed": diff};
               repEvals.push(repItem);
               localStorage.setItem("repEvals", JSON.stringify((repEvals)));
-              console.log(repEvals);
-              console.log(JSON.parse(localStorage.getItem("repEvals")));
-              document.getElementById("speedEval").innerHTML = speedEval;
+
+              //document.getElementById("speedEval").innerHTML = speedEval;
               st = ed;
               console.log("start time: ", st);
             }
@@ -730,11 +740,10 @@ function goToExercises() {
     });
 
     //if the patient is in position and doing a practice session
-
     if(JSON.parse(localStorage.getItem('canStartRecording')) === true && (parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
 
       //draw in the reference canvas
-        drawBody(refFrames[ref_index], ref_ctx,commonBlue,refJointColor, false);
+        drawBody(refFrames[ref_index], ref_ctx, commonBlue,refJointColor, false);
         //display one frame of reference every 2 frames of live frame captured
         //we can manipulate the number to control the display speed
         ref_index = (ref_index + 1) % refFrames.length;
@@ -770,4 +779,3 @@ function goToExercises() {
     return 'Bridge' in window;
   }
 })();
->>>>>>> f83f0834c8c0da20144507947c7248333396d99a

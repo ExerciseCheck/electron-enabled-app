@@ -26,7 +26,7 @@ $webview.addEventListener('dom-ready', () => {
 });
 
 // this is just for development convenience
-// (because the todo app's dev tools are in a separate process)
+// (because the app's dev tools are in a separate process)
 window.openWebviewDevTools = () => {
   $webview.openDevTools();
 };

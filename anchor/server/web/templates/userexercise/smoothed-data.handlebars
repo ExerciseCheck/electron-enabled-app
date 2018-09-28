@@ -1,0 +1,24 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    {{>dashboardNav}}
+    <div class="col-sm-9 col-md-10">
+      <div class="row justify-content-center text-center">
+        <div class="col-xl-10">
+          <p id="title">Let's review the exercise details.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center text-center">
+        <div id="data">{{smoothed_data}}</div>
+        <div id="plot"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <script type="text/javascript" src="/public/scripts/analysis/smoothing.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script>
+    var smoothed_data = {{data}};
+  </script>
+
