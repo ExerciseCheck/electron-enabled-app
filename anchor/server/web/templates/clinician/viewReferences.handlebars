@@ -14,9 +14,7 @@
                                 <th>ExerciseId</th>
                                 <th>numSets</th>
                                 <th>numRepetition</th>
-                                <th>rangeScale</th>
-                                <th>topThresh</th>
-                                <th>bottomThresh</th>
+                                <th>diffLevel</th>
                                 <th>createdAt</th>
                                 <th>view</th>
                                 <th>Edit</th>
@@ -48,7 +46,7 @@
             ajax: {
                 url: "/api/table/userexercise/reference/" + userId,
                 data: function (d) {
-                    d.fields = "exerciseId numSets rangeScale topThresh bottomThresh createdAt type name exerciseName numRepetition";
+                    d.fields = "exerciseId numSets diffLevel createdAt type name exerciseName numRepetition";
                 }
             },
             columns: [
@@ -70,15 +68,7 @@
                     defaultContent: ""
                 },
                 {
-                    data: "rangeScale",
-                    defaultContent: ""
-                },
-                {
-                    data: "topThresh",
-                    defaultContent: ""
-                },
-                {
-                    data: "bottomThresh",
+                    data: "diffLevel",
                     defaultContent: ""
                 },
                 {

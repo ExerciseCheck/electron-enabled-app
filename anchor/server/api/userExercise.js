@@ -389,12 +389,11 @@ internals.applyRoutes = function (server, next) {
             dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
             dataForCntReps['refMin'] = reference.refMin;
             dataForCntReps['refMax'] = reference.refMax;
-            dataForCntReps['neckX'] = reference.neckX;
-            dataForCntReps['neckY'] = reference.neckY;
+            dataForCntReps['bodyHeight'] = reference.neck2spineBase;
+            dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
+            dataForCntReps['jointNeck'] = reference.bodyFrames[0].joint[2];
             // numbers between [0,1]
-            dataForCntReps['topThresh'] = reference.topThresh;
-            dataForCntReps['bottomThresh'] = reference.bottomThresh;
-            dataForCntReps['rangeScale'] = reference.rangeScale;
+            dataForCntReps['diffLevel'] = reference.diffLevel;
             // time for one repetition in reference, in seconds
             dataForCntReps['refTime'] = reference.refTime;
           }
@@ -508,7 +507,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       let bodyFrames = [];
-      let neckX, neckY, refMin, refMax, refLowerJoint, refUpperJoint, refTime;
+      let neck2spineBase, shoulder2shoulder, refMin, refMax, refLowerJoint, refUpperJoint, refTime;
 
       Async.auto({
 
@@ -535,8 +534,8 @@ internals.applyRoutes = function (server, next) {
 
               let temp = results.findMostRecentReference[0];
               bodyFrames = temp.bodyFrames;
-              neckX = temp.neckX;
-              neckY = temp.neckY;
+              neck2spineBase = temp.neck2spineBase;
+              shoulder2shoulder = temp.shoulder2shoulder;
               refMin = temp.refMin
               refMax = temp.refMax;
               refLowerJoint = temp.refLowerJoint;
@@ -550,12 +549,10 @@ internals.applyRoutes = function (server, next) {
             request.payload.exerciseId,
             request.payload.numSets,
             request.payload.numRepetition,
-            request.payload.rangeScale,
-            request.payload.topThresh,
-            request.payload.bottomThresh,
+            request.payload.diffLevel,
             bodyFrames,
-            neckX,
-            neckY,
+            neck2spineBase,
+            shoulder2shoulder,
             refMin,
             refMax,
             refLowerJoint,
@@ -717,9 +714,7 @@ internals.applyRoutes = function (server, next) {
             $set: {
               numSets: request.payload.numSets,
               numRepetition: request.payload.numRepetition,
-              rangeScale: request.payload.rangeScale,
-              topThresh: request.payload.topThresh,
-              bottomThresh: request.payload.bottomThresh
+              diffLevel: request.payload.diffLevel,
             }
           };
           ReferenceExercise.findByIdAndUpdate(id, update, done);
@@ -776,8 +771,8 @@ internals.applyRoutes = function (server, next) {
           const update = {
             $set: {
               bodyFrames: request.payload.bodyFrames,
-              neckX: request.payload.neckX,
-              neckY: request.payload.neckY,
+              neck2spineBase: request.payload.neck2spineBase,
+              shoulder2shoulder: request.payload.shoulder2shoulder,
               refMin: request.payload.refMin,
               refMax: request.payload.refMax,
               refLowerJoint: request.payload.refLowerJoint,
