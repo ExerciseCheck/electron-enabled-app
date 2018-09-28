@@ -149,12 +149,24 @@ internals.applyRoutes = function (server, next) {
         payload: Exercise.payload
       }
     },
+
+
+
     handler: function (request, reply) {
 
       Exercise.create(
         request.payload.exerciseName,
         request.payload.description,
+<<<<<<< HEAD
         request.payload.instructions,
+=======
+        request.payload.joint,
+        request.payload.axis,
+        request.payload.direction,
+        request.payload.refLowerJoint,
+        request.payload.refUpperJoint,
+
+>>>>>>> f83f0834c8c0da20144507947c7248333396d99a
         request.auth.credentials.user._id.toString(),
         (err, document) => {
 

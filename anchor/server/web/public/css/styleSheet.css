@@ -66,30 +66,20 @@
 .bodyCanvas {
    padding-left: 0;
    padding-right: 0;
-   margin-left: auto;
-   margin-right: auto;
+   margin-left: 0;
+   margin-right: 0;
    margin-top: 30px;
    background: grey;
    display: block;
    height: 500px;
-   width: 900px;
+   width: 500px;
 
 }
 
-#cover {
-    background-color: rgba(0,0,0,0.5);
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    align-items: center;
-    justify-content: center;
-    z-index: 99999;
-    overflow: hidden;
-  }
-  #num {
-    font-size: 96px;
-    color: white;
-  }
+.commonBlue{
+  color: #1E89FB
+}
+
+.repsFont{
+  font-size: 120%
+}

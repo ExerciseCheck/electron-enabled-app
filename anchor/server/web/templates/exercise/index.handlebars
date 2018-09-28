@@ -15,6 +15,11 @@
                 <th>Description</th>
                 <th>Instructions</th>
                 <th>Created At</th>
+                <th>impJoint</th>
+                <th>impAxis</th>
+                <th>direction</th>
+                <th>lowerJoint</th>
+                <th>upperJoint</th>
                 {{#role user 'clinician'}}
                   <th>ID</th>
                   <th>Edit</th>
@@ -47,7 +52,11 @@
       ajax: {
         url: "../api/table/exercise",
         data: function (d) {
+<<<<<<< HEAD
           d.fields = "exerciseName description instructions createdAt";
+=======
+          d.fields = "exerciseName description createdAt impJoint impAxis direction lowerJoint upperJoint";
+>>>>>>> f83f0834c8c0da20144507947c7248333396d99a
         }
       },
       columns: [
@@ -70,6 +79,26 @@
             var date = new Date(row.createdAt);
             return date.toDateString() + ' ' + date.toLocaleTimeString('en-us');
           }
+        },
+        {
+          data: "impJoint",
+          defaultContent: ""
+        },
+        {
+          data: "impAxis",
+          defaultContent: ""
+        },
+        {
+          data: "direction",
+          defaultContent: ""
+        },
+        {
+          data: "lowerJoint",
+          defaultContent: ""
+        },
+        {
+          data: "upperJoint",
+          defaultContent: ""
         },
         {{#role user 'clinician'}}
           {

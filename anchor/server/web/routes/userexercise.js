@@ -3,7 +3,8 @@ const internals = {};
 const Async = require('async');
 const Boom = require('boom');
 const Config = require('../../../config');
-const UserExercise = require('../../models/userExercise');
+const PracticeExercise = require('../../models/practiceExercise');
+const ReferenceExercise = require('../../models/referenceExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
 const Info = require('./exerciseInfo.json');
@@ -12,7 +13,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise',
+    path: '/refexercise',
     config: {
       auth: {
         strategy: 'session'
@@ -20,7 +21,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      return reply.view('userexercise/index', {
+      return reply.view('userexercise/viewreference', {
         user: request.auth.credentials.user,
         projectName: Config.get('/projectName')
       });
@@ -95,7 +96,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop') {
+      if (request.params.mode !== 'start' && request.params.mode !== 'play' && request.params.mode !== 'stop' && request.params.mode !== 'end') {
         return reply(Boom.notFound('Invalid Mode'));
       }
 
@@ -112,7 +113,6 @@ internals.applyRoutes = function (server, next) {
       else {
         patientId = request.auth.credentials.user._id.toString();
       }
-      let isComplete = false;
       let setNumber = 0;
 
       Async.auto({
@@ -125,7 +125,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: patientId,
             exerciseId: request.params.exerciseId,
-            type:'Reference'
           };
 
           const pipeLine = [
@@ -133,7 +132,7 @@ internals.applyRoutes = function (server, next) {
             { '$sort': { createdAt: -1 } },
             { '$limit': 1 }
           ];
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
         },
         findNumPractices:['findReference', function (results, done) {
 
@@ -148,33 +147,27 @@ internals.applyRoutes = function (server, next) {
             userId: patientId,
             exerciseId: request.params.exerciseId,
             referenceId: results.findReference[0]._id.toString(),
-            type: 'Practice'
           };
 
-          UserExercise.find(query, done);
+          PracticeExercise.find(query, {sort: {$natural: -1}}, done);
         }],
         findExercise:['findNumPractices', function (results, done) {
 
           Exercise.findById(request.params.exerciseId, done);
-        }]
+        }],
+
       }, (err, results) => {
 
         if (err) {
           return reply(err);
         }
-        if (!results.findExercise || results.findExercise === undefined) {
+        if (!results.findExercise) {
           return reply(Boom.notFound('exercise not found'));
         }
         if (request.params.type === 'practice') {
-          if ( results.findNumPractices.length === results.findReference[0].numSessions ) {
-            isComplete = true;
-          }
-          if ( isComplete ) {
-            setNumber = results.findNumPractices.length;
-          }
-          else if ( !isComplete )  {
-            setNumber = results.findNumPractices.length + 1;
-          }
+          results.findNumPractices[0].isComplete ?
+            setNumber = results.findNumPractices[0].numSetsCompleted :
+            setNumber = results.findNumPractices[0].numSetsCompleted + 1;
         }
 
         if ( request.params.type === 'reference' ) {
@@ -190,12 +183,11 @@ internals.applyRoutes = function (server, next) {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           numRepetition: results.findReference[0].numRepetition,
-          numSets: results.findReference[0].numSessions,
+          numSets: results.findReference[0].numSets,
           setNumber,
           exercise : results.findExercise,
           mode: request.params.mode,
           type: request.params.type,
-          isComplete
         });
       });
     }
@@ -222,7 +214,6 @@ internals.applyRoutes = function (server, next) {
           const filter = {
             userId: request.params.patientId,
             exerciseId: request.params.exerciseId,
-            type:'Reference'
           };
 
           const pipeLine = [
@@ -231,7 +222,7 @@ internals.applyRoutes = function (server, next) {
             { '$limit': 1 }
           ];
 
-          UserExercise.aggregate(pipeLine, done);
+          ReferenceExercise.aggregate(pipeLine, done);
 
         },
         findPatientName:['findReference', function (results, done) {
@@ -270,8 +261,8 @@ internals.applyRoutes = function (server, next) {
             defaultNumReps = results.findReference[0].numRepetition;
           }
 
-          if ( results.findReference[0].numSessions ) {
-            defaultNumSets = results.findReference[0].numSessions;
+          if ( results.findReference[0].numSets ) {
+            defaultNumSets = results.findReference[0].numSets;
           }
         }
 
@@ -429,7 +420,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      UserExercise.findOne({ 'auth.user._id':request.params.id }, (err, document) => {
+      ReferenceExercise.findOne({ 'auth.user._id':request.params.id }, (err, document) => {
 
         if (err) {
           return reply(err);
@@ -455,7 +446,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       //noinspection JSAnnotator
-      UserExercise.findOne({}, (err, document) => {
+      ReferenceExercise.findOne({}, (err, document) => {
 
         if (err) {
           return reply(err);
