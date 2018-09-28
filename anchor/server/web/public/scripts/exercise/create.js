@@ -3,8 +3,13 @@
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
+<<<<<<< HEAD
   instructions: Joi.string().required()
+=======
+>>>>>>> f83f0834c8c0da20144507947c7248333396d99a
 });
+
+
 
 joiToForm('formFields',schema);
 
@@ -18,6 +23,14 @@ $('#create').click((event) => {
     values[field.name] = field.value;
   });
 
+<<<<<<< HEAD
+=======
+  values.joint = $('#impJoint').val();
+  values.axis = $('#impAxis').val();
+  values.direction = $('#direction').val();
+  values.refLowerJoint = $('#refLowerJoint').val();
+  values.refUpperJoint = $('#refUpperJoint').val();
+>>>>>>> f83f0834c8c0da20144507947c7248333396d99a
 
   $.ajax({
     type: 'POST',

@@ -4,11 +4,10 @@
   left: 100px;
   margin-left: auto;
   margin-right: auto;
-  background: #c1c1c1;
-  border-radius: 17px;
-  display: block;
-  height: 85%;
-  width: 97%;
+  background: #DDDEE3;
+  display: none;
+  height: 500px;
+  width: 500px;
 }
 
 .small {
@@ -23,9 +22,8 @@
 .secondSection {
   font-size: 30px;
   line-height: 30px;
-  margin-top:60px;
-  margin-bottom:60px;
-
+  margin-top: 50px;
+  margin-bottom: 60px;
 }
 
 .actionBtn {
@@ -45,3 +43,23 @@
 .mh1 {
     height: 100vh; /* 100% of viewport height*/
 }
+
+#cover {
+  background-color: rgba(0,0,0,0.5);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+#num {
+  font-size: 64px;
+  color: orangered;
+}
+

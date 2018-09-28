@@ -1,8 +1,11 @@
 'use strict';
 
 const schema = Joi.object({
-  numSessions: Joi.number().integer().required(),
+  numSets: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required()
+  // rangeScale: Joi.number().min(0).max(1).required(),
+  // topThresh: Joi.number().min(0).max(1).required(),
+  // bottomThresh: Joi.number().min(0).max(1).required(),
 });
 
 joiToForm('formFields',schema);
@@ -29,7 +32,7 @@ $('#create').click((event) => {
 });
 
 $(document).ready(function() {
-   
+
     $('#exerciseId').select2({
     ajax: {
       delay: 250,
@@ -74,6 +77,3 @@ $(document).ready(function() {
     minimumInputLength: 1,
   });
 });
-
-
-
