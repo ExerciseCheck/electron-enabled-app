@@ -636,7 +636,12 @@ function goToExercises() {
   //     return [reps, threshold_flag];
   //   }
   // }
-  function countReps(body, threshold_flag, diff_level, top_thresh, bottom_thresh) {
+
+  /*
+   * diff_level = {(easy:0.5), (normal:0.75), (hard:0.9)}
+   * base_thresh = 0.25
+   */
+  function countReps(body, threshold_flag, diff_level, base_thresh) {
 
     let reps = 0;
     let norm, ref_norm; // the position of the joint-for-norm
@@ -658,16 +663,21 @@ function goToExercises() {
 
     let currR = ref_d / d * (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm) + ref_norm;
 
-    let ref_max = dataForCntReps.refMax - ref_norm;
-    let ref_min = dataForCntReps.refMin - ref_norm;
+    let ref_min = dataForCntReps.refMin - ref_norm; //upper
+    let ref_max = dataForCntReps.refMax - ref_norm; //lower
+    let range = ref_max - ref_min;
+    let top_thresh, bottom_thresh;
 
+    if (direction === 'up') {
+      top_thresh = ref_min + range * (1-diff_level);
+      bottom_thresh = ref_max - range * base_thresh;
+    } else if (direction === 'down') {
+      top_thresh = ref_min + range * base_thresh;
+      bottom_thresh = ref_max - range * (1-diff_level);
+    }
     // direction group: (down, right), (up, left)
     if ((threshold_flag === 'up') && (currR < top_thresh)) {
       // goes up and pass the top_thresh
-      // // only increase reps when moving against the exercise direction:
-      // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-      //   reps++;
-      // }
       // only increase reps when moving in the same direction as defined in the exercise:
       if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
         reps++;
@@ -675,10 +685,6 @@ function goToExercises() {
       return [reps, 'down'];
     } else if ((threshold_flag === 'down') && (currR > bottom_thresh)) {
       // goes down and pass the bottom_thresh
-      // // only increase reps when moving against the exercise direction:
-      // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-      //   reps++;
-      // }
       // only increase reps when moving in the same direction as defined in the exercise:
       if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
         reps++;
@@ -768,8 +774,7 @@ function goToExercises() {
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
             console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
-            let tempCnt = countReps(body, threshold_flag,
-              dataForCntReps.diffLevel);
+            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
             document.getElementById("cntReps").innerHTML =
