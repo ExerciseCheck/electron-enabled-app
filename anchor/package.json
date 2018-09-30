@@ -26,7 +26,7 @@
     "node": "8.x.x"
   },
   "dependencies": {
-    "adm-zip": "0.4.x",
+    "adm-zip": "^0.4.11",
     "archiver": "2.x.x",
     "async": "2.x.x",
     "bcrypt": "1.x.x",
@@ -38,8 +38,8 @@
     "express": "^4.16.2",
     "glue": "4.x.x",
     "handlebars": "4.x.x",
-    "hapi": "16.x.x",
-    "hapi-auth-basic": "4.x.x",
+    "hapi": "^17.6.0",
+    "hapi-auth-basic": "^4.2.0",
     "hapi-auth-cookie": "7.x.x",
     "hapi-auth-jwt2": "7.x.x",
     "hapi-cron": "0.0.3",
@@ -69,7 +69,7 @@
     "code": "4.x.x",
     "coveralls": "3.x.x",
     "lab": "14.x.x",
-    "nodemon": "1.x.x",
+    "nodemon": "^1.18.4",
     "npm-run": "^4.1.2",
     "pre-commit": "1.x.x",
     "promptly": "2.x.x",

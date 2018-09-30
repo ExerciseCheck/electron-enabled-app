@@ -381,9 +381,11 @@ internals.applyRoutes = function (server, next) {
           dataForCntReps['direction'] = exercise.direction;
           dataForCntReps['refLowerJointID'] = exercise.refLowerJoint;
           dataForCntReps['refUpperJointID'] = exercise.refUpperJoint;
+          // numbers between [0,1]
+          dataForCntReps['diffLevel'] = reference.diffLevel;
 
-          if (reference !== undefined) {
-            console.log("reference exists");
+          if (reference.bodyFrames[0] !== undefined) {
+            console.log("reference.bodyFrames exists");
             // position values below, not jointID, initially undefined
             dataForCntReps['refLowerJointPos'] = reference.refLowerJoint;
             dataForCntReps['refUpperJointPos'] = reference.refUpperJoint;
@@ -391,9 +393,7 @@ internals.applyRoutes = function (server, next) {
             dataForCntReps['refMax'] = reference.refMax;
             dataForCntReps['bodyHeight'] = reference.neck2spineBase;
             dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
-            dataForCntReps['jointNeck'] = reference.bodyFrames[0].joint[2];
-            // numbers between [0,1]
-            dataForCntReps['diffLevel'] = reference.diffLevel;
+            dataForCntReps['jointNeck'] = reference.bodyFrames[0].joints[2];
             // time for one repetition in reference, in seconds
             dataForCntReps['refTime'] = reference.refTime;
           }
