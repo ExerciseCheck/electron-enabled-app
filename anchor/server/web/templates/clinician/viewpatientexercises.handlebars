@@ -28,12 +28,12 @@
          </form>
          <br><br>
          <ul>
-           <div> patient id {{patientId}} </div>
-           <div> exerciseid {{exerciseId}} </div>
+           <!-- <div> patient id {{patientId}} </div>
+           <div> exerciseid {{exerciseId}} </div> -->
            {{#each exercises}}
              <li class="listButtons">
                <a href= '/userexercise/info/{{exerciseName}}'>{{formatName this.exerciseName}}</a>
-                <!--<a href= '/userexercise/setting/{{this._id}}/{{../patientId}}'>{{formatName this.exerciseName}}</a>-->
+               <!--<a href= '/userexercise/setting/{{this._id}}/{{../patientId}}'>{{formatName this.exerciseName}}</a>-->
              </li>
           {{/each}}
         </ul>

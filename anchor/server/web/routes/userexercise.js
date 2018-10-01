@@ -557,6 +557,35 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+  server.route({
+  method: 'GET',
+  path: '/userexercise/info/{exerciseName}',
+  config: {
+    auth: {
+      strategy: 'session'
+    }
+  },
+  handler: function (request, reply) {
+
+    //console.log("trying to find patient id and exercise id")
+    console.log(request.params)
+    let exerciseName = request.params.exerciseName;
+    //db call db.exercise.find( exercisename: request.params.exerciseName)
+    Exercise.findOne({'exerciseName': request.params.exerciseName},(err, result) => {
+      return reply.view('userexercise/info', {
+        user: request.auth.credentials.user,
+        exerciseName: exerciseName,
+        projectName: Config.get('/projectName'),
+        title: exerciseName + ' Information',
+       instructions: result.instructions//mongo, ["a","b"]
+      //  goal: Info[exerciseName]['Goal']
+
+      });
+    })
+
+  }
+});
+
   next();
 };
 

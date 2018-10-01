@@ -1,4 +1,4 @@
-<nav class="col-sm-3 col-md-2 d-none d-sm-block bg-secondary sidebar" style="padding-top: 40px">
+<nav id="dashboardNav" class="col-sm-3 col-md-2 d-none d-sm-block bg-secondary sidebar" style="padding-top: 40px; height: 150%">
   <ul class="nav nav-pills flex-column">
     <h6 class="text-dark">Your Roles
       {{#if (isPatient user)}}
@@ -59,3 +59,6 @@
     </ul>
   {{/role}}
 </nav>
+
+<!-- read from dashboardNav.css -->
+<link rel="stylesheet" href="../public/css/styleSheet/dashboardNav.css">

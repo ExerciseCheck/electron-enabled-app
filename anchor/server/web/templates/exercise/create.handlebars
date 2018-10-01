@@ -1,7 +1,9 @@
 <div class="container-fluid h-100">
+
   <div class="row h-100">
-    {{>dashboardNav}}
+      {{>dashboardNav}}
     <div class="col-sm-9 col-md-10">
+
       <div style="padding: 30px">
         <h3>Create Exercise</h3>
         <hr>
@@ -9,6 +11,10 @@
           <div style="padding: 20px">
             <form id="form">
               <div id="formFields"></div>
+              <label for="instructions" class="label"> Instructions</label>
+              <div class="form-group">
+                <input id="instructions"></input>
+              </div>
               <label for="impJoint" class="label">Most Important Joint</label>
               <div class="form-group">
                 <select type="number" class="form-control" id="impJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>

@@ -13,6 +13,7 @@
               <tr>
                 <th>Exercise Name</th>
                 <th>Description</th>
+                <th>Instructions</th>
                 <th>Created At</th>
                 <th>impJoint</th>
                 <th>impAxis</th>
@@ -51,7 +52,7 @@
       ajax: {
         url: "../api/table/exercise",
         data: function (d) {
-          d.fields = "exerciseName description createdAt impJoint impAxis direction lowerJoint upperJoint";
+          d.fields = "exerciseName description instructions createdAt impJoint impAxis direction lowerJoint upperJoint";
         }
       },
       columns: [
@@ -61,6 +62,10 @@
         },
         {
           data: "description",
+          defaultContent: ""
+        },
+        {
+          data: "instructions",
           defaultContent: ""
         },
         {

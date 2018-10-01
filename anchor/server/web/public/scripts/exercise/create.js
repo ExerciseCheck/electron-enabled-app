@@ -3,6 +3,7 @@
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
+  // instructions: Joi.string().required()
 });
 
 
@@ -21,7 +22,9 @@ $('#create').click((event) => {
   values.direction = $('#direction').val();
   values.refLowerJoint = $('#refLowerJoint').val();
   values.refUpperJoint = $('#refUpperJoint').val();
+  values.instructions = $('#instructions').val();
 
+  console.log( values);
   $.ajax({
     type: 'POST',
     url: '/api/exercise',

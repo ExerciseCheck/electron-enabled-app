@@ -154,9 +154,12 @@ internals.applyRoutes = function (server, next) {
 
     handler: function (request, reply) {
 
+      console.log("request.payload.instructions");
+      console.log(request.payload);
       Exercise.create(
         request.payload.exerciseName,
         request.payload.description,
+        request.payload.instructions.split(","),
         request.payload.joint,
         request.payload.axis,
         request.payload.direction,

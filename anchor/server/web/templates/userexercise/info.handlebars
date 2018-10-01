@@ -7,19 +7,19 @@
         <h1>How To: {{exerciseName}}</h1>
 
 
-        <div class="goal"> Goal: {{goal}} *{{exerciseId}} {{patientId}} *</div>
+        <!-- <div class="goal"> Goal: {{goal}} *{{exerciseId}} {{patientId}} *</div> -->
 
-        <div class="instructions">
+        <!-- <div class="instructions">
           <ol>
             {{#each instructions}}
             <li class="text"> {{this.text}} </li>
             {{/each}}
           </ol>
-        </div>
+        </div> -->
 
 
         <div class="button-wrapper">
-          <a href ='/userexercise/setting/{{exerciseId}}/{{patientId}}'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
+          <a href ='/userexercise/userexercise/{exerciseName}/setting'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
         </div>
 
         <br><br>

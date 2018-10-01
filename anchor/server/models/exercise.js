@@ -4,11 +4,12 @@ const MongoModels = require('hicsail-mongo-models');
 
 class Exercise extends MongoModels {
 
-  static create(exerciseName, description, joint, axis, direction, refLowerJoint, refUpperJoint, userId, callback) {
+  static create(exerciseName, description, instructions, joint, axis, direction, refLowerJoint, refUpperJoint, userId, callback) {
 
     const document = {
       exerciseName,
       description,
+      instructions,
       joint,
       axis,
       direction,
@@ -34,6 +35,7 @@ Exercise.schema = Joi.object().keys({
   _id: Joi.object(),
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
+  instructions: Joi.array(),
   joint: Joi.number().integer().required(),
   axis: Joi.string().required(),
   direction: Joi.string().required(),
@@ -45,6 +47,7 @@ Exercise.schema = Joi.object().keys({
 Exercise.payload = Joi.object().keys({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
+  instructions: Joi.string().required(),
   joint: Joi.number().integer().required(),
   axis: Joi.string().valid('depthX','depthY').required(),
   direction: Joi.string().valid('up','down','L2R','R2L').required(),
