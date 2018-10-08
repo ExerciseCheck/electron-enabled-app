@@ -3,7 +3,7 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames;
+let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
 let req, db;
 let dataForCntReps = {};
 //let refStart, refEnd; //not used
