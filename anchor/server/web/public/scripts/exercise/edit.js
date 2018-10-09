@@ -2,23 +2,31 @@
 
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
-  description: Joi.string().required(),
-  joint: Joi.number().integer().required(),
-  axis: Joi.string().required(),
-  direction: Joi.string().required(),
-  refLowerJoint: Joi.number().integer().required(),
-  refUpperJoint: Joi.number().integer().required(),
+  description: Joi.string().required()
 });
 
-joiToForm('formFields',schema);
+joiToForm('formFields', schema);
 
-$('#update').click((event) => {
+// $('#update').click((event) => {
+//   const exerciseId = window.location.pathname.split('/').pop();
+//   event.preventDefault();
+//   const values = {};
+//   $.each($('#form').serializeArray(), (i, field) => {
+//     values[field.name] = field.value;
+//   });
+
+$('#update').click((event) = > {
   const exerciseId = window.location.pathname.split('/').pop();
   event.preventDefault();
   const values = {};
-  $.each($('#form').serializeArray(), (i, field) => {
+  $.each($('#form').serializeArray(), (i, field) = > {
     values[field.name] = field.value;
   });
+  values.joint = $('#impJoint').val();
+  values.axis = $('#impAxis').val();
+  values.direction = $('#direction').val();
+  values.refLowerJoint = $('#refLowerJoint').val();
+  values.refUpperJoint = $('#refUpperJoint').val();
   $.ajax({
     type: 'PUT',
     url: '/api/exercise/' + exerciseId,

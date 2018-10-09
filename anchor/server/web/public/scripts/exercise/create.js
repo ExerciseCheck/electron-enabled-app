@@ -2,12 +2,10 @@
 
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
-  description: Joi.string().required(),
+  description: Joi.string().required()
 });
 
-
-
-joiToForm('formFields',schema);
+joiToForm('formFields', schema);
 
 $('#create').click((event) => {
   event.preventDefault();
