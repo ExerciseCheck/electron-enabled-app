@@ -662,12 +662,17 @@ function goToExercises() {
     }
 
     let currR = ref_d / d * (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm) + ref_norm;
+    console.log("ref_d: " + ref_d);
+    console.log("ref_norm: " + ref_norm);
+    console.log("d: " + d);
+    console.log("norm: " + norm);
+    console.log("currR: " + currR);
 
-    let ref_min = dataForCntReps.refMin - ref_norm; //upper
-    let ref_max = dataForCntReps.refMax - ref_norm; //lower
+    let ref_min = dataForCntReps.refMin; //upper
+    let ref_max = dataForCntReps.refMax; //lower
     let range = ref_max - ref_min;
     let top_thresh, bottom_thresh;
-
+    console.log("ref_min, ref_max: " + ref_min + "\t" + ref_max);
     if (direction === 'up') {
       top_thresh = ref_min + range * (1-diff_level);
       bottom_thresh = ref_max - range * base_thresh;
@@ -675,6 +680,8 @@ function goToExercises() {
       top_thresh = ref_min + range * base_thresh;
       bottom_thresh = ref_max - range * (1-diff_level);
     }
+    console.log("top_thresh: " + top_thresh);
+    console.log("bottom_thresh: " + bottom_thresh);
     // direction group: (down, right), (up, left)
     if ((threshold_flag === 'up') && (currR < top_thresh)) {
       // goes up and pass the top_thresh
@@ -752,14 +759,14 @@ function goToExercises() {
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
         document.addEventListener('timer-done', function(evt){
-          console.log("timer done", evt.detail);
+          //console.log("timer done", evt.detail);
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
           nz_1stFrame = body.joints[2].cameraZ;
           bodyWidth = body.joints[8].depthX - body.joints[4].depthX;
           bodyHeight = body.joints[0].depthY - body.joints[2].depthY;
 
-          console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
+          //console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
           st = new Date().getTime();
           if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
             localStorage.setItem("refStart", st);

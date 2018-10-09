@@ -1,5 +1,5 @@
 'use strict';
 
 window.CONFIG = {
-  TIMER_MAX: 2
+  TIMER_MAX: 5
 }
