@@ -1,3 +1,24 @@
+h1 {
+  text-transform: capitalize !important;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-left: 20px;
+  color: black;
+
+
+}
+
+.instructions {
+  font-size: 25px;
+  margin-left: 40px;
+}
+
+li.text {
+  margin-top: 50px;
+  margin-right: 50px;
+}
+
+
 .body {margin:2rem;}
 
 .button {
@@ -22,36 +43,17 @@
   color:#fff;
   opacity:1;
 
-.goal{
-  margin-top: 20px;
-  margin-left: 20px;
-  font-style: italic;
-}
 
-h1 {
-  text-transform: capitalize;
-  margin-bottom: 20px;
-  margin-top: 20px;
-  margin-left: 20px;
 
-}
 
-.instructions {
-  font-size: 25px;
-  margin-left: 40px;
-}
 
-li.text {
-  margin-top: 50px;
-  margin-right: 50px;
-}
-
-.modal-body {
+/* .modal-body {
   position:relative;
   padding:0px;
-}
+  width: 100px;
+} */
 
-.modal-dialog {
+/* .modal-dialog {
       max-width: 800px;
       margin: 30px auto;
-  }
+  } */

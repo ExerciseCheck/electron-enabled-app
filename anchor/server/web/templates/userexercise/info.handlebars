@@ -4,54 +4,56 @@
     <div class="col-sm-9 col-md-10">
       <div id="mainContent">
 
-        <h1>How To: {{exerciseName}}</h1>
+        <h1 class="how-to"> How To: {{exerciseName}} </h1>
+        <hr>
 
 
         <!-- <div class="goal"> Goal: {{goal}} *{{exerciseId}} {{patientId}} *</div> -->
-
-        <!-- <div class="instructions">
+        <div class="test"> instructions: {{instructions}}</div>
+        <div class="card">
+        <div class="instructions">
           <ol>
             {{#each instructions}}
-            <li class="text"> {{this.text}} </li>
+              <li>{{ this }}</li>
             {{/each}}
           </ol>
-        </div> -->
-
+        </div>
+      </div>
 
         <div class="button-wrapper">
-          <a href ='/userexercise/userexercise/{exerciseName}/setting'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
+          <a href ='/userexercise/setting/{{exerciseName}}/'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
         </div>
 
         <br><br>
 
-        <div class="container">
-          <h1>Reference Video:</h1>
+        <!-- <div class="container">
+          <h1>Reference Video:</h1> -->
 
 
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://www.youtube.com/embed/Jfrjeg26Cwk" data-target="#myModal">
+          <!-- <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://www.youtube.com/embed/Jfrjeg26Cwk" data-target="#myModal">
             Play Video 1
-          </button>
+          </button> -->
 
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://www.youtube.com/embed/IP7uGKgJL8U" data-target="#myModal">
+          <!-- <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://www.youtube.com/embed/IP7uGKgJL8U" data-target="#myModal">
             Play Video 2
-          </button>
+          </button> -->
 
 
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://www.youtube.com/embed/A-twOC3W558" data-target="#myModal">
+          <!-- <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://www.youtube.com/embed/A-twOC3W558" data-target="#myModal">
             Play Video 3
-          </button>
+          </button> -->
 
 
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://player.vimeo.com/video/58385453?badge=0" data-target="#myModal">
+          <!-- <button type="button" class="btn btn-primary video-btn" data-toggle="modal" data-src="https://player.vimeo.com/video/58385453?badge=0" data-target="#myModal">
             Play Vimeo Video
-          </button>
+          </button> -->
 
           <!-- Modal -->
-          <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
 
@@ -60,9 +62,9 @@
 
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
-                  </button>
+                  </button> -->
                   <!-- 16:9 aspect ratio -->
-                  <div class="embed-responsive embed-responsive-16by9">
+                  <!-- <div class="embed-responsive embed-responsive-16by9">
                     <iframe class="embed-responsive-item" src="" id="video"  allowscriptaccess="always"></iframe>
                   </div>
 
@@ -78,11 +80,12 @@
         </div>
 
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 
-<link rel="stylesheet" href="/public/css/styleSheet/exerciseInfo.css">
-<script type="text/javascript" src="../public/scripts/userexercise/exerciseinfo.js"></script>
+
+<!-- <script type="text/javascript" src="../public/scripts/userexercise/exerciseinfo.js"></script> -->
 <script type="text/javascript" src="../public/scripts/userexercise/setting.js"></script>
 <script type="text/javascript" src="../public/scripts/clinician.js"></script>
+<link rel="stylesheet" href="/public/css/styleSheet/exerciseInfo.css">
