@@ -101,6 +101,18 @@
 
 <link rel="stylesheet" href="/public/css/styleSheet/setting.css">
 <script type="text/javascript" src="/public/scripts/userexercise/setting.js"></script>
+<script>
+  let defaultDiffLevel = {{defaultDiffLevel}};
+  console.log(defaultDiffLevel);
+  let diffLevel = document.getElementById('diffLevel');
+  for (let i = 0; i < diffLevel.options.length; ++i) {
+    if (parseFloat(diffLevel.options[i].value) !== defaultDiffLevel) {
+      diffLevel.options[i].selected = false;
+    } else {
+      diffLevel.options[i].selected = true;
+    }
+  }
+</script>
 
 
 

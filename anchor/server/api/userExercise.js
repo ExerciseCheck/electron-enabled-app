@@ -1076,6 +1076,7 @@ internals.applyRoutes = function (server, next) {
             exerciseId: request.params.exerciseId,
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
+          console.log("HERE: ref id: " + query.referenceId);
           PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
         }]
       }, (err, results) => {
@@ -1122,7 +1123,8 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-        if (!document) {
+        if (
+          !document) {
           return reply(Boom.notFound('Document not found.'));
         }
 

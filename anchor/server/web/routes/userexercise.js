@@ -207,6 +207,7 @@ internals.applyRoutes = function (server, next) {
       let referenceExists = true;
       let defaultNumReps = 1;
       let defaultNumSets = 1;
+      let defaultDiffLevel = 0.75;
 
       Async.auto({
 
@@ -265,6 +266,10 @@ internals.applyRoutes = function (server, next) {
           if ( results.findReference[0].numSets ) {
             defaultNumSets = results.findReference[0].numSets;
           }
+
+          if ( results.findReference[0].diffLevel ) {
+            defaultDiffLevel = results.findReference[0].diffLevel;
+          }
         }
 
         return reply.view('userexercise/setting', {
@@ -276,7 +281,8 @@ internals.applyRoutes = function (server, next) {
           patientId: request.params.patientId,
           referenceExists,
           defaultNumReps,
-          defaultNumSets
+          defaultNumSets,
+          defaultDiffLevel
         });
       });
     }
