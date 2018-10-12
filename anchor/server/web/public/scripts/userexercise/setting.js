@@ -123,7 +123,7 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, 0.5, getExerciseId(), getPatientId(), redirectToUrl);
+      initialSetting(1, 1, 0.75, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
 }

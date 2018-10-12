@@ -197,18 +197,10 @@ function savePractice() {
     url: url,
     data: values,
     success: function (result) {
-
-      //popup the analysis result:
-      //TODO: change alert msg to Sabrina's window
-      //let url_analysis = url; // seems not working, but why?
-      let url_analysis = '/api/userexercise/practiceanalysis/' + exerciseId + '/';
-      if(patientId) {
-        url_analysis = url_analysis + patientId;
-      }
-      $.get(url_analysis, function(data) {
-        localStorage.setItem("feedback", JSON.stringify(data));
-      });
-      let msg = localStorage.getItem("feedback");
+      let acc = result.accuracy;
+      let spd = result.speed;
+      console.log(acc, spd);
+      let msg = JSON.stringify(result);
       alert(msg);
 
       if(isComplete) {

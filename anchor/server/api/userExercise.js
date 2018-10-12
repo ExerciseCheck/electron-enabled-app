@@ -1041,63 +1041,6 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route sends the analysis result to the client
-  server.route({
-    method: 'GET',
-    path: '/userexercise/practiceanalysis/{exerciseId}/{patientId?}',
-    config: {
-      auth: {
-        strategies: ['simple', 'jwt', 'session'],
-        // scope: ['root', 'admin','clinician']
-      }
-    },
-    handler: function (request, reply) {
-
-      Async.auto({
-        //if there is a previous reference, we must find it so we can
-        //re-use its bodyFrames
-        findMostRecentReference: function (done) {
-
-          const filter = {
-            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-            exerciseId: request.params.exerciseId,
-          };
-
-          const pipeLine = [
-            { '$match': filter },
-            { '$sort': { createdAt: -1 } },
-            { '$limit': 1 }
-          ];
-          ReferenceExercise.aggregate(pipeLine, done);
-        },
-        findPracticeExercise: ['findMostRecentReference', function (results, done) {
-          const query = {
-            userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-            exerciseId: request.params.exerciseId,
-            referenceId: results.findMostRecentReference[0]._id.toString()
-          };
-          console.log("HERE: ref id: " + query.referenceId);
-          PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
-        }]
-      }, (err, results) => {
-
-        if (err) {
-          return reply(err);
-        }
-        if (!results.findMostRecentReference) {
-        return reply(Boom.notFound('Document not found.'));
-      }
-      if(results.findPracticeExercise) {
-          let set_len = results.findPracticeExercise.sets.length; // the most recent
-          console.log("set length: " + set_len);
-        return reply(results.findPracticeExercise.sets[set_len-1].analysis);
-      }
-      reply(false);
-    });
-    }
-  });
-
-
   // not used
   server.route({
     method: 'PUT',
