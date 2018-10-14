@@ -21,9 +21,12 @@ module.exports = function getSegmentation(x, theDirection, time_thresh) {
     } else if(v < (-1)*v_thresh) {
       idx.push([i, !ifIncreased]);
     }
+    else{
+      idx.push([i, !ifIncreased]);
+    }
   }
-  // console.log("first: " + idx[0]);
-  // console.log("last: " + idx[idx.length-1]);
+  console.log("first: " + idx[0]);
+  console.log("last: " + idx[idx.length-1]);
 
   let idx_st=[]; // records the idx of the first true
   let timing = [];
@@ -51,4 +54,3 @@ module.exports = function getSegmentation(x, theDirection, time_thresh) {
 
   return timing;
 }
-

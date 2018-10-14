@@ -2,7 +2,8 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
-const DTW = require('dtw');
+const DTW = require('../../../dtw');
+const Pako = require('pako');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Segs = require('../web/helpers/segmentation');
 
@@ -870,14 +871,17 @@ internals.applyRoutes = function (server, next) {
           let prac_impt_joint; // the chosen axis
           let prac_impt_joint_XYZ = [];
           // For normalization:
-          let prac_shoulderL2R = requestPayload.bodyFrames[0].joints[8]["depthX"] - requestPayload.bodyFrames[0].joints[4]["depthX"];
-          let prac_neck2base = requestPayload.bodyFrames[0].joints[0]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"];
+          // console.log("requestPayload=", requestPayload.bodyFrames);
+          let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
+          // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+          let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
+          let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
           //let prac_depth = ??
 
-          for (var i=0; i<requestPayload.bodyFrames.length; ++i) {
-            prac_impt_joint_X.push((requestPayload.bodyFrames[i].joints[theJoint]["depthX"] - requestPayload.bodyFrames[0].joints[2]["depthX"]) / prac_shoulderL2R);
-            prac_impt_joint_Y.push((requestPayload.bodyFrames[i].joints[theJoint]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"]) / prac_neck2base);
-            prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"] - requestPayload.bodyFrames[0].joints[2]["cameraZ"]);
+          for (var i=0; i<bodyFrames_decompressed.length; ++i) {
+            prac_impt_joint_X.push((bodyFrames_decompressed[i].joints[theJoint]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
+            prac_impt_joint_Y.push((bodyFrames_decompressed[i].joints[theJoint]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
+            prac_impt_joint_Z.push(bodyFrames_decompressed[i].joints[theJoint]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
           }
 
           let ref_impt_joint_X = [];
@@ -886,15 +890,18 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint;
           let ref_impt_joint_XYZ = [];
           // For normalization:
-          let ref_shoulderL2R = results.findMostRecentReference[0].bodyFrames[0].joints[8]["depthX"] - results.findMostRecentReference[0].bodyFrames[0].joints[4]["depthX"];
-          let ref_neck2base = results.findMostRecentReference[0].bodyFrames[0].joints[0]["depthY"] - results.findMostRecentReference[0].bodyFrames[0].joints[2]["depthY"];
+          // console.log("findMostRecentReference=", results.findMostRecentReference[0].bodyFrames);
+          let findMostRecentReference_decompressed = JSON.parse(Pako.inflate(results.findMostRecentReference[0].bodyFrames, { to: 'string' }));
+          console.log("findMostRecentReference_decompressed=", findMostRecentReference_decompressed);
+          let ref_shoulderL2R = findMostRecentReference_decompressed[0].joints[8]["depthX"] - findMostRecentReference_decompressed[0].joints[4]["depthX"];
+          let ref_neck2base = findMostRecentReference_decompressed[0].joints[0]["depthY"] - findMostRecentReference_decompressed[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          for (var i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
-            ref_impt_joint_X.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
-            ref_impt_joint_Y.push((results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
-            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] -
-              results.findMostRecentReference[0].bodyFrames[0].joints[2]["cameraZ"]);
+          for (var i=0; i<findMostRecentReference_decompressed.length; ++i) {
+            ref_impt_joint_X.push((findMostRecentReference_decompressed[i].joints[theJoint]["depthX"] - results.findMostRecentReference[0].neckX) / ref_shoulderL2R);
+            ref_impt_joint_Y.push((findMostRecentReference_decompressed[i].joints[theJoint]["depthY"] - results.findMostRecentReference[0].neckY) / ref_neck2base);
+            ref_impt_joint_Z.push(findMostRecentReference_decompressed[i].joints[theJoint]["cameraZ"] -
+              findMostRecentReference_decompressed[0].joints[2]["cameraZ"]);
           }
 
           let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
@@ -921,6 +928,7 @@ internals.applyRoutes = function (server, next) {
             ref_impt_joint = ref_impt_joint_Y_smoothed;
           }
           // assuming each repetition if any exercise takes >= 1 sec
+          console.log("prac_impt_joint=", prac_impt_joint);
           let prac_timing = Segs(prac_impt_joint, theDirection, 20);
           let ref_timing = Segs(ref_impt_joint, theDirection, 20);
 

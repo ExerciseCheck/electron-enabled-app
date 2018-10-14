@@ -99,7 +99,7 @@ function action(nextMode, type) {
         let ref_ed = new Date().getTime();
         localStorage.setItem("refEnd", ref_ed);
 
-        let updatedRef = {type: 'refFrames', body: liveFrames};
+        let updatedRef = {type: 'refFrames', body: liveFrames_compressed};
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         let request = bodyFramesStore.put(updatedRef);
         request.onsuccess = function(event) {
@@ -110,7 +110,7 @@ function action(nextMode, type) {
     //"Discard Reference Recording"
     else if(nextMode === 'start' && type === 'reference') {
       //hacky delete
-      let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: []});
+      let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: ''});
       deleteref.onsuccess = function(e) {
         redirect();
       }
@@ -118,7 +118,8 @@ function action(nextMode, type) {
 
     //End of doing a practice session. Live Frames get saved temporarily to indexedDB
     else if(nextMode === 'stop' && type === 'practice') {
-      let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+      let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames_compressed});
       request.onsuccess = function(e) {
         redirect();
       }
@@ -162,7 +163,8 @@ function saveReference() {
 
   let values = {};
   // save to referenceExercise
-  values.bodyFrames = JSON.stringify(refFrames);
+  // values.bodyFrames = JSON.stringify(refFrames);
+  values.bodyFrames = refFrames_compressed;
   values.neckX = refFrames[0].joints[2].depthX;
   values.neckY = refFrames[0].joints[2].depthY;
   var mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
@@ -202,6 +204,7 @@ function savePractice() {
   let isComplete = false;
   let values = {};
   values.bodyFrames = recentFrames_compressed;
+  // values.bodyFrames = recentFrames;
 
   // if no good repitition detected
   values.repEvals = localStorage.getItem("repEvals");
@@ -357,10 +360,10 @@ $('.actionBtn').click(function() {
             try {
               refFrames_compressed = getref.result.body;
               refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
+              console.log("refFrames loaded locally");
             } catch (err) {
               console.log(err);
             }
-            console.log("refFrames loaded locally");
           }
           showCanvas();
           console.log("show canvas called after getting referenceFrames");
@@ -749,12 +752,12 @@ $('.actionBtn').click(function() {
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
         document.addEventListener('timer-done', function(evt){
-          console.log("timer done", evt.detail);
+          // console.log("timer done", evt.detail);
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
           nz_1stFrame = body.joints[2].cameraZ;
 
-          console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
+          // console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
           st = new Date().getTime();
           if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
             localStorage.setItem("refStart", st);
