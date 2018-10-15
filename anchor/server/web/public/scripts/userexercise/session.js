@@ -9,8 +9,9 @@ let dataForCntReps = {};
 //let refStart, refEnd; //not used
 let repEvals = [];
 let liveBodyColor="#7BE39F";
-let commonBlue = "#1E89FB"
-let refJointColor = "#FF6786"
+let commonBlue = "#1E89FB";
+let refJointColor = "#FF6786";
+//const popupS = require('popups');
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -136,8 +137,6 @@ function saveReference() {
   let mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
   values.refMin = mm.min;
   values.refMax = mm.max;
-  values.refLowerJoint = refFrames[0].joints[dataForCntReps.refLowerJointID][dataForCntReps.axis];
-  values.refUpperJoint = refFrames[0].joints[dataForCntReps.refUpperJointID][dataForCntReps.axis];
   values.neck2spineBase = refFrames[0].joints[0]["depthY"] - refFrames[0].joints[2]["depthY"];
   values.shoulder2shoulder = refFrames[0].joints[8]["depthX"] - refFrames[0].joints[4]["depthX"];
   let ed = localStorage.getItem("refEnd");
@@ -147,8 +146,6 @@ function saveReference() {
   values.refTime = Math.round((ed - st) / 1000);
   console.log(values.refTime);
   // save also to dataForCntReps
-  dataForCntReps.refLowerJointPos = values.refLowerJoint;
-  dataForCntReps.refUpperJointPos = values.refUpperJoint;
   dataForCntReps.refTime = values.refTime;
   dataForCntReps.bodyHeight = values.neck2spineBase;
   dataForCntReps.bodyWidth = values.shoulder2shoulder;
@@ -167,6 +164,30 @@ function saveReference() {
   });
 }
 
+
+function showFeedback(accuracy, speed) {
+  //TODO: set threshold for comment and return feedback as words
+  document.getElementById("acc").innerHTML = (accuracy*100).toFixed(2) + "%";
+  document.getElementById("spd").innerHTML = (speed*100).toFixed(2) + "%";
+
+  // Get the modal
+  let modal = document.getElementById('fdbkModal');
+  // Get the <span> element that closes the modal
+  let span = document.getElementsByClassName("close")[0];
+  // Open Modal
+  modal.style.display = "block";
+  // Close Modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  };
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+}
+
+
 function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
@@ -176,7 +197,7 @@ function savePractice() {
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
 
-  // if no good repitition detected
+  // if no good repetition detected
   values.repEvals = localStorage.getItem("repEvals");
   if(!values.repEvals) {
     values.repEvals=JSON.stringify([{"speed": -1}]);
@@ -184,7 +205,7 @@ function savePractice() {
   console.log(values.repEvals);
   localStorage.removeItem("repEvals");
 
-  //logged-in user is clinician
+  // logged-in user is clinician
   if (patientId) {
     url = url + patientId;
   }
@@ -192,29 +213,37 @@ function savePractice() {
     values.weekEnd = new Date().getWeekNumber();
     isComplete = true;
   }
+
+  // variables for feedback
+  let ifSuccess = false;
+  let acc;
+  let spd;
   $.ajax({
     type: 'PUT',
     url: url,
     data: values,
     success: function (result) {
-      let acc = result.accuracy;
-      let spd = result.speed;
+      acc = result.accuracy;
+      spd = result.speed;
       console.log(acc, spd);
-      let msg = JSON.stringify(result);
-      alert(msg);
+      ifSuccess = true;
+      // Modal popup for analysis
+      showFeedback(acc, spd);
 
       if(isComplete) {
-      	window.location = '/userexercise/session/end/practice/' +
+        window.location = '/userexercise/session/end/practice/' +
           exerciseId + '/' + patientId;
       } else {
         window.location = '/userexercise/session/start/practice/' +
           exerciseId + '/' + patientId;
       }
+      let msg = JSON.stringify(result);
+      alert(msg)
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
     }
-  });
+  })
 }
 
 function goTodashBoard() {
@@ -572,63 +601,6 @@ function goToExercises() {
     //ctx.strokeStyle="black";
   }
 
-  //function that counts repetitions
-  // function countReps(body, threshold_flag, range_scale, top_thresh, bottom_thresh) {
-  //
-  //   let reps = 0;
-  //   let norm, ref_norm;
-  //   // This is set when user is correctly positioned in circle
-  //   // neck: 2
-  //   if (dataForCntReps.axis == 'depthY') {
-  //     ref_norm = dataForCntReps.neckY;
-  //     norm = ny_1stFrame;
-  //   } else if (dataForCntReps.axis == 'depthX') {
-  //     ref_norm = dataForCntReps.neckX;
-  //     norm = nx_1stFrame;
-  //   }
-  //
-  //   // Normalize reference points to neck
-  //   let ref_lower_joint = dataForCntReps.refLowerJointPos - ref_norm;
-  //   let ref_upper_joint = dataForCntReps.refUpperJointPos - ref_norm;
-  //   //let range = (ref_lower_joint - ref_upper_joint) * range_scale;
-  //
-  //   let ref_max = dataForCntReps.refMax - ref_norm;
-  //   let ref_min = dataForCntReps.refMin - ref_norm;// only increase reps when moving against the exercise direction:
-  //
-  //   let range = (ref_max - ref_min) * range_scale;
-  //
-  //   // Normalize current point by range and current neck value
-  //   let current_pt = (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm - ref_min) / range;
-  //
-  //   // direction group: (down, right), (up, left)
-  //   if ((threshold_flag === 'up') && (current_pt < top_thresh)) {
-  //     // goes up and pass the top_thresh
-  //     // // only increase reps when moving against the exercise direction:
-  //     // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-  //     //   reps++;
-  //     // }
-  //     // only increase reps when moving in the same direction as defined in the exercise:
-  //     if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-  //       reps++;
-  //     }
-  //     return [reps, 'down'];
-  //   } else if ((threshold_flag === 'down') && (current_pt > bottom_thresh)) {
-  //     // goes down and pass the bottom_thresh
-  //     // // only increase reps when moving against the exercise direction:
-  //     // if (threshold_flag !== direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-  //     //   reps++;
-  //     // }
-  //     // only increase reps when moving in the same direction as defined in the exercise:
-  //     if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-  //       reps++;
-  //     }
-  //     return [reps, 'up'];
-  //   } else {
-  //     // console.log("No flip");
-  //     return [reps, threshold_flag];
-  //   }
-  // }
-
   /*
    * diff_level = {(easy:0.5), (normal:0.75), (hard:0.9)}
    * base_thresh = 0.25
@@ -778,22 +750,6 @@ function goToExercises() {
             threshold_flag = tempCnt[1];
             document.getElementById("cntReps").innerHTML =
               parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
-
-            if (tempCnt[0] === 1) {
-              ed = new Date().getTime();
-              console.log("end time: ", ed);
-              let diff = Math.round((ed - st) / 1000);
-              let speedEval = "It takes " + diff + " s";
-
-              //Note: online speed is not very accurate
-              let repItem = {"speed": diff};
-              repEvals.push(repItem);
-              localStorage.setItem("repEvals", JSON.stringify((repEvals)));
-
-              //document.getElementById("speedEval").innerHTML = speedEval;
-              st = ed;
-              console.log("start time: ", st);
-            }
           }
         }
       }

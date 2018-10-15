@@ -50,8 +50,8 @@ function smoothGauss(list,degree){
   return smoothed;
 }
 
-module.exports = function smoothingMethod(list, degree, method="gauss") {
-  if (method === "gauss") return smoothGauss(list,degree);
-  else if (method === "tri") return smoothTri(list, degree);
+module.exports = function smoothingMethod(list, degree, method) {
+  if (method === "tri") return smoothTri(list, degree);
   else if (method === "avg") return smoothAvg(list, degree);
+  else return smoothGauss(list,degree);
 }

@@ -160,9 +160,6 @@ internals.applyRoutes = function (server, next) {
         request.payload.joint,
         request.payload.axis,
         request.payload.direction,
-        request.payload.refLowerJoint,
-        request.payload.refUpperJoint,
-
         request.auth.credentials.user._id.toString(),
         (err, document) => {
 

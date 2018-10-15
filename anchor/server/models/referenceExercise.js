@@ -5,7 +5,7 @@ const MongoModels = require('hicsail-mongo-models');
 class ReferenceExercise extends MongoModels {
 
   static create(userId, exerciseId, numSets, numRepetition, diffLevel, bodyFrames,
-                neck2spineBase, shoulder2shoulder, refMin, refMax, refLowerJoint, refUpperJoint, refTime, callback){
+                neck2spineBase, shoulder2shoulder, refMin, refMax, refTime, callback){
 
     const document = {
       userId,
@@ -19,8 +19,6 @@ class ReferenceExercise extends MongoModels {
       shoulder2shoulder,
       refMin,
       refMax,
-      refLowerJoint,
-      refUpperJoint,
       refTime,
       createdAt: new Date()
     };
@@ -53,8 +51,6 @@ ReferenceExercise.schema = Joi.object().keys({
   shoulder2shoulder: Joi.number().required(),
   refMin: Joi.number().required(),
   refMax: Joi.number().required(),
-  refLowerJoint: Joi.number().required(),
-  refUpperJoint: Joi.number().required(),
   refTime: Joi.number().required(),
 
   isActive: Joi.boolean().required(),
@@ -78,8 +74,6 @@ ReferenceExercise.dataPayload = Joi.object().keys({
   shoulder2shoulder: Joi.number().required(),
   refMin: Joi.number().required(),
   refMax: Joi.number().required(),
-  refLowerJoint: Joi.number().required(),
-  refUpperJoint: Joi.number().required(),
   refTime: Joi.number().required(),
 });
 

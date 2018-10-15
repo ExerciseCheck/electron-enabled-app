@@ -74,6 +74,18 @@
             {{/compare}}
             {{#compare type 'practice'}}
               <button class="btn btn-primary blueBackground white actionBtn" onclick="savePractice()">SAVE SET</button>
+              <div id="fdbkModal" class="modal">
+                <div class="modal-content">
+                  <div style="padding: 10px">
+                    <span class="close">&times;</span>
+                    <p style= "display: inline; margin-left: 20px; margin-right: 40px;"> Your average repetition accuracy: <span id="acc" style="color: #007bff">__</span></p>
+                    <p style= "display: inline;"> Your average repetition speed: <span id="spd" style="color: #007bff">__</span></p>
+                  </div>
+                  <canvas id="accuracy-chart-container" height="350" width="350"></canvas>
+                  <canvas id="speed-chart-container" height="350" width="350"></canvas>
+                </div>
+              </div>
+            </div>
             {{/compare}}
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}

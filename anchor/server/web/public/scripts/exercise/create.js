@@ -17,8 +17,6 @@ $('#create').click((event) => {
   values.joint = $('#impJoint').val();
   values.axis = $('#impAxis').val();
   values.direction = $('#direction').val();
-  values.refLowerJoint = $('#refLowerJoint').val();
-  values.refUpperJoint = $('#refUpperJoint').val();
 
   $.ajax({
     type: 'POST',

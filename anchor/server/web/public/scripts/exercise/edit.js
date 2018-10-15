@@ -15,18 +15,16 @@ joiToForm('formFields', schema);
 //     values[field.name] = field.value;
 //   });
 
-$('#update').click((event) = > {
+$('#update').click((event) => {
   const exerciseId = window.location.pathname.split('/').pop();
   event.preventDefault();
   const values = {};
-  $.each($('#form').serializeArray(), (i, field) = > {
+  $.each($('#form').serializeArray(), (i, field) => {
     values[field.name] = field.value;
   });
   values.joint = $('#impJoint').val();
   values.axis = $('#impAxis').val();
   values.direction = $('#direction').val();
-  values.refLowerJoint = $('#refLowerJoint').val();
-  values.refUpperJoint = $('#refUpperJoint').val();
   $.ajax({
     type: 'PUT',
     url: '/api/exercise/' + exerciseId,
