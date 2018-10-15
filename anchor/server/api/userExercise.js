@@ -4,7 +4,7 @@ const Boom = require('boom');
 const Joi = require('joi');
 const DTW = require('dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
-const Segs = require('../web/helpers/segmentation');
+const Discard = require('../web/helpers/discardIndices');
 
 const internals = {};
 
@@ -899,31 +899,10 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
           let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
           // Assumption:
-          // 1) patient does 1 repetition per referenceExercise
-          // 2) referenceExercise always has a clean stop (clinician clicks the STOP button for the patient)
-          // 3) so we multiply the rep by numRep required
-          // 4) no need to segment referenceExercise in such case
-          for (let j=0; j<results.findMostRecentReference[0].numRepetition; ++j) {
-            for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
-              ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
-            }
+          // patient does N repetitions per referenceExercise, where N is required by clinician
+          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
+            ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
           }
-          console.log("ref with 1 rep, length=" + ref_impt_joint_X_smoothed.length);
-          console.log("ref with N reps, length=" + ref_impt_joint_XYZ.length);
-          if (theAxis === "depthX") {
-            prac_impt_joint = prac_impt_joint_X_smoothed;
-          } else if (theAxis === "depthY") {
-            prac_impt_joint = prac_impt_joint_Y_smoothed;
-          }
-          // assuming each repetition for any exercise takes >= 1 sec
-          let prac_timing = Segs(prac_impt_joint, theDirection, 20);
-
-          // use total timing for the practice here
-          let prac_ttl = prac_timing.reduce((a,b) => a+b, 0);
-          let ref_ttl = ref_impt_joint_XYZ.length;
-          console.log("prac timing: " + prac_timing + "\t" + prac_ttl);
-          console.log("ref timing: " + ref_ttl);
-          let spd = ref_ttl / prac_ttl;
 
           let dtw_impt_joint_XYZ = new DTW();
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
@@ -940,9 +919,38 @@ internals.applyRoutes = function (server, next) {
           console.log(msg_dtw_XYZ);
           console.log(msg_dtw_max);
 
-          let analysis = {"accuracy": acc, "speed": spd };
+          // speed analysis, using dtw, no smoothing
+          if (theAxis === "depthX") {
+            prac_impt_joint = prac_impt_joint_X;
+            ref_impt_joint = ref_impt_joint_X;
+          } else if (theAxis === "depthY") {
+            prac_impt_joint = prac_impt_joint_Y;
+            ref_impt_joint = ref_impt_joint_Y;
+          }
+          let options = { distanceMetric: 'euclidean' };
+          //let dtw_seg = new DTW(options);
+          let dtw_seg = new DTW();
+          let cost_seg = dtw_seg.compute(ref_impt_joint, prac_impt_joint);
+          let path_seg = dtw_seg.path();
+          console.log(path_seg);
+          let ref_indices = [];
+          let prac_indices = [];
+          let pair;
+          for (pair in path_seg) {
+            ref_indices.push(pair[0]);
+            prac_indices.push(pair[1]);
+          }
+          let discard_ref = Discard(prac_indices, 24);
+          let discard_prac = Discard(ref_indices, 24);
+          let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
+          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint - discard_prac);
+
+          console.log("original speed ratio: " + spd_ratio);
+          console.log("final speed ratio: " + fin_spd_ratio);
+
+          let analysis = {"accuracy": acc, "speed": fin_spd_ratio };
           let acc_str = (acc * 100).toFixed(2) + "%";
-          let spd_str = (spd * 100).toFixed(2) + "%";
+          let spd_str = (fin_spd_ratio * 100).toFixed(2) + "%";
           // let analysis = {"accuracy": acc_str, "speed": spd_str };
           console.log("accuracy: " + acc_str + "\nspeed: " + spd_str);
           done(null, analysis);
@@ -970,7 +978,7 @@ internals.applyRoutes = function (server, next) {
             },
             $set: {
               weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
-              numRepsCompleted: requestPayload.repEvals.length
+              numRepsCompleted: 1
             }
           };
 
@@ -986,7 +994,7 @@ internals.applyRoutes = function (server, next) {
               },
               $set: {
                 weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
-                numRepsCompleted: requestPayload.repEvals.length,
+                numRepsCompleted: 1,
                 isComplete: true
               }
             };

@@ -6,12 +6,9 @@
 let liveFrames, refFrames, recentFrames;
 let req, db;
 let dataForCntReps = {};
-//let refStart, refEnd; //not used
-let repEvals = [];
 let liveBodyColor="#7BE39F";
 let commonBlue = "#1E89FB";
 let refJointColor = "#FF6786";
-//const popupS = require('popups');
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -165,26 +162,25 @@ function saveReference() {
 }
 
 
-function showFeedback(accuracy, speed) {
+function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
+  $("#fdbkOK").click(function (e) {
+    if(isComplete) {
+      window.location = '/userexercise/session/end/practice/' +
+        exerciseId + '/' + patientId;
+    } else {
+      window.location = '/userexercise/session/start/practice/' +
+        exerciseId + '/' + patientId;
+    }
+  });
+
   //TODO: set threshold for comment and return feedback as words
   document.getElementById("acc").innerHTML = (accuracy*100).toFixed(2) + "%";
   document.getElementById("spd").innerHTML = (speed*100).toFixed(2) + "%";
 
   // Get the modal
   let modal = document.getElementById('fdbkModal');
-  // Get the <span> element that closes the modal
-  let span = document.getElementsByClassName("close")[0];
   // Open Modal
   modal.style.display = "block";
-  // Close Modal
-  span.onclick = function() {
-    modal.style.display = "none";
-  };
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  };
 }
 
 
@@ -197,14 +193,6 @@ function savePractice() {
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
 
-  // if no good repetition detected
-  values.repEvals = localStorage.getItem("repEvals");
-  if(!values.repEvals) {
-    values.repEvals=JSON.stringify([{"speed": -1}]);
-  }
-  console.log(values.repEvals);
-  localStorage.removeItem("repEvals");
-
   // logged-in user is clinician
   if (patientId) {
     url = url + patientId;
@@ -215,7 +203,6 @@ function savePractice() {
   }
 
   // variables for feedback
-  let ifSuccess = false;
   let acc;
   let spd;
   $.ajax({
@@ -226,19 +213,9 @@ function savePractice() {
       acc = result.accuracy;
       spd = result.speed;
       console.log(acc, spd);
-      ifSuccess = true;
       // Modal popup for analysis
-      showFeedback(acc, spd);
-
-      if(isComplete) {
-        window.location = '/userexercise/session/end/practice/' +
-          exerciseId + '/' + patientId;
-      } else {
-        window.location = '/userexercise/session/start/practice/' +
-          exerciseId + '/' + patientId;
-      }
-      let msg = JSON.stringify(result);
-      alert(msg)
+      showFeedback(acc, spd, exerciseId, patientId, isComplete);
+      
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -296,9 +273,6 @@ function goToExercises() {
       threshold_flag = dataForCntReps.direction;
     }
   });
-
-  // time pt for speed evaluation
-  let st, ed;
 
   if (isElectron())
   {
@@ -731,7 +705,7 @@ function goToExercises() {
           bodyHeight = body.joints[0].depthY - body.joints[2].depthY;
 
           //console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
-          st = new Date().getTime();
+          let st = new Date().getTime();
           if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
             localStorage.setItem("refStart", st);
           }
