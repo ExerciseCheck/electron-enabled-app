@@ -3,12 +3,15 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames;
+let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
 let req, db;
 let dataForCntReps = {};
 let liveBodyColor="#7BE39F";
 let commonBlue = "#1E89FB";
 let refJointColor = "#FF6786";
+let MAX_BODYFRAMES_STORED = 4400;
+let framesExceededLimit = false;
+
 window.actionBtn = false;
 
 window.onbeforeunload = (e) => {
@@ -57,6 +60,22 @@ function parseURL(url)
   };
 }
 
+Ladda.bind('.ladda-button', {
+      callback: function( instance ) {
+        let progress = 0;
+        let interval = setInterval( function() {
+          let multiplier = Math.random() * 0.1;
+          progress = Math.min( progress + multiplier, 1 );
+          instance.setProgress( progress );
+
+          if( progress === 1 ) {
+            instance.stop();
+            clearInterval( interval );
+          }
+        }, 200 );
+      }
+    });
+
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
@@ -71,9 +90,14 @@ function action(nextMode, type) {
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
+        console.log("liveFrames before compression=", (JSON.stringify(liveFrames).length*2) / 1048576, "MB");
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        console.log("liveFrames after compression=", (JSON.stringify(liveFrames_compressed).length*2) / 1048576, "MB");
+
         let ref_ed = new Date().getTime();
         localStorage.setItem("refEnd", ref_ed);
-        let updatedRef = {type: 'refFrames', body: liveFrames};
+
+        let updatedRef = {type: 'refFrames', body: liveFrames_compressed};
         let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
         let request = bodyFramesStore.put(updatedRef);
         request.onsuccess = function(event) {
@@ -84,7 +108,7 @@ function action(nextMode, type) {
     //"Discard Reference Recording"
     else if(nextMode === 'start' && type === 'reference') {
       //hacky delete
-      let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: []});
+      let deleteref = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'refFrames', body: ''});
       deleteref.onsuccess = function(e) {
         redirect();
       }
@@ -92,7 +116,8 @@ function action(nextMode, type) {
 
     //End of doing a practice session. Live Frames get saved temporarily to indexedDB
     else if(nextMode === 'stop' && type === 'practice') {
-      let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames});
+      liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+      let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames_compressed});
       request.onsuccess = function(e) {
         redirect();
       }
@@ -105,6 +130,12 @@ function action(nextMode, type) {
       }
     }
     else {
+      if(nextMode === 'stop') {
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        let updatedLiveFrames = {type: 'liveFrames', body: liveFrames_compressed};
+        let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
+        let request = bodyFramesStore.put(updatedLiveFrames);
+      }
       redirect();
     }
   });
@@ -130,7 +161,7 @@ function saveReference() {
 
   let values = {};
   // save to referenceExercise
-  values.bodyFrames = JSON.stringify(refFrames);
+  values.bodyFrames = refFrames_compressed;
   let mm = getMinMax_joint(dataForCntReps.joint, refFrames, dataForCntReps.axis);
   values.refMin = mm.min;
   values.refMax = mm.max;
@@ -191,9 +222,14 @@ function savePractice() {
   let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
-  values.bodyFrames = JSON.stringify(recentFrames);
+  values.bodyFrames = recentFrames_compressed;
+  // values.bodyFrames = recentFrames;
 
-  // logged-in user is clinician
+  // if no good repitition detected
+  values.NumRepsCompleted = localStorage.getItem("numRepsCompleted");
+  localStorage.removeItem("numRepsCompleted");
+
+  //logged-in user is clinician
   if (patientId) {
     url = url + patientId;
   }
@@ -215,7 +251,7 @@ function savePractice() {
       console.log(acc, spd);
       // Modal popup for analysis
       showFeedback(acc, spd, exerciseId, patientId, isComplete);
-      
+
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -232,6 +268,25 @@ function goToExercises() {
   const patientId = window.location .pathname.split('/').pop();
   window.location = '/clinician/patientexercises/' + patientId;
 }
+
+window.onbeforeunload = (e) => {
+
+  if (actionBtn) {
+    return;
+  }
+
+  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
+    return;
+  }
+  else {
+    // electron treats any return value that is not 'null' as intent to stay on the page
+    return false;
+  }
+};
+
+$('.actionBtn').click(function() {
+  actionBtn = true;
+});
 
 (function ()
 {
@@ -303,18 +358,30 @@ function goToExercises() {
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
-          if(getref.result) {
-            refFrames = getref.result.body; //CHECk WHAT refFRAMES IS on the start page of "recording new reference"
-            console.log("refFrames loaded locally");
+          if(getref.result.body) {
+            try {
+              refFrames_compressed = getref.result.body;
+              refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
+              console.log("refFrames loaded locally");
+            } catch (err) {
+              console.log(err);
+            }
           }
           showCanvas();
           console.log("show canvas called after getting referenceFrames");
         }
 
         let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
+        console.log("getrecent=", getrecent);
         getrecent.onsuccess = function(e) {
-          if(getrecent.result) {
-            recentFrames = getrecent.result.body;
+          if(getrecent.result.body) {
+            try {
+              recentFrames_compressed = getrecent.result.body;
+              recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));
+            } catch (err) {
+              console.log(err);
+            }
+
           }
         }
       });
@@ -337,10 +404,7 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //nothing should be shown
-      // document.getElementById("refCanvas").style.display = "none";
-      // document.getElementById("exeCanvas").style.display = "none";
-      // document.getElementById("outputCanvas").style.display = "none";
-      refCanvas.style.display = "none";
+       refCanvas.style.display = "none";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
     }
@@ -350,10 +414,7 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show reference canvas only
-      // document.getElementById("refCanvas").style.display = "block";
-      // document.getElementById("exeCanvas").style.display = "none";
-      // document.getElementById("outputCanvas").style.display = "none";
-      refCanvas.style.display = "block";
+       refCanvas.style.display = "block";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
       let ctx = refCanvas.getContext('2d');
@@ -367,9 +428,6 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show live canvas only
-      // document.getElementById("refCanvas").style.display = "none";
-      // document.getElementById("exeCanvas").style.display = "none";
-      // document.getElementById("outputCanvas").style.display = "block";
       refCanvas.style.display = "none";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "block";
@@ -383,9 +441,6 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show live canvas and reference canvas
-      // document.getElementById("refCanvas").style.display = "inline";
-      // document.getElementById("exeCanvas").style.display = "none";
-      // document.getElementById("outputCanvas").style.display = "inline";
       refCanvas.style.display = "inline";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "inline";
@@ -403,9 +458,6 @@ function goToExercises() {
       ref_index = 0;
       exe_index = 0;
       //show reference canvas
-      // document.getElementById("refCanvas").style.display = "block";
-      // document.getElementById("exeCanvas").style.display = "none";
-      // document.getElementById("outputCanvas").style.display = "none";
       refCanvas.style.display = "block";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
@@ -419,10 +471,6 @@ function goToExercises() {
     {
       ref_index = 0;
       exe_index = 0;
-      //show reference and exercise canvas
-      // document.getElementById("refCanvas").style.display = "inline";
-      // document.getElementById("exeCanvas").style.display = "inline";
-      // document.getElementById("outputCanvas").style.display = "none";
       refCanvas.style.display = "inline";
       exeCanvas.style.display = "inline";
       outputCanvas.style.display = "none";
@@ -512,11 +560,8 @@ function goToExercises() {
     ctx.moveTo(body.joints[7].depthX * width, body.joints[7].depthY * height);
     jointType.forEach(function(jointType){
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
-//      ctx.shadowColor = "red";
-//      ctx.shadowOffsetX = 2;
-//      ctx.shadowOffsetY = 4;
-//      ctx.shadowBlur = 8;
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
+
     });
 
     ctx.lineWidth=8;
@@ -572,7 +617,6 @@ function goToExercises() {
     ctx.arc(x, y, r, 0, Math.PI*2);
     ctx.stroke();
     ctx.closePath();
-    //ctx.strokeStyle="black";
   }
 
   /*
@@ -697,14 +741,12 @@ function goToExercises() {
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
         document.addEventListener('timer-done', function(evt){
-          //console.log("timer done", evt.detail);
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
           nz_1stFrame = body.joints[2].cameraZ;
           bodyWidth = body.joints[8].depthX - body.joints[4].depthX;
           bodyHeight = body.joints[0].depthY - body.joints[2].depthY;
 
-          //console.log("neck position in the first frame recorded: " + nx_1stFrame + ny_1stFrame + nz_1stFrame);
           let st = new Date().getTime();
           if ((parsedURL.type === 'reference') && (parsedURL.mode === 'play')) {
             localStorage.setItem("refStart", st);
@@ -716,14 +758,20 @@ function goToExercises() {
           //filter joints, remove fingertips and spineShoulder for they are not used
           body.joints.splice(20,5);
           liveFrames.push(body);
+          if(liveFrames.length >= MAX_BODYFRAMES_STORED)
+          {
+            framesExceededLimit = true;
+            errorAlert("liveFrame data capacity of 4,400 bodyFrames has been reached.")
+          }
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
             console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
             let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
-            document.getElementById("cntReps").innerHTML =
-              parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+            let numRepsCompleted = parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+            document.getElementById("cntReps").innerHTML = numRepsCompleted;
+            localStorage.setItem("numRepsCompleted", numRepsCompleted);
           }
         }
       }

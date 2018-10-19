@@ -54,7 +54,7 @@ ReferenceExercise.schema = Joi.object().keys({
   refTime: Joi.number().required(),
 
   isActive: Joi.boolean().required(),
-  bodyFrames: Joi.array().required(),
+  bodyFrames: Joi.string().required(),
   createdAt: Joi.date().required()
 });
 //this is used for validating payload of post requests when creating reference exercise
@@ -69,7 +69,7 @@ ReferenceExercise.referencePayload = Joi.object().keys({
 
 // This is for validating new bodyFrames data and its associated parameters
 ReferenceExercise.dataPayload = Joi.object().keys({
-  bodyFrames: Joi.array().required(),
+  bodyFrames: Joi.string().required(),
   neck2spineBase: Joi.number().required(),
   shoulder2shoulder: Joi.number().required(),
   refMin: Joi.number().required(),

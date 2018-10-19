@@ -3,7 +3,7 @@
  * @author Elmar Langholz
  */
 
-var debug = require('debug')('dtw');
+// var debug = require('debug')('dtw');
 var validate = require('./validate');
 var matrix = require('./matrix');
 var comparison = require('./comparison');
@@ -111,7 +111,7 @@ function validateComputeParameters(s, t) {
 }
 
 function computeOptimalPath(s, t, state) {
-    debug('> computeOptimalPath');
+    // debug('> computeOptimalPath');
     validateComputeParameters(s, t);
     var start = new Date().getTime();
     state.m = s.length;
@@ -143,14 +143,14 @@ function computeOptimalPath(s, t, state) {
 
     var end = new Date().getTime();
     var time = end - start;
-    debug('< computeOptimalPath (' + time + ' ms)');
+    // debug('< computeOptimalPath (' + time + ' ms)');
     state.distanceCostMatrix = distanceCostMatrix;
     state.similarity = distanceCostMatrix[state.m - 1][state.n - 1];
     return state.similarity;
 }
 
 function computeOptimalPathWithWindow(s, t, w, state) {
-    debug('> computeOptimalPathWithWindow');
+    // debug('> computeOptimalPathWithWindow');
     validateComputeParameters(s, t);
     var start = new Date().getTime();
     state.m = s.length;
@@ -172,7 +172,7 @@ function computeOptimalPathWithWindow(s, t, w, state) {
 
     var end = new Date().getTime();
     var time = end - start;
-    debug('< computeOptimalPathWithWindow (' + time + ' ms)');
+    // debug('< computeOptimalPathWithWindow (' + time + ' ms)');
     distanceCostMatrix.shift();
     distanceCostMatrix = distanceCostMatrix.map(function (row) {
         return row.slice(1, row.length);
@@ -183,7 +183,7 @@ function computeOptimalPathWithWindow(s, t, w, state) {
 }
 
 function retrieveOptimalPath(state) {
-    debug('> retrieveOptimalPath');
+    // debug('> retrieveOptimalPath');
     var start = new Date().getTime();
 
     var rowIndex = state.m - 1;
@@ -215,7 +215,7 @@ function retrieveOptimalPath(state) {
 
     var end = new Date().getTime();
     var time = end - start;
-    debug('< retrieveOptimalPath (' + time + ' ms)');
+    // debug('< retrieveOptimalPath (' + time + ' ms)');
     return path.reverse();
 }
 

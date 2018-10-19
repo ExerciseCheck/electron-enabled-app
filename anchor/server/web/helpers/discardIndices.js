@@ -13,6 +13,9 @@ module.exports = function discardIndices(x, threshold) {
     }
   }
   isZero.push(0);
+  console.log(x.length);
+  console.log(isZero.length);
+
   let absDiff = [];
   for (i=0; i<isZero.length; i++ ){
     let diff = isZero[i] - isZero[i-1];
@@ -23,6 +26,7 @@ module.exports = function discardIndices(x, threshold) {
       absDiff.push(1);
     }
   }
+
   let rangesOdd = [];
   let rangesEven = []; // length should be equal
   let isOdd = true;
@@ -36,6 +40,8 @@ module.exports = function discardIndices(x, threshold) {
       isOdd = true;
     }
   }
+  console.log(rangesOdd);
+  console.log(rangesEven);
   let discard = 0;
   for (i=0; i<rangesEven.length; i++){
     let delta = rangesEven[i] - rangesOdd[i];
@@ -43,7 +49,7 @@ module.exports = function discardIndices(x, threshold) {
       discard += delta;
     }
   }
-
+  console.log(discard);
   return discard;
 }
 

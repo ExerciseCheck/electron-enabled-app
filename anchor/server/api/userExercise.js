@@ -2,7 +2,8 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
-const DTW = require('dtw');
+const DTW = require('../../../dtw');
+const Pako = require('pako');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
 
@@ -856,14 +857,17 @@ internals.applyRoutes = function (server, next) {
           let prac_impt_joint; // the chosen axis
           let prac_impt_joint_XYZ = [];
           // For normalization:
-          let prac_shoulderL2R = requestPayload.bodyFrames[0].joints[8]["depthX"] - requestPayload.bodyFrames[0].joints[4]["depthX"];
-          let prac_neck2base = requestPayload.bodyFrames[0].joints[0]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"];
+          // console.log("requestPayload=", requestPayload.bodyFrames);
+          let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
+          // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+          let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
+          let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
           //let prac_depth = ??
 
-          for (let i=0; i<requestPayload.bodyFrames.length; ++i) {
-            prac_impt_joint_X.push((requestPayload.bodyFrames[i].joints[theJoint]["depthX"] - requestPayload.bodyFrames[0].joints[2]["depthX"]) / prac_shoulderL2R);
-            prac_impt_joint_Y.push((requestPayload.bodyFrames[i].joints[theJoint]["depthY"] - requestPayload.bodyFrames[0].joints[2]["depthY"]) / prac_neck2base);
-            prac_impt_joint_Z.push(requestPayload.bodyFrames[i].joints[theJoint]["cameraZ"] - requestPayload.bodyFrames[0].joints[2]["cameraZ"]);
+          for (let i=0; i<bodyFrames_decompressed.length; ++i) {
+            prac_impt_joint_X.push((bodyFrames_decompressed[i].joints[theJoint]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
+            prac_impt_joint_Y.push((bodyFrames_decompressed[i].joints[theJoint]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
+            prac_impt_joint_Z.push(bodyFrames_decompressed[i].joints[theJoint]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
           }
 
           let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
@@ -880,19 +884,21 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint_Z = [];
           let ref_impt_joint;
           let ref_impt_joint_XYZ = [];
+
+          let findMostRecentReference_decompressed = JSON.parse(Pako.inflate(results.findMostRecentReference[0].bodyFrames, { to: 'string' }));
           // For normalization:
-          let ref_shoulderL2R = results.findMostRecentReference[0].bodyFrames[0].joints[8]["depthX"]
-            - results.findMostRecentReference[0].bodyFrames[0].joints[4]["depthX"];
-          let ref_neck2base = results.findMostRecentReference[0].bodyFrames[0].joints[0]["depthY"]
-            - results.findMostRecentReference[0].bodyFrames[0].joints[2]["depthY"];
+          let ref_shoulderL2R = findMostRecentReference_decompressed[0].joints[8]["depthX"]
+            - findMostRecentReference_decompressed[0].joints[4]["depthX"];
+          let ref_neck2base = findMostRecentReference_decompressed[0].joints[0]["depthY"]
+            - findMostRecentReference_decompressed[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          for (let i=0; i<results.findMostRecentReference[0].bodyFrames.length; ++i) {
+          for (let i=0; i<findMostRecentReference_decompressed.length; ++i) {
             ref_impt_joint_X.push(
-              (results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
+              (findMostRecentReference_decompressed[0].bodyFrames[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
             ref_impt_joint_Y.push(
-              (results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
-            ref_impt_joint_Z.push(results.findMostRecentReference[0].bodyFrames[i].joints[theJoint]["cameraZ"] - refJointNeck["cameraZ"]);
+              (findMostRecentReference_decompressed[0].bodyFrames[i].joints[theJoint]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
+            ref_impt_joint_Z.push(findMostRecentReference_decompressed[0].bodyFrames[i].joints[theJoint]["cameraZ"] - refJointNeck["cameraZ"]);
           }
 
           let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
@@ -903,6 +909,48 @@ internals.applyRoutes = function (server, next) {
           for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
           }
+
+          if (theAxis === "depthX") {
+            prac_impt_joint = prac_impt_joint_X_smoothed;
+            ref_impt_joint = ref_impt_joint_X_smoothed;
+          } else if (theAxis === "depthY") {
+            prac_impt_joint = prac_impt_joint_Y_smoothed;
+            ref_impt_joint = ref_impt_joint_Y_smoothed;
+          }
+          // assuming each repetition if any exercise takes >= 1 sec
+          console.log("prac_impt_joint=", prac_impt_joint);
+          let prac_timing = Segs(prac_impt_joint, theDirection, 20);
+          let ref_timing = Segs(ref_impt_joint, theDirection, 20);
+
+          let prac_ttl = prac_timing.reduce((a,b) => a+b, 0);
+          let ref_ttl = ref_timing.reduce((a,b) => a+b, 0);
+
+          console.log("prac timing: " + prac_timing + "\t" + prac_ttl);
+          console.log("ref timing: " + ref_timing + "\t" + ref_ttl);
+          //Note: The reference part can actually be done during the saveReference(),
+          //but that requires to update a the referenceExercise model
+
+          //TODO: There are a number of other different ways for speed analysis
+          // // 1) the simplest: use the total number of bodyFrames
+          // let nFrames_prac = requestPayload.bodyFrames.length;
+          // let prac_ttl = Math.round(nFrames_prac/30);
+          // let nFrames_ref = results.findMostRecentReference[0].bodyFrames.length;
+          // let ref_ttl = Math.round(nFrames_ref/30);
+
+          // // 2) the sum of the online timing, but that does not handle it well when no repetition detected online
+          // let n = 0; //number of counted reps
+          // if(requestPayload.repEvals[0].speed !== -1 ) {
+          //   n = requestPayload.repEvals.length
+          // };
+          // console.log(n);
+          // for (let i=0; i<n; i++){
+          //   prac_ttl =+ requestPayload.repEvals[i].speed;
+          // }
+          // let ref_ttl = results.findMostRecentReference[0].refTime;
+          // let msg_speed = "You have done " + n + " good repititions for this set.\nIt takes you " + prac_ttl + " seconds to complete.\nYour reference time is " + ref_ttl + " seconds.\n"
+          // console.log(msg_speed);
+
+
 
           let dtw_impt_joint_XYZ = new DTW();
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
@@ -940,6 +988,9 @@ internals.applyRoutes = function (server, next) {
             ref_indices.push(pair[0]);
             prac_indices.push(pair[1]);
           }
+          console.log(ref_indices);
+          console.log(prac_indices);
+
           let discard_ref = Discard(prac_indices, 24);
           let discard_prac = Discard(ref_indices, 24);
           let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
@@ -967,9 +1018,14 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
+          let isCompleted = false;
+          if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
+            isCompleted = true;
+          }
           let update = {
             $addToSet: {
               sets: {date: new Date(),
+                numRepsCompleted: requestPayload.numRepsCompleted,
                 analysis: results.analyzePractice,
                 bodyFrames: requestPayload.bodyFrames}
             },
@@ -978,28 +1034,11 @@ internals.applyRoutes = function (server, next) {
             },
             $set: {
               weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
-              numRepsCompleted: 1
+              isComplete: isCompleted,
             }
           };
-
-          if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
-            update = {
-              $addToSet: {
-                sets: {date: new Date(),
-                  analysis: results.analyzePractice,
-                  bodyFrames: requestPayload.bodyFrames}
-              },
-              $inc: {
-                numSetsCompleted: 1,
-              },
-              $set: {
-                weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
-                numRepsCompleted: 1,
-                isComplete: true
-              }
-            };
-          }
           PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
+
         }]
       }, (err, results) => {
 
@@ -1009,7 +1048,6 @@ internals.applyRoutes = function (server, next) {
         if (!results.findMostRecentReference[0]) {
           return reply(Boom.notFound('Document not found.'));
         }
-        // reply(results.analyzePractice);
         reply(results.analyzePractice);
       });
     }
@@ -1040,8 +1078,7 @@ internals.applyRoutes = function (server, next) {
         if (err) {
           return reply(err);
         }
-        if (
-          !document) {
+        if (!document) {
           return reply(Boom.notFound('Document not found.'));
         }
 
