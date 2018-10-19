@@ -30,6 +30,8 @@ module.exports = function discardIndices(x, threshold) {
   let rangesOdd = [];
   let rangesEven = []; // length should be equal
   let isOdd = true;
+  console.log(absDiff.length);
+
   for (i=0; i<absDiff.length; i++){
     let n = absDiff[i];
     if( n === 1 && isOdd){

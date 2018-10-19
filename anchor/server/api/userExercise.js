@@ -2,8 +2,7 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
-const DTW = require('../../../dtw');
-const Pako = require('pako');
+const DTW = require('dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
 
@@ -910,48 +909,6 @@ internals.applyRoutes = function (server, next) {
             ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
           }
 
-          if (theAxis === "depthX") {
-            prac_impt_joint = prac_impt_joint_X_smoothed;
-            ref_impt_joint = ref_impt_joint_X_smoothed;
-          } else if (theAxis === "depthY") {
-            prac_impt_joint = prac_impt_joint_Y_smoothed;
-            ref_impt_joint = ref_impt_joint_Y_smoothed;
-          }
-          // assuming each repetition if any exercise takes >= 1 sec
-          console.log("prac_impt_joint=", prac_impt_joint);
-          let prac_timing = Segs(prac_impt_joint, theDirection, 20);
-          let ref_timing = Segs(ref_impt_joint, theDirection, 20);
-
-          let prac_ttl = prac_timing.reduce((a,b) => a+b, 0);
-          let ref_ttl = ref_timing.reduce((a,b) => a+b, 0);
-
-          console.log("prac timing: " + prac_timing + "\t" + prac_ttl);
-          console.log("ref timing: " + ref_timing + "\t" + ref_ttl);
-          //Note: The reference part can actually be done during the saveReference(),
-          //but that requires to update a the referenceExercise model
-
-          //TODO: There are a number of other different ways for speed analysis
-          // // 1) the simplest: use the total number of bodyFrames
-          // let nFrames_prac = requestPayload.bodyFrames.length;
-          // let prac_ttl = Math.round(nFrames_prac/30);
-          // let nFrames_ref = results.findMostRecentReference[0].bodyFrames.length;
-          // let ref_ttl = Math.round(nFrames_ref/30);
-
-          // // 2) the sum of the online timing, but that does not handle it well when no repetition detected online
-          // let n = 0; //number of counted reps
-          // if(requestPayload.repEvals[0].speed !== -1 ) {
-          //   n = requestPayload.repEvals.length
-          // };
-          // console.log(n);
-          // for (let i=0; i<n; i++){
-          //   prac_ttl =+ requestPayload.repEvals[i].speed;
-          // }
-          // let ref_ttl = results.findMostRecentReference[0].refTime;
-          // let msg_speed = "You have done " + n + " good repititions for this set.\nIt takes you " + prac_ttl + " seconds to complete.\nYour reference time is " + ref_ttl + " seconds.\n"
-          // console.log(msg_speed);
-
-
-
           let dtw_impt_joint_XYZ = new DTW();
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
           //let path_XYZ = dtw_impt_joint_XYZ.path();
@@ -980,21 +937,19 @@ internals.applyRoutes = function (server, next) {
           let dtw_seg = new DTW();
           let cost_seg = dtw_seg.compute(ref_impt_joint, prac_impt_joint);
           let path_seg = dtw_seg.path();
-          console.log(path_seg);
+          // console.log(path_seg);
           let ref_indices = [];
           let prac_indices = [];
-          let pair;
-          for (pair in path_seg) {
+          path_seg.forEach(function(pair){
             ref_indices.push(pair[0]);
             prac_indices.push(pair[1]);
-          }
-          console.log(ref_indices);
-          console.log(prac_indices);
-
+          });
+          // console.log(ref_indices, ref_indices.length);
+          // console.log(prac_indices, prac_indices.length);
           let discard_ref = Discard(prac_indices, 24);
           let discard_prac = Discard(ref_indices, 24);
           let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
-          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint - discard_prac);
+          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint.length - discard_prac);
 
           console.log("original speed ratio: " + spd_ratio);
           console.log("final speed ratio: " + fin_spd_ratio);
@@ -1038,7 +993,6 @@ internals.applyRoutes = function (server, next) {
             }
           };
           PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
-
         }]
       }, (err, results) => {
 
