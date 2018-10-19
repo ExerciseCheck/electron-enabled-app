@@ -940,6 +940,8 @@ internals.applyRoutes = function (server, next) {
             ref_indices.push(pair[0]);
             prac_indices.push(pair[1]);
           }
+          console.log(ref_indices, ref_indices.length);
+          console.log(prac_indices, prac_indices.length);
           let discard_ref = Discard(prac_indices, 24);
           let discard_prac = Discard(ref_indices, 24);
           let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
