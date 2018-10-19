@@ -204,9 +204,37 @@ function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
     }
   });
 
+  let acc_words, spd_words;
+  if(accuracy > 0.9) {
+    acc_words = "Excellent Job!";
+  } else if (accuracy <0.9 && accuracy > 0.5) {
+
+  } else if (accuracy <0.9 && accuracy > 0.5) {
+
+  } else if (accuracy <0.9 && accuracy > 0.5) {
+
+  } else {
+
+  }
+
+  if(speed > 1.2) {
+    spd_words = "You are too fast!";
+  } else if (accuracy <0.9 && accuracy > 0.5) {
+
+  } else if (accuracy <0.9 && accuracy > 0.5) {
+
+  } else if (accuracy <0.9 && accuracy > 0.5) {
+
+  } else {
+
+  }
+
+
   //TODO: set threshold for comment and return feedback as words
-  document.getElementById("acc").innerHTML = (accuracy*100).toFixed(2) + "%";
-  document.getElementById("spd").innerHTML = (speed*100).toFixed(2) + "%";
+  // document.getElementById("acc").innerHTML = (accuracy*100).toFixed(2) + "%";
+  // document.getElementById("spd").innerHTML = (speed*100).toFixed(2) + "%";
+  document.getElementById("acc").innerHTML = acc_words;
+  document.getElementById("spd").innerHTML = spd_words;
 
   // Get the modal
   let modal = document.getElementById('fdbkModal');
