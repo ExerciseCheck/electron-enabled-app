@@ -223,11 +223,8 @@ function savePractice() {
   let isComplete = false;
   let values = {};
   values.bodyFrames = recentFrames_compressed;
-  // values.bodyFrames = recentFrames;
-
-  // if no good repitition detected
-  values.NumRepsCompleted = localStorage.getItem("numRepsCompleted");
-  localStorage.removeItem("numRepsCompleted");
+  values.numRepsCompleted = localStorage.getItem("numRepsCompleted");
+  //localStorage.removeItem("numRepsCompleted");
 
   //logged-in user is clinician
   if (patientId) {
@@ -769,9 +766,9 @@ $('.actionBtn').click(function() {
             let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
-            let numRepsCompleted = parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
-            document.getElementById("cntReps").innerHTML = numRepsCompleted;
-            localStorage.setItem("numRepsCompleted", numRepsCompleted);
+            let n = parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
+            document.getElementById("cntReps").innerHTML = n;
+            localStorage.setItem("numRepsCompleted", n);
           }
         }
       }

@@ -5,6 +5,7 @@ const Joi = require('joi');
 const DTW = require('dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
+const Pako = require('pako');
 
 const internals = {};
 
@@ -374,6 +375,7 @@ internals.applyRoutes = function (server, next) {
         }],
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findMostRecentReference[0];
+          let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
           let exercise = results.findExercise;
 
           dataForCntReps['joint'] = exercise.joint;
@@ -382,13 +384,13 @@ internals.applyRoutes = function (server, next) {
           // numbers between [0,1]
           dataForCntReps['diffLevel'] = reference.diffLevel;
 
-          if (reference.bodyFrames[0] !== undefined) {
-            console.log("reference.bodyFrames exists");
+          if (refBodyframes[0] !== undefined) {
+            console.log("reference.bodyFrames exists, and decompressed: ");
             dataForCntReps['refMin'] = reference.refMin;
             dataForCntReps['refMax'] = reference.refMax;
             dataForCntReps['bodyHeight'] = reference.neck2spineBase;
             dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
-            dataForCntReps['jointNeck'] = reference.bodyFrames[0].joints[2];
+            dataForCntReps['jointNeck'] = refBodyframes[0].joints[2];
             // time for one repetition in reference, in seconds
             dataForCntReps['refTime'] = reference.refTime;
           }
@@ -846,9 +848,9 @@ internals.applyRoutes = function (server, next) {
           // from exercise
           let theJoint = results.findExercise.joint;
           let theAxis = results.findExercise.axis;
-          let theDirection = results.findExercise.direction;
           // from reference
-          let refJointNeck = results.findMostRecentReference[0].bodyFrames[0].joints[2];
+          let refBodyframes = JSON.parse(Pako.inflate(results.findMostRecentReference[0].bodyFrames, { to: 'string' }));
+          let refJointNeck = refBodyframes[0].joints[2];
 
           let prac_impt_joint_X = []; //separate X,Y,Z for smoothing
           let prac_impt_joint_Y = [];
@@ -884,20 +886,17 @@ internals.applyRoutes = function (server, next) {
           let ref_impt_joint;
           let ref_impt_joint_XYZ = [];
 
-          let findMostRecentReference_decompressed = JSON.parse(Pako.inflate(results.findMostRecentReference[0].bodyFrames, { to: 'string' }));
           // For normalization:
-          let ref_shoulderL2R = findMostRecentReference_decompressed[0].joints[8]["depthX"]
-            - findMostRecentReference_decompressed[0].joints[4]["depthX"];
-          let ref_neck2base = findMostRecentReference_decompressed[0].joints[0]["depthY"]
-            - findMostRecentReference_decompressed[0].joints[2]["depthY"];
+          let ref_shoulderL2R = refBodyframes[0].joints[8]["depthX"] - refBodyframes[0].joints[4]["depthX"];
+          let ref_neck2base = refBodyframes[0].joints[0]["depthY"] - refBodyframes[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          for (let i=0; i<findMostRecentReference_decompressed.length; ++i) {
+          for (let i=0; i<refBodyframes.length; ++i) {
             ref_impt_joint_X.push(
-              (findMostRecentReference_decompressed[0].bodyFrames[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
+              (refBodyframes[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
             ref_impt_joint_Y.push(
-              (findMostRecentReference_decompressed[0].bodyFrames[i].joints[theJoint]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
-            ref_impt_joint_Z.push(findMostRecentReference_decompressed[0].bodyFrames[i].joints[theJoint]["cameraZ"] - refJointNeck["cameraZ"]);
+              (refBodyframes[i].joints[theJoint]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
+            ref_impt_joint_Z.push(refBodyframes[i].joints[theJoint]["cameraZ"] - refJointNeck["cameraZ"]);
           }
 
           let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
