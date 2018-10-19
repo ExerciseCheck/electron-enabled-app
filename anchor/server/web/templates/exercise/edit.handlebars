@@ -9,6 +9,16 @@
           <div style="padding: 20px">
             <form id="form">
               <div id="formFields"></div>
+              <label for="impJoint" class="label">Most Important Joint</label>
+              <div class="form-group">
+                <select type="number" class="form-control" id="impJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>
+                  {{> jointList}}
+                </select>
+              </div>
+              <label for="impAxis" class="label">Moving Pattern</label>
+              {{> axis}}
+              <label for="direction" class="label">Starting Direction</label>
+              {{> direction}}
               <button id="update" type="submit" class="btn btn-primary">Update</button>
             </form>
           </div>
@@ -21,4 +31,6 @@
 <script>
   joiFormValue('exerciseName', '{{exercise.exerciseName}}');
   joiFormValue('description', '{{exercise.description}}');
+  joiFormValue('Most Important Joint', '{{exercise.impAxis}}');
+  joiFormValue('Starting Direction', '{{exercise.direction}}');
 </script>

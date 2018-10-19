@@ -2,7 +2,10 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
-
+const DTW = require('dtw');
+const Smoothing = require('../web/helpers/smoothingMethod');
+const Discard = require('../web/helpers/discardIndices');
+const Pako = require('pako');
 
 const internals = {};
 
@@ -263,7 +266,7 @@ internals.applyRoutes = function (server, next) {
   });
 
   //this route finds the a reference document for (exerciseId, patientId) with empty bodyFrames
-  //the purspose of this route is to find out if a reference with specified setting is already
+  //the purpose of this route is to find out if a reference with specified setting is already
   //inserted or not
   server.route({
     method: 'GET',
@@ -309,7 +312,7 @@ internals.applyRoutes = function (server, next) {
 
       const query = {
         userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
-        exerciseId: request.params.exerciseId,
+        exerciseId: request.params.exerciseId
       };
 
       ReferenceExercise.findOne(query, {sort: {$natural: -1}}, (err, refExercise) => {
@@ -323,6 +326,86 @@ internals.applyRoutes = function (server, next) {
         }
 
         return reply(refExercise.bodyFrames);
+      });
+    }
+  });
+
+  // this route get the data from the latest version of reference for count reps
+  server.route({
+    method: 'GET',
+    path: '/userexercise/dataforcount/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+      }
+    },
+    handler: function (request, reply) {
+
+      let patientId = '';
+      let dataForCntReps = {};
+      //logged in user is a clinician
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      //Logged in user is a patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+      Async.auto({
+
+        //first we need to find the referenceId of the exercise
+        //finding one document matching the query is enough
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            { '$match': filter },
+            { '$sort': { createdAt: -1 } },
+            { '$limit': 1 }
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findExercise:['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        getDataForCntReps: ['findExercise', function(results, done) {
+          let reference = results.findMostRecentReference[0];
+          let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
+          let exercise = results.findExercise;
+
+          dataForCntReps['joint'] = exercise.joint;
+          dataForCntReps['axis'] = exercise.axis;
+          dataForCntReps['direction'] = exercise.direction;
+          // numbers between [0,1]
+          dataForCntReps['diffLevel'] = reference.diffLevel;
+
+          if (refBodyframes[0] !== undefined) {
+            console.log("reference.bodyFrames exists, and decompressed: ");
+            dataForCntReps['refMin'] = reference.refMin;
+            dataForCntReps['refMax'] = reference.refMax;
+            dataForCntReps['bodyHeight'] = reference.neck2spineBase;
+            dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
+            dataForCntReps['jointNeck'] = refBodyframes[0].joints[2];
+            // time for one repetition in reference, in seconds
+            dataForCntReps['refTime'] = reference.refTime;
+          }
+          //console.log(dataForCntReps);
+          done();
+        }]
+      }, (err, results) => {
+
+        if (err) {
+          return reply(err);
+        }
+        if (!results.findMostRecentReference) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+        return reply(dataForCntReps);
       });
     }
   });
@@ -380,73 +463,6 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //retrieves practice exercise with a particular referenceId for the logged in patient
-  //this route is used if we don't tag practiceExercise documents with a referenceId tag
-  //Not used.
-  // server.route({
-  //   method: 'GET',
-  //   path: '/userexercise/practice/{referenceId}',
-  //   config: {
-  //     auth: {
-  //       strategies: ['simple', 'jwt', 'session']
-  //     }
-  //   },
-  //   handler: function (request, reply) {
-  //
-  //     Async.auto({
-  //
-  //       //first we need to find the exerciseId of the reference
-  //       findExerciseId: function (done) {
-  //
-  //         PracticeExercise.findById(request.params.referenceId, done);
-  //       },
-  //       findPracticeExercises:['findExerciseId', function (results, done) {
-  //
-  //         const query = {
-  //           userId: request.auth.credentials.user._id.toString(),
-  //           exerciseId: results.findExerciseId.exerciseId,
-  //         };
-  //
-  //         PracticeExercise.find(query, done);
-  //       }]
-  //     }, (err, results) => {
-  //
-  //       if (err) {
-  //         return reply(err);
-  //       }
-  //       if (!results.findExerciseId || results.findPracticeExercises === undefined) {
-  //         return reply(Boom.notFound('Document not found.'));
-  //       }
-  //
-  //       reply(results.findPracticeExercises);
-  //     });
-  //   }
-  // });
-  //
-  // //this route finds the exerciseId of a practiceExercise with specified referenceId
-  // server.route({
-  //   method: 'GET',
-  //   path: '/userexercise/exerciseId/{referenceId}',
-  //   config: {
-  //     auth: {
-  //       strategies: ['simple', 'jwt', 'session']
-  //     }
-  //   },
-  //   handler: function (request, reply) {
-  //
-  //     PracticeExercise.findById(request.params.referenceId, (err, practiceExercise) => {
-  //
-  //       if (err) {
-  //         return reply(err);
-  //       }
-  //
-  //       if (!practiceExercise) {
-  //         return reply(Boom.notFound('Document not found.'));
-  //       }
-  //       reply({ exerciseId: practiceExercise.exerciseId });
-  //     });
-  //   }
-  // });
 
   server.route({
     method: 'GET',
@@ -488,6 +504,7 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       let bodyFrames = [];
+      let neck2spineBase, shoulder2shoulder, refMin, refMax, refTime;
 
       Async.auto({
 
@@ -511,7 +528,14 @@ internals.applyRoutes = function (server, next) {
 
           if(results.findMostRecentReference.length > 0 ) {
             if(results.findMostRecentReference[0].bodyFrames.length > 0) {
-              bodyFrames = results.findMostRecentReference[0].bodyFrames;
+
+              let temp = results.findMostRecentReference[0];
+              bodyFrames = temp.bodyFrames;
+              neck2spineBase = temp.neck2spineBase;
+              shoulder2shoulder = temp.shoulder2shoulder;
+              refMin = temp.refMin
+              refMax = temp.refMax;
+              refTime = temp.refTime;
             }
           }
 
@@ -520,10 +544,13 @@ internals.applyRoutes = function (server, next) {
             request.payload.exerciseId,
             request.payload.numSets,
             request.payload.numRepetition,
-            request.payload.rangeScale,
-            request.payload.topThresh,
-            request.payload.bottomThresh,
+            request.payload.diffLevel,
             bodyFrames,
+            neck2spineBase,
+            shoulder2shoulder,
+            refMin,
+            refMax,
+            refTime,
             done);
           }]
         }, (err, results) => {
@@ -537,7 +564,7 @@ internals.applyRoutes = function (server, next) {
     });
 
   //this route inserts a new practice exercise document into its respective collection,
-  //could be trrigered by both clinician and patient,
+  //could be triggered by both clinician and patient,
   server.route({
     method: 'POST',
     path: '/userexercise/practice/{patientId?}',
@@ -680,9 +707,7 @@ internals.applyRoutes = function (server, next) {
             $set: {
               numSets: request.payload.numSets,
               numRepetition: request.payload.numRepetition,
-              rangeScale: request.payload.rangeScale,
-              topThresh: request.payload.topThresh,
-              bottomThresh: request.payload.bottomThresh
+              diffLevel: request.payload.diffLevel,
             }
           };
           ReferenceExercise.findByIdAndUpdate(id, update, done);
@@ -702,7 +727,7 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-  //this route updates the bodyframes data for most recent reference of a (patientId, exerciseId) pair
+  //this route updates the bodyframes and relative data for most recent reference of a (patientId, exerciseId) pair
   server.route({
     method: 'PUT',
     path: '/userexercise/reference/mostrecent/data/{exerciseId}/{patientId}',
@@ -739,12 +764,11 @@ internals.applyRoutes = function (server, next) {
           const update = {
             $set: {
               bodyFrames: request.payload.bodyFrames,
-              neckX: request.payload.neckX,
-              neckY: request.payload.neckY,
+              neck2spineBase: request.payload.neck2spineBase,
+              shoulder2shoulder: request.payload.shoulder2shoulder,
               refMin: request.payload.refMin,
               refMax: request.payload.refMax,
-              refLowerJoint: request.payload.refLowerJoint,
-              refUpperJoint: request.payload.refUpperJoint
+              refTime: request.payload.refTime,
             }
           };
           ReferenceExercise.findByIdAndUpdate(id, update, done);
@@ -764,7 +788,8 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
-//updates practice document with new set information
+  //updates practice document with new set information
+  //it also calculates dtw and rep time offline
   server.route({
     method: 'PUT',
     path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
@@ -789,6 +814,7 @@ internals.applyRoutes = function (server, next) {
         patientId = request.auth.credentials.user._id.toString();
       }
 
+      let requestPayload = request.payload;
       Async.auto({
 
         findMostRecentReference: function (done) {
@@ -805,7 +831,11 @@ internals.applyRoutes = function (server, next) {
           ];
           ReferenceExercise.aggregate(pipeLine, done);
         },
-        findPracticeExercise: ['findMostRecentReference', function (results, done) {
+        findExercise:['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        findPracticeExercise: ['findExercise', function (results, done) {
           const query = {
             userId: (request.params.patientId) ? request.params.patientId : request.auth.credentials.user._id.toString(),
             exerciseId: request.params.exerciseId,
@@ -813,7 +843,128 @@ internals.applyRoutes = function (server, next) {
           };
           PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
         }],
-        findPracticeandUpdate: ['findPracticeExercise', function(results, done) {
+        analyzePractice: ['findPracticeExercise', function(results, done) {
+          //TODO: currently only one joint is used for the accuracy
+          // from exercise
+          let theJoint = results.findExercise.joint;
+          let theAxis = results.findExercise.axis;
+          // from reference
+          let refBodyframes = JSON.parse(Pako.inflate(results.findMostRecentReference[0].bodyFrames, { to: 'string' }));
+          let refJointNeck = refBodyframes[0].joints[2];
+
+          let prac_impt_joint_X = []; //separate X,Y,Z for smoothing
+          let prac_impt_joint_Y = [];
+          let prac_impt_joint_Z = [];
+          let prac_impt_joint; // the chosen axis
+          let prac_impt_joint_XYZ = [];
+          // For normalization:
+          // console.log("requestPayload=", requestPayload.bodyFrames);
+          let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
+          // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+          let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
+          let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
+          //let prac_depth = ??
+
+          for (let i=0; i<bodyFrames_decompressed.length; ++i) {
+            prac_impt_joint_X.push((bodyFrames_decompressed[i].joints[theJoint]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
+            prac_impt_joint_Y.push((bodyFrames_decompressed[i].joints[theJoint]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
+            prac_impt_joint_Z.push(bodyFrames_decompressed[i].joints[theJoint]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
+          }
+
+          let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
+          let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
+          let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
+          let std_impt_joint_XYZ = []; // for establishing the max cost in dtw
+          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
+            prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
+            std_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]]);
+          }
+
+          let ref_impt_joint_X = [];
+          let ref_impt_joint_Y = [];
+          let ref_impt_joint_Z = [];
+          let ref_impt_joint;
+          let ref_impt_joint_XYZ = [];
+
+          // For normalization:
+          let ref_shoulderL2R = refBodyframes[0].joints[8]["depthX"] - refBodyframes[0].joints[4]["depthX"];
+          let ref_neck2base = refBodyframes[0].joints[0]["depthY"] - refBodyframes[0].joints[2]["depthY"];
+          //let ref_depth = ??
+
+          for (let i=0; i<refBodyframes.length; ++i) {
+            ref_impt_joint_X.push(
+              (refBodyframes[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
+            ref_impt_joint_Y.push(
+              (refBodyframes[i].joints[theJoint]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
+            ref_impt_joint_Z.push(refBodyframes[i].joints[theJoint]["cameraZ"] - refJointNeck["cameraZ"]);
+          }
+
+          let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
+          let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
+          let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
+          // Assumption:
+          // patient does N repetitions per referenceExercise, where N is required by clinician
+          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
+            ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
+          }
+
+          let dtw_impt_joint_XYZ = new DTW();
+          let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
+          //let path_XYZ = dtw_impt_joint_XYZ.path();
+
+          let dtw_maxCost = new DTW();
+          let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint_XYZ);
+
+          let acc = 1 - cost_XYZ / cost_max;
+          if(acc<0) acc=0;
+
+          let msg_dtw_XYZ = "DTW cost: " + cost_XYZ + '\n';
+          let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
+          console.log(msg_dtw_XYZ);
+          console.log(msg_dtw_max);
+
+          // speed analysis, using dtw, no smoothing
+          if (theAxis === "depthX") {
+            prac_impt_joint = prac_impt_joint_X;
+            ref_impt_joint = ref_impt_joint_X;
+          } else if (theAxis === "depthY") {
+            prac_impt_joint = prac_impt_joint_Y;
+            ref_impt_joint = ref_impt_joint_Y;
+          }
+          let options = { distanceMetric: 'euclidean' };
+          //let dtw_seg = new DTW(options);
+          let dtw_seg = new DTW();
+          let cost_seg = dtw_seg.compute(ref_impt_joint, prac_impt_joint);
+          let path_seg = dtw_seg.path();
+          // console.log(path_seg);
+          let ref_indices = [];
+          let prac_indices = [];
+          path_seg.forEach(function(pair){
+            ref_indices.push(pair[0]);
+            prac_indices.push(pair[1]);
+          });
+          // console.log(ref_indices, ref_indices.length);
+          // console.log(prac_indices, prac_indices.length);
+          let discard_ref = Discard(prac_indices, 24);
+          let discard_prac = Discard(ref_indices, 24);
+          let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
+          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint.length - discard_prac);
+
+          console.log("original speed ratio: " + spd_ratio);
+          console.log("final speed ratio: " + fin_spd_ratio);
+
+          let analysis = {"accuracy": acc, "speed": fin_spd_ratio };
+          let acc_str = (acc * 100).toFixed(2) + "%";
+          let spd_str = (fin_spd_ratio * 100).toFixed(2) + "%";
+          // let analysis = {"accuracy": acc_str, "speed": spd_str };
+          console.log("accuracy: " + acc_str + "\nspeed: " + spd_str);
+          done(null, analysis);
+        }],
+        findPracticeandUpdate: ['analyzePractice', function(results, done) {
+
+          // console.log("results.analyzePractice: " + results.analyzePractice); //[object object]
+          // console.log("stringify: " + JSON.stringify(results.analyzePractice)); //{"accuracy": 0.945..., "speed": 0.729...}
+          // console.log("results.analyzePractice.accuracy: " + results.analyzePractice.accuracy); //0.945...
 
           const query = {
             userId: patientId,
@@ -821,45 +972,36 @@ internals.applyRoutes = function (server, next) {
             referenceId: results.findMostRecentReference[0]._id.toString()
           };
 
+          let isCompleted = false;
+          if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
+            isCompleted = true;
+          }
           let update = {
             $addToSet: {
-              sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
+              sets: {date: new Date(),
+                numRepsCompleted: requestPayload.numRepsCompleted,
+                analysis: results.analyzePractice,
+                bodyFrames: requestPayload.bodyFrames}
             },
             $inc: {
               numSetsCompleted: 1,
-              numRepsCompleted: 1
             },
             $set: {
-              weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1
+              weekEnd: (requestPayload.weekEnd) ? requestPayload.weekEnd : -1,
+              isComplete: isCompleted,
             }
           };
-
-          if(results.findPracticeExercise.numSetsCompleted + 1 === results.findMostRecentReference[0].numSets) {
-            update = {
-              $addToSet: {
-                sets: {date: new Date(), reps: [1], bodyFrames: request.payload.bodyFrames}
-              },
-              $inc: {
-                numSetsCompleted: 1,
-                numRepsCompleted: 1
-              },
-              $set: {
-                weekEnd: (request.payload.weekEnd) ? request.payload.weekEnd : -1,
-                isComplete: true
-              }
-            };
-          }
           PracticeExercise.findOneAndUpdate(query, update, {sort: {$natural: -1}}, done);
         }]
       }, (err, results) => {
 
         if (err) {
-          return reply(err);
+          return reply(results);
         }
         if (!results.findMostRecentReference[0]) {
           return reply(Boom.notFound('Document not found.'));
         }
-        reply(results.findPracticeandUpdate);
+        reply(results.analyzePractice);
       });
     }
   });
@@ -886,11 +1028,9 @@ internals.applyRoutes = function (server, next) {
       };
 
       ReferenceExercise.findByIdAndUpdate(request.params.id, update, (err, document) => {
-
         if (err) {
           return reply(err);
         }
-
         if (!document) {
           return reply(Boom.notFound('Document not found.'));
         }

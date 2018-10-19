@@ -13,9 +13,16 @@
           <p class="large">Current Exercise</p>
           <div class= "small" style="line-height: 15px;">
             {{#compare type 'practice'}}
-              <p>{{numRepetition}} {{formatName exercise.exerciseName}}s</p>
+              <p>{{formatName exercise.exerciseName}}</p>
               <p>Set {{setNumber}} of {{numSets}}</p>
+              <p>{{numRepetition}} Repetitions</p>
+              {{#compare mode 'play'}}
+                  <p id="cntReps" class="commonBlue repsFont">0</p>
+                  <p>repetitions completed.</p>
+                  <p id="speedEval" style="color: grey"></p>
+              {{/compare}}
             {{/compare}}
+
             {{#compare type 'reference'}}
               <p>{{formatName exercise.exerciseName}}</p>
               <p>Reference</p>
@@ -44,9 +51,11 @@
               <p id="timerStart" class="orangeColor small"></p>
               <p id="num" class="orangeColor"></p>
             </div>
+
             <p>To end the set,</p>
             <p>click Stop.</p>
           {{/compare}}
+
           {{#compare mode 'stop'}}
             <p>Set ended.</p>
             <p class="small">What would you like to do?</p>
@@ -57,14 +66,32 @@
             <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play','{{type}}')">START</button>
           {{/compare}}
           {{#compare mode 'play'}}
-              <button type="button" class="red white actionBtn btn btn-primary actionBtn" onclick="action('stop', '{{type}}')">STOP</button>
+              <button type="button" id="stop" class="red white actionBtn btn btn-primary actionBtn ladda-button" data-style="expand-right" onclick="action('stop', '{{type}}')">STOP</button>
           {{/compare}}
           {{#compare mode 'stop'}}
             {{#compare type 'reference'}}
-              <button class="btn btn-primary blueBackground white actionBtn" onclick="saveReference()">SAVE REFERENCE</button>
+              <button class="btn btn-primary blueBackground white actionBtn ladda-button" onclick="saveReference()">SAVE REFERENCE</button>
             {{/compare}}
             {{#compare type 'practice'}}
-              <button class="btn btn-primary blueBackground white actionBtn" onclick="savePractice()">SAVE SET</button>
+              <button class="btn btn-primary blueBackground white actionBtn ladda-button" onclick="savePractice()">SAVE SET</button>
+
+              <div class="modal" id="fdbkModal" tabindex="-1"  role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Here is how you performed: </h5>
+                    </div>
+                    <div class="modal-body">
+                      <div> Your average repetition accuracy: <span id="acc" style="color: #007bff">__</span></div>
+                      <div> Your average repetition speed: <span id="spd" style="color: #007bff">__</span></div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" id="fdbkOK" class="btn btn-primary">OK</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             {{/compare}}
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}

@@ -3,6 +3,7 @@
 const schema = Joi.object({
   numSets: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required()
+  // diffLevel: Joi.number().min(0).max(1).required(),
 });
 
 joiToForm('formFields',schema);

@@ -4,7 +4,7 @@ const MongoModels = require('hicsail-mongo-models');
 
 class Exercise extends MongoModels {
 
-  static create(exerciseName, description, joint, axis, direction, refLowerJoint, refUpperJoint, userId, callback) {
+  static create(exerciseName, description, joint, axis, direction, userId, callback) {
 
     const document = {
       exerciseName,
@@ -12,9 +12,6 @@ class Exercise extends MongoModels {
       joint,
       axis,
       direction,
-      refLowerJoint,
-      refUpperJoint,
-      userId,
       createdAt: new Date()
     };
 
@@ -31,7 +28,6 @@ class Exercise extends MongoModels {
 
 Exercise.collection = 'exercises';
 
-
 Exercise.schema = Joi.object().keys({
   _id: Joi.object(),
   exerciseName: Joi.string().required(),
@@ -39,21 +35,15 @@ Exercise.schema = Joi.object().keys({
   joint: Joi.number().integer().required(),
   axis: Joi.string().required(),
   direction: Joi.string().required(),
-  refLowerJoint: Joi.number().integer().required(),
-  refUpperJoint: Joi.number().integer().required(),
-  //this is the userId of the person creating the exercise
-  userId: Joi.string().required(),
   createdAt: Joi.date().required()
 });
 
 Exercise.payload = Joi.object().keys({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
-  // joint: Joi.number().integer().required(),
-  // axis: Joi.number().required(),
-  // direction: Joi.string().valid('up','down').required(),
-  // refLowerJoint: Joi.number().integer().required(),
-  // refUpperJoint: Joi.number().integer().required()
+  joint: Joi.number().integer().required(),
+  axis: Joi.string().valid('depthX','depthY').required(),
+  direction: Joi.string().valid('up','down','L2R','R2L').required(),
 });
 
 

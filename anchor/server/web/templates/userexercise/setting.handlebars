@@ -16,11 +16,19 @@
                 <div class="form-group">
                   <label for="numSets" class="label">Number of Sets</label>
                   <input type="number" class="form-control" id="numSets" aria-describedby="" placeholder="Enter a number" value={{defaultNumSets}}>
-               </div>
-               <div class="form-group">
-                 <label for="numReps" class="label">Number of Repetitions</label>
-                 <input type="number" class="form-control" id="numReps" aria-describedby="" placeholder="Enter a number" value={{defaultNumReps}}>
-               </div>
+                </div>
+                <div class="form-group">
+                  <label for="numReps" class="label">Number of Repetitions</label>
+                  <input type="number" class="form-control" id="numReps" aria-describedby="" placeholder="Enter a number" value={{defaultNumReps}}>
+                </div>
+                <div class="form-group">
+                  <label for="difficultyLevel" class="label">Difficulty Level</label>
+                  <select class="form-control" id="diffLevel">
+                    <option value="0.9">Hard</option>
+                    <option value="0.75" selected="selected">Medium</option>
+                    <option value="0.5">Easy</option>
+                  </select>
+                </div>
                {{#if referenceExists}}
                <a id="save" href="#" onclick="update()">Update settings</a>
                {{else}}
@@ -74,6 +82,7 @@
                    <a id="start" href="#" onclick="StartPracticeSession()">Start exercise session</a>
                 </div>
               </div>
+
              {{else}}
              <div class="row" style="margin-top:30px;">
                 <div class="col">
@@ -92,6 +101,19 @@
 
 <link rel="stylesheet" href="/public/css/styleSheet/setting.css">
 <script type="text/javascript" src="/public/scripts/userexercise/setting.js"></script>
+<script>
+  let defaultDiffLevel = {{defaultDiffLevel}};
+  console.log(defaultDiffLevel);
+  let diffLevel = document.getElementById('diffLevel');
+  for (let i = 0; i < diffLevel.options.length; ++i) {
+    if (parseFloat(diffLevel.options[i].value) !== defaultDiffLevel) {
+      diffLevel.options[i].selected = false;
+    } else {
+      diffLevel.options[i].selected = true;
+    }
+  }
+</script>
+
 
 
 

@@ -7,6 +7,7 @@ const PracticeExercise = require('../../models/practiceExercise');
 const ReferenceExercise = require('../../models/referenceExercise');
 const Exercise = require('../../models/exercise');
 const User = require('../../models/user');
+const Smoothing = require('../helpers/smoothingMethod');
 
 internals.applyRoutes = function (server, next) {
 
@@ -155,6 +156,7 @@ internals.applyRoutes = function (server, next) {
 
           Exercise.findById(request.params.exerciseId, done);
         }],
+
       }, (err, results) => {
 
         if (err) {
@@ -205,6 +207,7 @@ internals.applyRoutes = function (server, next) {
       let referenceExists = true;
       let defaultNumReps = 1;
       let defaultNumSets = 1;
+      let defaultDiffLevel = 0.75;
 
       Async.auto({
 
@@ -263,6 +266,10 @@ internals.applyRoutes = function (server, next) {
           if ( results.findReference[0].numSets ) {
             defaultNumSets = results.findReference[0].numSets;
           }
+
+          if ( results.findReference[0].diffLevel ) {
+            defaultDiffLevel = results.findReference[0].diffLevel;
+          }
         }
 
         return reply.view('userexercise/setting', {
@@ -274,7 +281,8 @@ internals.applyRoutes = function (server, next) {
           patientId: request.params.patientId,
           referenceExists,
           defaultNumReps,
-          defaultNumSets
+          defaultNumSets,
+          defaultDiffLevel
         });
       });
     }
@@ -303,6 +311,105 @@ internals.applyRoutes = function (server, next) {
           numSets: request.params.numSets,
           setNumber: request.params.setNumber,
           exercise
+        });
+      });
+    }
+  });
+
+  // for smoothing test
+  server.route({
+    method: 'GET',
+    path: '/userexercise/smoothing/{exerciseId}/{patientId?}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+      }
+    },
+    handler: function (request, reply) {
+
+      let smoothingResult = {};
+      let patientId = '';
+      //logged in user is a clinician
+      if (request.params.patientId) {
+        patientId = request.params.patientId;
+      }
+      //Logged in user is a patient
+      else {
+        patientId = request.auth.credentials.user._id.toString();
+      }
+
+      console.log("patientId: " + patientId);
+
+      Async.auto({
+
+        //first we need to find the referenceId of the exercise
+        //finding one document matching the query is enough
+        findMostRecentReference: function (done) {
+
+          const filter = {
+            userId: patientId,
+            exerciseId: request.params.exerciseId,
+          };
+
+          const pipeLine = [
+            {'$match': filter},
+            {'$sort': {createdAt: -1}},
+            {'$limit': 1}
+          ];
+          ReferenceExercise.aggregate(pipeLine, done);
+        },
+        findExercise: ['findMostRecentReference', function (results, done) {
+
+          Exercise.findById(request.params.exerciseId, done);
+        }],
+        smoothingTest: ['findExercise', function (results, done) {
+          let reference = results.findMostRecentReference[0];
+          let exercise = results.findExercise;
+
+          let theJoint = exercise.joint;
+
+          let ref_impt_joint_X = [];
+          let ref_impt_joint_Y = [];
+          let ref_impt_joint_Z = [];
+
+          for (let i = 0; i < reference.bodyFrames.length; ++i) {
+            ref_impt_joint_X.push(reference.bodyFrames[i].joints[theJoint]["depthX"]);
+            ref_impt_joint_Y.push(reference.bodyFrames[i].joints[theJoint]["depthY"]);
+            ref_impt_joint_Z.push(reference.bodyFrames[i].joints[theJoint]["cameraZ"]);
+          }
+          //console.log(ref_impt_joint_Y);
+
+          let t = [];
+          for (let i=0; i<ref_impt_joint_Y.length; i++) {
+            t.push(i);
+          }
+          console.log("t: " + t);
+          console.log("raw: " + ref_impt_joint_Y);
+
+          let ref_Y_smoothedAvg = Smoothing(ref_impt_joint_Y, 10, "avg");
+          console.log("ref_Y_smoothedAvg: " + ref_Y_smoothedAvg);
+          let ref_Y_smoothedTri = Smoothing(ref_impt_joint_Y, 5, "tri");
+          let ref_Y_smoothedGauss = Smoothing(ref_impt_joint_Y, 5);
+
+          smoothingResult['t'] = t;
+          smoothingResult['raw'] = ref_impt_joint_Y;
+          smoothingResult['smoothedAvg'] = ref_Y_smoothedAvg;
+          smoothingResult['smoothedTri'] = ref_Y_smoothedTri;
+          smoothingResult['smoothedGauss'] = ref_Y_smoothedGauss;
+
+          console.log("smoothed: " + smoothingResult.smoothedGauss);
+          done();
+        }]
+      }, (err, results) => {
+        if(err) {
+          return reply(err);
+        }
+        if(!results.findMostRecentReference) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        return reply.view('userexercise/smoothed-data', {
+          data: smoothingResult
         });
       });
     }

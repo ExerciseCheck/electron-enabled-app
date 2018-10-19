@@ -11,10 +11,9 @@ class PracticeExercise extends MongoModels {
       exerciseId,
       referenceId,
       numSetsCompleted: 0,
-      numRepsCompleted: 0,
       weekStart,
       weekEnd: -1,
-      sets: [], //[] of {date: 00, reps: [], bodyframes: []}
+      sets: [], //[] of {date: DATE, numRepsCompleted: 0, analysis: {}, bodyframes: []}
       //isActive is set to true by default
       isActive: true,
       isComplete: false, //sets to true if a session completes all sets
@@ -41,7 +40,6 @@ PracticeExercise.schema = Joi.object().keys({
   referenceId:  Joi.string().required(),
   //we can also define a boolean field as isReference instead
   numSetsCompleted: Joi.number().integer().required(),
-  numRepsCompleted: Joi.number().integer().required(),
   weekStart: Joi.number().required(),
   weekEnd: Joi.number().required(),
   sets: Joi.array().required(), //make it more specific later
@@ -58,8 +56,9 @@ PracticeExercise.practicePayload = Joi.object().keys({
 
 //this is used for validating payload of put requests when updating a practice
 PracticeExercise.dataPayload = Joi.object().keys({
-  bodyFrames: Joi.array().required(),
-  weekEnd: Joi.number()
+  bodyFrames: Joi.string().required(),
+  numRepsCompleted: Joi.number().required(),
+  weekEnd: Joi.number(),
   //not sure how to validate updating an item inside sets
 });
 

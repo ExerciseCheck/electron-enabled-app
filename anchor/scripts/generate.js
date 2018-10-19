@@ -37,11 +37,11 @@ const Generate = {
     pluralName: 'RefExercises',
     schema: 'Joi.object().keys({\n' +
     '  _id: Joi.object(),\n' +
-    '  bodyFrames: Joi.array().required(),\n' +
+    '  bodyFrames: Joi.string().required(),\n' +
     '  time: Joi.date().required()\n' +
     '});',
     payload: 'Joi.object().keys({\n' +
-    '  bodyFrames: Joi.array().required()\n' +
+    '  bodyFrames: Joi.string().required()\n' +
     '});',
     defaultValues: {
       time: 'new Date()'

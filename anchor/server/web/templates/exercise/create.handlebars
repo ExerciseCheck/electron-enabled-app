@@ -10,15 +10,16 @@
             <form id="form">
               <div id="formFields"></div>
               <label for="impJoint" class="label">Most Important Joint</label>
-              {{> jointList}}
-              <label for="impAxis" class="label">Axis</label>
+              <div class="form-group">
+                <select type="number" class="form-control" id="impJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>
+                  {{> jointList}}
+                </select>
+              </div>
+              <label for="impAxis" class="label">Moving Pattern</label>
               {{> axis}}
-              <label for="direction" class="label">Direction</label>
+              <label for="direction" class="label">Starting Direction</label>
               {{> direction}}
-              <label for="lowerJoint" class="label">Ref Lower Joint</label>
-              {{> jointList}}
-              <label for="upperJoint" class="label">Ref Lower Joint</label>
-              {{> jointList}}
+
               <button id="create" type="submit" class="btn btn-primary">Create</button>
             </form>
           </div>
