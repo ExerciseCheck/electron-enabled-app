@@ -932,20 +932,19 @@ internals.applyRoutes = function (server, next) {
           let dtw_seg = new DTW();
           let cost_seg = dtw_seg.compute(ref_impt_joint, prac_impt_joint);
           let path_seg = dtw_seg.path();
-          console.log(path_seg);
+          // console.log(path_seg);
           let ref_indices = [];
           let prac_indices = [];
-          let pair;
-          for (pair in path_seg) {
+          path_seg.forEach(function(pair){
             ref_indices.push(pair[0]);
             prac_indices.push(pair[1]);
-          }
-          console.log(ref_indices, ref_indices.length);
-          console.log(prac_indices, prac_indices.length);
+          });
+          // console.log(ref_indices, ref_indices.length);
+          // console.log(prac_indices, prac_indices.length);
           let discard_ref = Discard(prac_indices, 24);
           let discard_prac = Discard(ref_indices, 24);
           let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
-          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint - discard_prac);
+          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint.length - discard_prac);
 
           console.log("original speed ratio: " + spd_ratio);
           console.log("final speed ratio: " + fin_spd_ratio);
