@@ -396,7 +396,7 @@ $('.actionBtn').click(function() {
     let outputCanvas = document.getElementById("outputCanvas");
 
     //start of creating reference
-    if(parsedURL.mode === 'start' && refFrames.length === 0)
+    if(parsedURL.mode === 'start'  && refFrames && refFrames.length === 0)
     {
       ref_index = 0;
       exe_index = 0;
@@ -791,7 +791,7 @@ $('.actionBtn').click(function() {
     //4. end of practice
     //in theses cases, the in-position will not be checked
     else if (((parsedURL.type === 'reference') && (parsedURL.mode === 'stop')) ||
-      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start') && (refFrames.length > 0)) ||
+      ((parsedURL.type === 'reference') && (parsedURL.mode === 'start')  && refFrames && (refFrames.length > 0)) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'start' || parsedURL.mode === 'end')) ||
       ((parsedURL.type === 'practice') && (parsedURL.mode === 'stop'))
     )
