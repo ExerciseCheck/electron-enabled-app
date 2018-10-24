@@ -83,7 +83,7 @@ function action(nextMode, type) {
     var exerciseId = parsedURL.exerciseId;
 
     function redirect() {
-      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      var redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
 
@@ -157,7 +157,7 @@ function saveReference() {
   const pathToArray = window.location.pathname.split('/');
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
-  const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
+  const redirectToUrl = 'userexercise/setting/' + exerciseId +'/' + patientId;
 
   let values = {};
   // save to referenceExercise

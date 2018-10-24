@@ -23,7 +23,7 @@ const config = {
     production: process.env.BASE_URL,
     test: 'localhost:9090',
     local: process.env.BASE_URL,
-    $default: 'https://sail3.bu.edu/exercisecheck/'
+    $default: 'http://localhost:9000/'
   },
   port: {
     web: {

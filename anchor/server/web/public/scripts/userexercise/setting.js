@@ -113,7 +113,7 @@ function update() {
 function createRef() {
 
   const url = 'api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/reference/' +
+  const redirectToUrl = 'userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
@@ -139,7 +139,7 @@ function updateReference() {
   const diffLevel = $("#diffLevel").val();
 
   const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +
+  const redirectToUrl = 'userexercise/session/start/' + 'reference' + '/' +
     getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
