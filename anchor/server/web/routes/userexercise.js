@@ -23,6 +23,7 @@ internals.applyRoutes = function (server, next) {
 
       return reply.view('userexercise/viewreference', {
         user: request.auth.credentials.user,
+        baseUrl: Config.get('/baseUrl'),
         projectName: Config.get('/projectName')
       });
     }
@@ -46,6 +47,7 @@ internals.applyRoutes = function (server, next) {
 
         return reply.view('clinician/viewReferences', {
           patientName: user.name,
+          baseUrl: Config.get('/baseUrl'),
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName')
         });
@@ -65,6 +67,7 @@ internals.applyRoutes = function (server, next) {
 
       return reply.view('userexercise/create', {
         user: request.auth.credentials.user,
+        baseUrl: Config.get('/baseUrl'),
         projectName: Config.get('/projectName')
       });
     }
@@ -82,6 +85,7 @@ internals.applyRoutes = function (server, next) {
 
       return reply.view('userexercise/createpractice', {
         user: request.auth.credentials.user,
+        baseUrl: Config.get('/baseUrl'),
         projectName: Config.get('/projectName')
       });
     }
@@ -176,6 +180,7 @@ internals.applyRoutes = function (server, next) {
             user: request.auth.credentials.user,
             projectName: Config.get('/projectName'),
             exercise : results.findExercise,
+            baseUrl: Config.get('/baseUrl'),
             mode: request.params.mode,
             type: request.params.type
           });
@@ -189,6 +194,8 @@ internals.applyRoutes = function (server, next) {
           exercise : results.findExercise,
           mode: request.params.mode,
           type: request.params.type,
+          baseUrl: Config.get('/baseUrl')
+
         });
       });
     }

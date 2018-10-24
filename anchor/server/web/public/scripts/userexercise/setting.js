@@ -88,7 +88,7 @@ function changeSetting() {
 
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
-  $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
+  $.get('api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
       updateSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId());
@@ -130,7 +130,7 @@ function createRef() {
 
 function viewReferences() {
 
-  window.location = 'userexercise/reference/' + getPatientId();
+  window.location = 'api/userexercise/reference/' + getPatientId();
 }
 
 function updateReference() {
