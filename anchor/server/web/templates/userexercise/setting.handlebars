@@ -30,9 +30,9 @@
                   </select>
                 </div>
                {{#if referenceExists}}
-               <a id="save" href="#" onclick="update()">Update settings</a>
+               <a id="save" href="">Update settings</a>
                {{else}}
-               <a id="save" href="#" onclick="changeSetting()">Update settings</a>
+               <a id="save" href="">Update settings</a>
                {{/if}}
              </form>
             </div>
@@ -103,6 +103,8 @@
 <script type="text/javascript" src="public/scripts/userexercise/setting.js"></script>
 <script>
   let defaultDiffLevel = {{defaultDiffLevel}};
+  let doesReferenceExist = {{referenceExists}};
+
   console.log(defaultDiffLevel);
   let diffLevel = document.getElementById('diffLevel');
   for (let i = 0; i < diffLevel.options.length; ++i) {

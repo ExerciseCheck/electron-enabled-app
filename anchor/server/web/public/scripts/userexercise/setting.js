@@ -2,6 +2,19 @@
 
 let req, db;
 
+$(document).ready(function(){
+  //attach click handlers
+  document.getElementById("save").click(function(event){
+    event.preventDefault();
+    if(doesReferenceExist){
+      update();
+    }else{
+      changeSetting();
+    }
+  });
+
+});
+
 function getExerciseId() {
 
   return (window.location.pathname.split('/'))[3];
@@ -88,7 +101,7 @@ function changeSetting() {
 
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
-  $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
+  $.get('api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
       updateSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId());
