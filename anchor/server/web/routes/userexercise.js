@@ -279,6 +279,7 @@ internals.applyRoutes = function (server, next) {
           patientName : results.findPatientName.name,
           exerciseId : request.params.exerciseId,
           patientId: request.params.patientId,
+          baseUrl: Config.get('/baseUrl'),
           referenceExists,
           defaultNumReps,
           defaultNumSets,
@@ -307,6 +308,7 @@ internals.applyRoutes = function (server, next) {
         return reply.view('userexercise/play', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
+          baseUrl: Config.get('/baseUrl'),
           numRepetition: request.params.numRepetition,
           numSets: request.params.numSets,
           setNumber: request.params.setNumber,
@@ -409,7 +411,8 @@ internals.applyRoutes = function (server, next) {
         }
 
         return reply.view('userexercise/smoothed-data', {
-          data: smoothingResult
+          data: smoothingResult,
+          baseUrl: Config.get('/baseUrl')
         });
       });
     }
@@ -434,6 +437,7 @@ internals.applyRoutes = function (server, next) {
         return reply.view('userexercise/stop', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
+          baseUrl: Config.get('/baseUrl'),
           numRepetition: request.params.numRepetition,
           numSets: request.params.numSets,
           setNumber: request.params.setNumber,
@@ -455,6 +459,7 @@ internals.applyRoutes = function (server, next) {
 
       return reply.view('userexercise/createref', {
         user: request.auth.credentials.user,
+        baseUrl: Config.get('/baseUrl'),
         projectName: Config.get('/projectName')
       });
     }
@@ -478,6 +483,7 @@ internals.applyRoutes = function (server, next) {
         }
         return reply.view('userexercise/edit', {
           user: request.auth.credentials.user,
+          baseUrl: Config.get('/baseUrl'),
           projectName: Config.get('/projectName'),
           userExercise
         });
@@ -504,6 +510,7 @@ internals.applyRoutes = function (server, next) {
 
         return reply.view('userexercise/viewExercises', {
           user: request.auth.credentials.user,
+          baseUrl: Config.get('/baseUrl'),
           projectName: Config.get('/projectName'),
           exercises
         });
@@ -532,6 +539,7 @@ internals.applyRoutes = function (server, next) {
 
         return reply.view('refexercises/play', {
           projectName: Config.get('/projectName'),
+          baseUrl: Config.get('/baseUrl'),
           frameData: JSON.stringify(document.bodyFrames)
         });
       });
@@ -557,7 +565,8 @@ internals.applyRoutes = function (server, next) {
         }
 
         return reply.view('userexercises/play', {
-          frameData: JSON.stringify(document.bodyFrames)
+          frameData: JSON.stringify(document.bodyFrames),
+          baseUrl: Config.get('/baseUrl')
         });
       });
     }
