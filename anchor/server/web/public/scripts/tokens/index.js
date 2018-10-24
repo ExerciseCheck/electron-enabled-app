@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/tokens/' + id,
+      url: 'api/tokens/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('Token Deleted');

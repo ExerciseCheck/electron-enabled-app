@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/templates/' + id,
+      url: 'api/templates/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('Template Deleted');

@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/users/' + id,
+      url: 'api/users/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('User Deleted');

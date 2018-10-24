@@ -13,7 +13,7 @@ $('#create').click((event) => {
   });
   $.ajax({
     type: 'POST',
-    url: '/api/tokens',
+    url: 'api/tokens',
     data: values,
     success: function (result) {
       window.location = '/tokens'

@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/exercise/' + id,
+      url: 'api/exercise/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('Exercise Deleted');
@@ -24,4 +24,4 @@ function editDoc(id) {
   window.location = '/exercise/edit/' + id
 }
 
- 
+

@@ -18,7 +18,7 @@ $('#create').click((event) => {
   values.exerciseId = $('#exerciseId').val();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
       window.location = '/userexercise'
@@ -34,7 +34,7 @@ $(document).ready(function() {
     $('#exerciseId').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/exercise',
+      url: 'api/select2/exercise',
       dataType: 'json',
       processResults: function (data) {
         var results = [];
@@ -56,7 +56,7 @@ $(document).ready(function() {
   $('#userId').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/users',
+      url: 'api/select2/users',
       dataType: 'json',
       processResults: function (data) {
         var results = [];

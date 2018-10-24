@@ -23,7 +23,7 @@ $('#setup').click((event) => {
       delete values.email;
       $.ajax({
         type: 'POST',
-        url: '/api/login',
+        url: 'api/login',
         data: values,
         success: function (result) {
           window.location.reload();

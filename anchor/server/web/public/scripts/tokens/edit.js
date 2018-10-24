@@ -28,7 +28,7 @@ $('#update').click((event) => {
   }
   $.ajax({
     type: 'PUT',
-    url: '/api/tokens/' + tokenID,
+    url: 'api/tokens/' + tokenID,
     data: values,
     success: function (result) {
       window.location = '/tokens'

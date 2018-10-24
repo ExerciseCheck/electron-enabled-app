@@ -26,7 +26,7 @@ function initializePractice(exerciseId, addressValue) {
 
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/practice/',
+    url: 'api/userexercise/practice/',
     data: values,
     success: function (result) {
         successAlert('Starting new practice session!');

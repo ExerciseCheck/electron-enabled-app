@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/feedback/' + id,
+      url: 'api/feedback/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('Feedback Deleted');

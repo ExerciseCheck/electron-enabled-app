@@ -3,7 +3,7 @@ function update(id,resolved) {
   const comment = $('#comment').val();
   $.ajax({
     type: 'PUT',
-    url: '/api/feedback/' + id,
+    url: 'api/feedback/' + id,
     data: {
       resolved,
       comment

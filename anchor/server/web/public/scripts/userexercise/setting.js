@@ -23,7 +23,7 @@ function initialSetting(numSets, numReps, diffLevel, exerciseId, patientId, redi
 
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
@@ -44,7 +44,7 @@ function initializePractice() {
   values.weekStart = new Date().getWeekNumber();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/practice/' + getPatientId(),
+    url: 'api/userexercise/practice/' + getPatientId(),
     data: values,
     success: function (result) {
         successAlert('Starting new practice session');
@@ -68,7 +68,7 @@ function updateSetting(numSets, numReps, diffLevel, exerciseId, patientId) {
   //updating settings creates a new reference document with the latest reference bodyframes
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');

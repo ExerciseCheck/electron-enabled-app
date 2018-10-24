@@ -181,7 +181,7 @@ function saveReference() {
 
   $.ajax({
     type: 'PUT',
-    url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
+    url: 'api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
       window.location = redirectToUrl

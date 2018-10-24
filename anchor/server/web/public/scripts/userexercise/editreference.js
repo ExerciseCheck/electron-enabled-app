@@ -17,7 +17,7 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '/api/userexercise/reference/' + userExerciseId,
+    url: 'api/userexercise/reference/' + userExerciseId,
     data: values,
     success: function (result) {
       window.location = '/userexercise'

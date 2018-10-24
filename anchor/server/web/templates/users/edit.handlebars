@@ -30,7 +30,7 @@
     });
     $.ajax({
       type: 'PUT',
-      url: '/api/users/{{editUser._id}}',
+      url: 'api/users/{{editUser._id}}',
       data: values,
       success: function (result) {
         window.location = '/users'

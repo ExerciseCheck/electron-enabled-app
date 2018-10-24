@@ -12,7 +12,7 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '/api/users/my',
+    url: 'api/users/my',
     data: values,
     success: function (result) {
       window.location = '/account';

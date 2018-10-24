@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/{{lowercasePluralName}}/' + id,
+      url: 'api/{{lowercasePluralName}}/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('{{name}} Deleted');

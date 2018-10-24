@@ -1,7 +1,7 @@
 function hidePopUp(){
 
  $("#popUp").hide();
-  
+
 }
 
 function update(){
@@ -10,17 +10,17 @@ function update(){
   event.preventDefault();
   var values = {};
   var checkedPatients = [];
-  //get the value of the checked checkboxes and store them in an array 
+  //get the value of the checked checkboxes and store them in an array
   $('.popupItems input[type=checkbox]:checked').each(function (index, item) {
-    checkedPatients.push($(item).val());              
-                
+    checkedPatients.push($(item).val());
+
   });
   //this is neccessary to pass the payload validation
   values.userAccess = JSON.stringify(checkedPatients);
-   
+
   $.ajax({
     type: 'PUT',
-    url: '/api/clinicians/userAccess/' + clinicianId,
+    url: 'api/clinicians/userAccess/' + clinicianId,
     dataType: 'json',
     data:values,
     success: function (result) {

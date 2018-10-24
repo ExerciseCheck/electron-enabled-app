@@ -88,7 +88,7 @@ const manifest = {
             timezone: 'America/New_York',
             request: {
               method: 'POST',
-              url: '/api/backups/internal',
+              url: 'api/backups/internal',
               allowInternals: true
             }
           }]

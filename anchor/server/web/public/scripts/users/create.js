@@ -19,7 +19,7 @@ $('#create').click((event) => {
     delete values['confirmPassword'];
     $.ajax({
       type: 'POST',
-      url: '/api/users',
+      url: 'api/users',
       data: values,
       success: function (result) {
         window.location = '/users'
