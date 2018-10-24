@@ -20,7 +20,7 @@ $('#create').click((event) => {
       url: 'api/invite',
       data: values,
       success: function (result) {
-        window.location = '/invite'
+        window.location = 'invite'
       },
       error: function (result) {
         errorAlert(result.responseJSON.message);

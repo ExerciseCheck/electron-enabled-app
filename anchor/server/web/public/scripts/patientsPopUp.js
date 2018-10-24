@@ -25,7 +25,7 @@ function update(){
     data:values,
     success: function (result) {
       successAlert(JSON.stringify(result.message));
-      window.location = '/clinician';
+      window.location = 'clinician';
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

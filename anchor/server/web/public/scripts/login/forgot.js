@@ -15,7 +15,7 @@ $('#forgot').click((event) => {
     url: 'api/login/forgot',
     data: values,
     success: function (result) {
-      window.location = '/reset'
+      window.location = 'reset'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

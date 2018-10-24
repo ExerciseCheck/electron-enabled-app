@@ -21,19 +21,19 @@ function deleteDoc(id) {
 }
 
 function editDoc(id) {
-  window.location = '/users/' + id
+  window.location = 'users/' + id
 }
 
 function viewUserEvent(id) {
-  window.location = '/events/user/' + id
+  window.location = 'events/user/' + id
 }
 
 function viewChangePassword(id) {
-  window.location = '/change-password/' + id
+  window.location = 'change-password/' + id
 }
 
 function viewUserClinicians(id) {
-  window.location = '/users/clinicians/' + id
+  window.location = 'users/clinicians/' + id
 }
 
 function createGroundTruth(id) {

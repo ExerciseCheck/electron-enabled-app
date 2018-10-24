@@ -1,19 +1,19 @@
 'use strict';
 
 function login() {
-  window.location = '/login'; 
+  window.location = 'login';
 }
 
 function logout() {
-  window.location = '/logout'; 
+  window.location = 'logout';
 }
 
 function account() {
-  window.location = '/account'; 
+  window.location = 'account';
 }
 
 function signup() {
-  window.location = '/signup';
+  window.location = 'signup';
 }
 
- 
+

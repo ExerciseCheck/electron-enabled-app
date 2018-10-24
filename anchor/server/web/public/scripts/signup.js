@@ -21,7 +21,7 @@ $('#signup').click((event) => {
       url: 'api/signup',
       data: values,
       success: function (result) {
-        window.location = '/';
+        window.location = '';
       },
       error: function (result) {
         alert("oye")

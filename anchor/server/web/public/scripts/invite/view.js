@@ -22,7 +22,7 @@ $('#accept').click((event) => {
       url: 'api/signup',
       data: values,
       success: function (result) {
-        window.location = '/';
+        window.location = '';
       },
       error: function (result) {
         errorAlert(result.responseJSON.message);
@@ -40,7 +40,7 @@ $('#reject').click((event) => {
     type: 'PUT',
     url: 'api/invite/'+ id +'/reject',
     success: function (result) {
-      window.location = '/';
+      window.location = '';
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

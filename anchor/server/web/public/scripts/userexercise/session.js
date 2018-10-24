@@ -196,10 +196,10 @@ function saveReference() {
 function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
   $("#fdbkOK").click(function (e) {
     if(isComplete) {
-      window.location = '/userexercise/session/end/practice/' +
+      window.location = 'userexercise/session/end/practice/' +
         exerciseId + '/' + patientId;
     } else {
-      window.location = '/userexercise/session/start/practice/' +
+      window.location = 'userexercise/session/start/practice/' +
         exerciseId + '/' + patientId;
     }
   });
@@ -257,13 +257,13 @@ function savePractice() {
 }
 
 function goTodashBoard() {
-  window.location = '/dashboard';
+  window.location = 'dashboard';
 }
 
 function goToExercises() {
 
   const patientId = window.location .pathname.split('/').pop();
-  window.location = '/clinician/patientexercises/' + patientId;
+  window.location = 'clinician/patientexercises/' + patientId;
 }
 
 window.onbeforeunload = (e) => {

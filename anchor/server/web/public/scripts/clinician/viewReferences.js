@@ -26,7 +26,7 @@ function editDoc(id) {
   const patientId = window.location.pathname.split('/').pop();
   $.get(url, function(data){
 
-    window.location = '/userexercise/setting/' + data.exerciseId + '/' + patientId;
+    window.location = 'userexercise/setting/' + data.exerciseId + '/' + patientId;
 
   });
 }

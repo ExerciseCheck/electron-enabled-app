@@ -15,7 +15,7 @@ $('#update').click((event) => {
     url: 'api/{{lowercasePluralName}}/' + documentID,
     data: values,
     success: function (result) {
-      window.location = '/{{lowercasePluralName}}'
+      window.location = '{{lowercasePluralName}}'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

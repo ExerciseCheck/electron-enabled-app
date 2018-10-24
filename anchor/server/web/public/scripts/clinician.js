@@ -93,7 +93,7 @@ function remove(clinicainId) {
 
 function addExr() {
 
-  window.location = '/exercise/create';
+  window.location = 'exercise/create';
 }
 
 function filter() {

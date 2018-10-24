@@ -130,7 +130,7 @@ function createRef() {
 
 function viewReferences() {
 
-  window.location = '/userexercise/reference/' + getPatientId();
+  window.location = 'userexercise/reference/' + getPatientId();
 }
 
 function updateReference() {
@@ -184,7 +184,7 @@ function loadReferenceandStart(type) {
 }
 
 function redirect(type) {
-  window.location = '/userexercise/session/start/' + type + '/' +
+  window.location = 'userexercise/session/start/' + type + '/' +
     getExerciseId() + '/' + getPatientId();
 }
 

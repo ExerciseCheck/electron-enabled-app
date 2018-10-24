@@ -31,7 +31,7 @@ $('#update').click((event) => {
     url: 'api/tokens/' + tokenID,
     data: values,
     success: function (result) {
-      window.location = '/tokens'
+      window.location = 'tokens'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

@@ -21,7 +21,7 @@ function deleteDoc(id) {
 }
 
 function editDoc(id) {
-  window.location = '/exercise/edit/' + id
+  window.location = 'exercise/edit/' + id
 }
 
 

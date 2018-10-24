@@ -45,13 +45,13 @@ function getPatientId() {
 }
 
 function viewPlot() {
-  window.location = '/userexercise/smoothing/' + getExerciseId() + '/' + getPatientId();
+  window.location = 'userexercise/smoothing/' + getExerciseId() + '/' + getPatientId();
 }
 
 //for smoothing test
 function plotData(smoothed_data) {
 
-  window.location = '/userexercise/smoothing/' + getExerciseId() + '/' + getPatientId();
+  window.location = 'userexercise/smoothing/' + getExerciseId() + '/' + getPatientId();
 
   let smoothingResult = {};
 

@@ -20,7 +20,7 @@ $('#update').click((event) => {
     url: 'api/userexercise/reference/' + userExerciseId,
     data: values,
     success: function (result) {
-      window.location = '/userexercise'
+      window.location = 'userexercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

@@ -17,7 +17,7 @@ $('#update').click((event) => {
     url: 'api/templates/' + documentID,
     data: values,
     success: function (result) {
-      window.location = '/templates'
+      window.location = 'templates'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

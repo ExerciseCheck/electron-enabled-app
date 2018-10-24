@@ -9,7 +9,7 @@ function update(id,resolved) {
       comment
     },
     success: function (result) {
-      window.location = '/feedback'
+      window.location = 'feedback'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

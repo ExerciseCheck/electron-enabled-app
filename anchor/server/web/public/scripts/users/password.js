@@ -21,7 +21,7 @@ $('#change').click((event) => {
       url: 'api/users/' + userID +'/password',
       data: values,
       success: function (result) {
-        window.location = '/users'
+        window.location = 'users'
       },
       error: function (result) {
         errorAlert(result.responseJSON.message);

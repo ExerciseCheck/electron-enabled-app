@@ -15,7 +15,7 @@ $('#update').click((event) => {
     url: 'api/users/my',
     data: values,
     success: function (result) {
-      window.location = '/account';
+      window.location = 'account';
     },
     fail: function (result) {
       errorAlert(result.responseJSON.message);

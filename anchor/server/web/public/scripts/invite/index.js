@@ -21,5 +21,5 @@ function deleteDoc(id) {
 }
 
 function editDoc(id) {
-  window.location = '/invite/edit/' + id
+  window.location = 'invite/edit/' + id
 }
