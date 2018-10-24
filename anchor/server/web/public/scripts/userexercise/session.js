@@ -309,7 +309,7 @@ $('.actionBtn').click(function() {
   let bodyHeight; // neck to spineBase
   let threshold_flag, direction;
   // fetch data before start exercise
-  let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
+  let url = 'api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;

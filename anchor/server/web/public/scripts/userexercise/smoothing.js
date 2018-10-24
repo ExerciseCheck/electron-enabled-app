@@ -54,8 +54,7 @@ function plotData(smoothed_data) {
   window.location = 'userexercise/smoothing/' + getExerciseId() + '/' + getPatientId();
 
   let smoothingResult = {};
-
-  $.get('/api/userexercise/smoothing/' + getExerciseId() + '/' + getPatientId(), function(data){
+  $.get('api/userexercise/smoothing/' + getExerciseId() + '/' + getPatientId(), function(data){
     smoothingResult = data;
     localStorage.setItem("smoothingResult", JSON.stringify(data));
   });

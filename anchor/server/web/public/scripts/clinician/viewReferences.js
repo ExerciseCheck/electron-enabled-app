@@ -22,7 +22,7 @@ function deleteDoc(id) {
 
 function editDoc(id) {
 
-  const url = '/api/userexercise/exerciseId/' + id;
+  const url = 'api/userexercise/exerciseId/' + id;
   const patientId = window.location.pathname.split('/').pop();
   $.get(url, function(data){
 

@@ -13,10 +13,10 @@ $('#create').click((event) => {
   });
   $.ajax({
     type: 'POST',
-    url: '../api/refexercises',
+    url: 'api/refexercises',
     data: values,
     success: function (result) {
-      window.location = '../refexercises'
+      window.location = 'refexercises'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

@@ -1158,7 +1158,7 @@ function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
-  let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  let url ='api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
@@ -1270,7 +1270,7 @@ function goToExercises() {
   let bodyHeight; // neck to spineBase
   let threshold_flag, direction;
   // fetch data before start exercise
-  let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
+  let url = 'api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;

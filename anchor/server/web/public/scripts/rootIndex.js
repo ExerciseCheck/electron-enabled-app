@@ -37,7 +37,7 @@ function showPopUp(clinicianId, userAccess) {
 $('#clinicians').change(function() {
 
   const clinicianId = $('#clinicians').val();
-  const url = '/api/clinicians/userAccess/' + clinicianId;
+  const url = 'api/clinicians/userAccess/' + clinicianId;
   const preSelected = [];
 
   $.get(url , function( data ) {

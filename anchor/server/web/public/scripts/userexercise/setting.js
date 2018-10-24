@@ -112,7 +112,7 @@ function update() {
 
 function createRef() {
 
-  const url = '/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
   const redirectToUrl = '/userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
@@ -138,7 +138,7 @@ function updateReference() {
   const numReps = $("#numReps").val();
   const diffLevel = $("#diffLevel").val();
 
-  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +
     getExerciseId() + '/' + getPatientId();
 
@@ -157,7 +157,7 @@ function updateReference() {
 //TODO: everytime we start exercise a new document is created but it could be empty
 function StartPracticeSession() {
 
-  const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
   // $.get(url, function(data) {
   //   if (data === true) {
   //     loadReferenceandStart('practice');
@@ -170,7 +170,7 @@ function StartPracticeSession() {
 }
 
 function loadReferenceandStart(type) {
-  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data){
     openDB(function() {
       let refEntry = {type: 'refFrames', body: data};
