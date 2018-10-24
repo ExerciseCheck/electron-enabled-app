@@ -2,6 +2,19 @@
 
 let req, db;
 
+$(document).ready(function(){
+  //attach click handlers
+  document.getElementById("save").click(function(event){
+    event.preventDefault();
+    if(doesReferenceExist){
+      update();
+    }else{
+      changeSetting();
+    }
+  });
+
+});
+
 function getExerciseId() {
 
   return (window.location.pathname.split('/'))[3];
