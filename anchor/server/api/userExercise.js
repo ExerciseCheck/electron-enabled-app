@@ -20,7 +20,7 @@ internals.applyRoutes = function (server, next) {
 //Will eventually get rid of because no longer need user exercises page but this should now load REF EX
   server.route({
     method: 'GET',
-    path: 'table/refexercise',
+    path: '/table/refexercise',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
