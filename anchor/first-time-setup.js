@@ -12,7 +12,7 @@ Async.auto({
   mongodbUri: (done) => {
 
     const options = {
-      default: 'mongodb://localhost:27017/anchor'
+      default: 'mongodb://localhost:27017/exercisecheck'
     };
 
     Promptly.prompt(`MongoDB URI: (${options.default})`, options, done);
