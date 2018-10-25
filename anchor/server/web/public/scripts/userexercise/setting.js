@@ -14,10 +14,12 @@ $(document).ready(function(){
   });
 
   if(doesReferenceExist){
-    document.getElementById("view").addEventListener("click",function(event) {
-      event.preventDefault();
-      viewReferences();
-    });
+
+    //TODO bring back later when view button is enabled again
+    // document.getElementById("view").addEventListener("click",function(event) {
+    //   event.preventDefault();
+    //   viewReferences();
+    // });
 
     document.getElementById("start").addEventListener("click",function(event) {
       event.preventDefault();
