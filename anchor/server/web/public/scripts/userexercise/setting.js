@@ -28,12 +28,14 @@ $(document).ready(function(){
       event.preventDefault();
       updateReference();
     });
+  }else{
+    document.getElementById("createRef").addEventListener("click",function(event) {
+      event.preventDefault();
+      createRef();
+    });
   }
 
-  document.getElementById("createRef").addEventListener("click",function(event) {
-    event.preventDefault();
-    createRef();
-  });
+
 });
 
 function getExerciseId() {

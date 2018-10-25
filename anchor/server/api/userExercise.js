@@ -865,7 +865,7 @@ internals.applyRoutes = function (server, next) {
           // For normalization:
           // console.log("requestPayload=", requestPayload.bodyFrames);
           let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
-          // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+         // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
           let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
           let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
           //let prac_depth = ??
