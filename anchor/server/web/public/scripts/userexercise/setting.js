@@ -4,7 +4,7 @@ let req, db;
 
 $(document).ready(function(){
   //attach click handlers
-  document.getElementById("save").click(function(event){
+  document.getElementById("save").addEventListener("click",function(event){
     event.preventDefault();
     if(doesReferenceExist){
       update();
@@ -13,6 +13,27 @@ $(document).ready(function(){
     }
   });
 
+  if(doesReferenceExist){
+    document.getElementById("view").addEventListener("click",function(event) {
+      event.preventDefault();
+      viewReferences();
+    });
+
+    document.getElementById("start").addEventListener("click",function(event) {
+      event.preventDefault();
+      StartPracticeSession();
+    });
+
+    document.getElementById("update").addEventListener("click",function(event) {
+      event.preventDefault();
+      updateReference();
+    });
+  }
+
+  document.getElementById("createRef").addEventListener("click",function(event) {
+    event.preventDefault();
+    createRef();
+  });
 });
 
 function getExerciseId() {
@@ -143,7 +164,7 @@ function createRef() {
 
 function viewReferences() {
 
-  window.location = 'api/userexercise/reference/' + getPatientId();
+  window.location = 'api/userexercise/reference/'+ getExerciseId() + '/' + getPatientId();
 }
 
 function updateReference() {

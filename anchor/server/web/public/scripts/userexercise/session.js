@@ -3,7 +3,7 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
+let liveFrames = [], refFrames = [], recentFrames  = [], liveFrames_compressed  = [], refFrames_compressed  = [], recentFrames_compressed = [];
 let req, db;
 let dataForCntReps = {};
 let liveBodyColor="#7BE39F";
@@ -11,6 +11,7 @@ let commonBlue = "#1E89FB";
 let refJointColor = "#FF6786";
 let MAX_BODYFRAMES_STORED = 4400;
 let framesExceededLimit = false;
+let threshold_flag, direction;
 
 window.actionBtn = false;
 
@@ -76,6 +77,26 @@ Ladda.bind('.ladda-button', {
       }
     });
 
+const parsedURL = parseURL(window.location.pathname);
+
+let url = 'api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
+url =(!parsedURL.patientId) ? url: url + parsedURL.patientId;
+$.get(url, function(data){
+  dataForCntReps = data;
+  //group: (down, L2R) + and (up, R2L) -
+  if(dataForCntReps.direction === 'L2R') {
+    direction = "down";
+    threshold_flag = "down";
+  } else if (dataForCntReps.direction === 'R2L') {
+    direction = "up";
+    threshold_flag = "up";
+  } else {
+    direction = dataForCntReps.direction;
+    threshold_flag = dataForCntReps.direction;
+  }
+  // redirect();
+})
+
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
@@ -86,7 +107,11 @@ function action(nextMode, type) {
       var redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
+    // if(nextMode === 'play'){
+      //call data for count reps here and redicrect on success
+      // fetch data before start exercise
 
+//    }
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
@@ -137,6 +162,7 @@ function action(nextMode, type) {
         let request = bodyFramesStore.put(updatedLiveFrames);
       }
       redirect();
+
     }
   });
 }
@@ -307,24 +333,7 @@ $('.actionBtn').click(function() {
   let nx_1stFrame, ny_1stFrame, nz_1stFrame; // neck position
   let bodyWidth; // shoulderLeft to shoulderRight
   let bodyHeight; // neck to spineBase
-  let threshold_flag, direction;
   // fetch data before start exercise
-  let url = 'api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
-  (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
-  $.get(url, function(data){
-    dataForCntReps = data;
-    //group: (down, L2R) + and (up, R2L) -
-    if(dataForCntReps.direction === 'L2R') {
-      direction = "down";
-      threshold_flag = "down";
-    } else if (dataForCntReps.direction === 'R2L') {
-      direction = "up";
-      threshold_flag = "up";
-    } else {
-      direction = dataForCntReps.direction;
-      threshold_flag = dataForCntReps.direction;
-    }
-  });
 
   if (isElectron())
   {
@@ -355,7 +364,7 @@ $('.actionBtn').click(function() {
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
-          if(getref.result.body) {
+          if(getref.result && getref.result.body && getref.result.body.length > 0 ) {
             try {
               refFrames_compressed = getref.result.body;
               refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
@@ -371,7 +380,7 @@ $('.actionBtn').click(function() {
         let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
         console.log("getrecent=", getrecent);
         getrecent.onsuccess = function(e) {
-          if(getrecent.result.body) {
+          if(getrecent.result && getrecent.result.body && getrecent.result.body.length > 0) {
             try {
               recentFrames_compressed = getrecent.result.body;
               recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));

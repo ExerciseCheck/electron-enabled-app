@@ -2,7 +2,7 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
-const DTW = require('dtw');
+const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
 const Pako = require('pako');
@@ -375,25 +375,30 @@ internals.applyRoutes = function (server, next) {
         }],
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findMostRecentReference[0];
-          let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
+
+          if(reference.bodyFrames.length > 0 ){
+            let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
+            if (refBodyframes[0] !== undefined) {
+              console.log("reference.bodyFrames exists, and decompressed: ");
+              dataForCntReps['refMin'] = reference.refMin;
+              dataForCntReps['refMax'] = reference.refMax;
+              dataForCntReps['bodyHeight'] = reference.neck2spineBase;
+              dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
+              dataForCntReps['jointNeck'] = refBodyframes[0].joints[2];
+              // time for one repetition in reference, in seconds
+              dataForCntReps['refTime'] = reference.refTime;
+              // numbers between [0,1]
+              dataForCntReps['diffLevel'] = reference.diffLevel;
+
+            }
+          }
           let exercise = results.findExercise;
 
           dataForCntReps['joint'] = exercise.joint;
           dataForCntReps['axis'] = exercise.axis;
           dataForCntReps['direction'] = exercise.direction;
-          // numbers between [0,1]
-          dataForCntReps['diffLevel'] = reference.diffLevel;
 
-          if (refBodyframes[0] !== undefined) {
-            console.log("reference.bodyFrames exists, and decompressed: ");
-            dataForCntReps['refMin'] = reference.refMin;
-            dataForCntReps['refMax'] = reference.refMax;
-            dataForCntReps['bodyHeight'] = reference.neck2spineBase;
-            dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
-            dataForCntReps['jointNeck'] = refBodyframes[0].joints[2];
-            // time for one repetition in reference, in seconds
-            dataForCntReps['refTime'] = reference.refTime;
-          }
+
           //console.log(dataForCntReps);
           done();
         }]
