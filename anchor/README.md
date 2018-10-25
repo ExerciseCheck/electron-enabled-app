@@ -91,7 +91,7 @@ $ npm run first-time-setup
 # > anchor@0.0.0 first-time-setup /home/hicsail/projects/anchor
 # > node first-time-setup.js
 
-# MongoDB URL: (mongodb://localhost:27017/anchor)
+# MongoDB URL: (mongodb://localhost:27017/exercisecheck)
 # Root user email: jedireza@gmail.com
 # Root user password:
 # Setup complete.
