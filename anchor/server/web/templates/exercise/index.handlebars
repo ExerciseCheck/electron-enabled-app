@@ -14,11 +14,9 @@
                 <th>Exercise Name</th>
                 <th>Description</th>
                 <th>Created At</th>
-                <th>impJoint</th>
-                <th>impAxis</th>
-                <th>direction</th>
-                <th>lowerJoint</th>
-                <th>upperJoint</th>
+                <th>Joint</th>
+                <th>Axis</th>
+                <th>Direction</th>
                 {{#role user 'clinician'}}
                   <th>ID</th>
                   <th>Edit</th>
@@ -51,7 +49,7 @@
       ajax: {
         url : "api/table/exercise",
         data: function (d) {
-          d.fields = "exerciseName description createdAt impJoint impAxis direction lowerJoint upperJoint";
+          d.fields = "exerciseName description createdAt joint axis direction";
         }
       },
       columns: [
@@ -71,26 +69,16 @@
           }
         },
         {
-          data: "impJoint",
+          data: "joint",
           defaultContent: ""
         },
         {
-          data: "impAxis",
+          data: "axis",
           defaultContent: ""
         },
         {
           data: "direction",
           defaultContent: ""
-        },
-        {
-          data: "lowerJoint",
-          defaultContent: "",
-          visible: false
-        },
-        {
-          data: "upperJoint",
-          defaultContent: "",
-          visible: false
         },
         {{#role user 'clinician'}}
           {
