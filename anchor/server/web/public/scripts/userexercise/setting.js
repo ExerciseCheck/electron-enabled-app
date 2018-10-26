@@ -150,7 +150,7 @@ function update() {
 
 function createRef() {
 
-  const url = 'api/userexercise/reference/' + '/' + getPatientId();
+  const url = 'api/userexercise/reference' + '/' + getPatientId();
   const redirectToUrl = 'userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
