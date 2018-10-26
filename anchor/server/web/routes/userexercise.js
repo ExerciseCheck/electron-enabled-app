@@ -278,7 +278,8 @@ internals.applyRoutes = function (server, next) {
             defaultDiffLevel = results.findReference[0].diffLevel;
           }
         }
-
+        console.log("defaultDiffLevel,defaultNumReps,defaultNumSets ");
+        console.log(defaultDiffLevel,defaultNumReps,defaultNumSets);
         return reply.view('userexercise/setting', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
