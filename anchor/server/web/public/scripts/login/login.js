@@ -13,7 +13,7 @@ $('#login').click((event) => {
     url: 'api/login',
     data: values,
     success: function (result) {
-      location.reload();
+      window.location = baseUrl;
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

@@ -24,7 +24,6 @@ $('#signup').click((event) => {
         window.location = '';
       },
       error: function (result) {
-        alert("oye")
         errorAlert(result.responseJSON.message);
       }
     });
