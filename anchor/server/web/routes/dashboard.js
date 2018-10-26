@@ -30,7 +30,7 @@ internals.applyRoutes = function (server, next) {
         });
       }
 
-      //if logged in user is cilinician we dispaly list of patients associated with clinician
+      //if logged in user is clinician we display list of patients associated with clinician
       else if (request.auth.credentials.user.roles.clinician) {
         const clinicianId = request.auth.credentials.user._id.toString();
         const patients = [];

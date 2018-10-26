@@ -10,9 +10,11 @@
       <li class="nav-item">
         <a class="nav-link" href="" style="color:white;">HOME</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="dashboard" style="color:white;">DASHBOARD</a>
-      </li>
+      {{#if user}}
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard" style="color:white;">DASHBOARD</a>
+          </li>
+      {{/if}}
     </ul>
     {{#if user}}
       <ul class="navbar-nav my-2 my-lg-0">
