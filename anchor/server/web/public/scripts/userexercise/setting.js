@@ -42,12 +42,12 @@ $(document).ready(function(){
 
 function getExerciseId() {
 
-  return (window.location.pathname.split('/'))[3];
+  return (window.location.href.split("/").reverse()[1]);
 }
 
 function getPatientId() {
 
-  return (window.location.pathname.split('/'))[4];
+  return (window.location.href.split("/").reverse()[0]);
 }
 
 function initialSetting(numSets, numReps, diffLevel, exerciseId, patientId, redirectToUrl) {
