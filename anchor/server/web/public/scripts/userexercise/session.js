@@ -409,10 +409,14 @@ $('.actionBtn').click(function() {
     {
       ref_index = 0;
       exe_index = 0;
-      //nothing should be shown
-       refCanvas.style.display = "none";
+      //showing the live view
+      refCanvas.style.display = "none";
       exeCanvas.style.display = "none";
-      outputCanvas.style.display = "none";
+      outputCanvas.style.display = "block";
+      let ctx = Canvas.getContext('2d');
+      //ctx.fillText("Click the Start button to record your first reference", canvas.width/2, canvas.height/20);
+      drawGrids(ctx);
+      drawFloorPlane(ctx);
     }
     // start of updating reference and practice
     else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
@@ -420,7 +424,7 @@ $('.actionBtn').click(function() {
       ref_index = 0;
       exe_index = 0;
       //show reference canvas only
-       refCanvas.style.display = "block";
+      refCanvas.style.display = "block";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
       let ctx = refCanvas.getContext('2d');
@@ -714,7 +718,7 @@ $('.actionBtn').click(function() {
     ctx.font="20px Arial";
     (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#23D160";
     ctx.textAlign = "center";
-    ctx.fillText("Current Set", canvas.width/2, canvas.height/20);
+    ctx.fillText("Live View", canvas.width/2, canvas.height/20);
     drawGrids(ctx);
     drawFloorPlane(ctx);
 
