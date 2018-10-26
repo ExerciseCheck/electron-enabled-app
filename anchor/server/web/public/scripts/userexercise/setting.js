@@ -42,12 +42,12 @@ $(document).ready(function(){
 
 function getExerciseId() {
 
-  return (window.location.href.split("/").reverse()[1]);
+  return (window.location.pathname.split("/").reverse()[1]);
 }
 
 function getPatientId() {
 
-  return (window.location.href.split("/").reverse()[0]);
+  return (window.location.pathname.split("/").reverse()[0]);
 }
 
 function initialSetting(numSets, numReps, diffLevel, exerciseId, patientId, redirectToUrl) {
@@ -150,7 +150,7 @@ function update() {
 
 function createRef() {
 
-  const url = 'api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/reference/' + '/' + getPatientId();
   const redirectToUrl = 'userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
