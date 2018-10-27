@@ -17,10 +17,10 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '/api/userexercise/reference/' + userExerciseId,
+    url: 'api/userexercise/reference/' + userExerciseId,
     data: values,
     success: function (result) {
-      window.location = '/userexercise'
+      window.location = 'userexercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

@@ -20,10 +20,10 @@ $('#create').click((event) => {
 
   $.ajax({
     type: 'POST',
-    url: '/api/exercise',
+    url: 'api/exercise',
     data: values,
     success: function (result) {
-      window.location = '/exercise'
+      window.location = 'exercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

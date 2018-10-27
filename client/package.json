@@ -20,7 +20,9 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "~1.8.3",
-    "electron-builder": "^20.28.4"
+    "electron-builder": "^20.28.4",
+    "electron-is-dev": "1.0.1"
+
   },
   "dependencies": {
     "kinect2": "^0.1.5"

@@ -2,14 +2,52 @@
 
 let req, db;
 
+$(document).ready(function(){
+  //attach click handlers
+  document.getElementById("save").addEventListener("click",function(event){
+    event.preventDefault();
+    if(doesReferenceExist){
+      update();
+    }else{
+      changeSetting();
+    }
+  });
+
+  if(doesReferenceExist){
+
+    //TODO bring back later when view button is enabled again
+    // document.getElementById("view").addEventListener("click",function(event) {
+    //   event.preventDefault();
+    //   viewReferences();
+    // });
+
+    document.getElementById("start").addEventListener("click",function(event) {
+      event.preventDefault();
+      StartPracticeSession();
+    });
+
+    document.getElementById("update").addEventListener("click",function(event) {
+      event.preventDefault();
+      updateReference();
+    });
+  }else{
+    document.getElementById("createRef").addEventListener("click",function(event) {
+      event.preventDefault();
+      createRef();
+    });
+  }
+
+
+});
+
 function getExerciseId() {
 
-  return (window.location.pathname.split('/'))[3];
+  return (window.location.pathname.split("/").reverse()[1]);
 }
 
 function getPatientId() {
 
-  return (window.location.pathname.split('/'))[4];
+  return (window.location.pathname.split("/").reverse()[0]);
 }
 
 function initialSetting(numSets, numReps, diffLevel, exerciseId, patientId, redirectToUrl) {
@@ -23,7 +61,7 @@ function initialSetting(numSets, numReps, diffLevel, exerciseId, patientId, redi
 
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
@@ -44,7 +82,7 @@ function initializePractice() {
   values.weekStart = new Date().getWeekNumber();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/practice/' + getPatientId(),
+    url: 'api/userexercise/practice/' + getPatientId(),
     data: values,
     success: function (result) {
         successAlert('Starting new practice session');
@@ -68,7 +106,7 @@ function updateSetting(numSets, numReps, diffLevel, exerciseId, patientId) {
   //updating settings creates a new reference document with the latest reference bodyframes
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
@@ -88,7 +126,7 @@ function changeSetting() {
 
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
-  $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
+  $.get('api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
       updateSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId());
@@ -112,8 +150,8 @@ function update() {
 
 function createRef() {
 
-  const url = '/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/reference/' +
+  const url = 'api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
+  const redirectToUrl = 'userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
@@ -130,7 +168,7 @@ function createRef() {
 
 function viewReferences() {
 
-  window.location = '/userexercise/reference/' + getPatientId();
+  window.location = 'api/userexercise/reference/'+ getExerciseId() + '/' + getPatientId();
 }
 
 function updateReference() {
@@ -138,8 +176,8 @@ function updateReference() {
   const numReps = $("#numReps").val();
   const diffLevel = $("#diffLevel").val();
 
-  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +
+  const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const redirectToUrl = 'userexercise/session/start/' + 'reference' + '/' +
     getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
@@ -157,7 +195,7 @@ function updateReference() {
 //TODO: everytime we start exercise a new document is created but it could be empty
 function StartPracticeSession() {
 
-  const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
   // $.get(url, function(data) {
   //   if (data === true) {
   //     loadReferenceandStart('practice');
@@ -170,7 +208,7 @@ function StartPracticeSession() {
 }
 
 function loadReferenceandStart(type) {
-  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data){
     openDB(function() {
       let refEntry = {type: 'refFrames', body: data};
@@ -184,7 +222,7 @@ function loadReferenceandStart(type) {
 }
 
 function redirect(type) {
-  window.location = '/userexercise/session/start/' + type + '/' +
+  window.location = 'userexercise/session/start/' + type + '/' +
     getExerciseId() + '/' + getPatientId();
 }
 

@@ -22,26 +22,26 @@
       {{/if}}
     </h6>
     <li class="nav-item">
-      <a class="nav-link text-light" href="/dashboard">Dashboard</a>
+      <a class="nav-link text-light" href="dashboard">Dashboard</a>
     </li>
   </ul>
   <ul class="nav nav-pills flex-column" style="padding-top: 20px">
     <h6 class="text-dark">Collections</h6>
     <li class="nav-item">
       {{#role user 'clinician'}}
-        <a class="nav-link text-light" href="/refexercise">Reference Exercises</a>
-        <a class="nav-link text-light" href="/exercise">Exercises</a>
-        <a class="nav-link text-light" href="/users">Users</a>
+        <a class="nav-link text-light" href="refexercise">Reference Exercises</a>
+        <a class="nav-link text-light" href="exercise">Exercises</a>
+        <a class="nav-link text-light" href="users">Users</a>
       {{/role}}
       {{#if user.roles.root}}
-        <a class="nav-link text-light" href="/clinician">Link Users</a>
+        <a class="nav-link text-light" href="clinician">Link Users</a>
       {{/if}}
     </li>
   </ul>
   {{#role user 'root'}}
     <ul class="nav nav-pills flex-column" style="padding-top: 20px">
       <li class="nav-item">
-        <a class="nav-link text-light" href="/roles">Roles</a>
+        <a class="nav-link text-light" href="roles">Roles</a>
       </li>
     </ul>
   {{/role}}

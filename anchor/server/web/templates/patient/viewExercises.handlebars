@@ -4,7 +4,7 @@
         <div class="col-sm-9 col-md-10">
             <div class="contentPadding">
                 <h1>Hello {{formatName user.name}}, Select an exercise to continue.</h1>
-                <h3>Your last session was on {{formatDate lastSession}}.</h3> 
+                <h3>Your last session was on {{formatDate lastSession}}.</h3>
                 <br><br><br>
                 <form>
                   <div class="form-group">
@@ -18,7 +18,7 @@
                <ul id ="ul" class = "ul">
                  {{#each exercises}}
                    <li class="listButtons">
-                     <a href= '/userexercise/session/start/practice/{{this._id}}' class="listItem">{{formatName this.exerciseName}}</a>
+                     <a href= 'userexercise/session/start/practice/{{this._id}}' class="listItem">{{formatName this.exerciseName}}</a>
                   </li>
                  {{/each}}
              </ul>
@@ -29,7 +29,7 @@
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../public/css/styleSheet/viewExercise.css">
-<link rel="stylesheet" href="../public/css/styleSheet/scrollToTop.css">
-<script type="text/javascript" src="../public/scripts/patient/viewexercise.js"></script>
-<script type="text/javascript" src="../public/scripts/scrollToTop.js"></script>
+<link rel="stylesheet" href="public/css/styleSheet/viewExercise.css">
+<link rel="stylesheet" href="public/css/styleSheet/scrollToTop.css">
+<script type="text/javascript" src="public/scripts/patient/viewexercise.js"></script>
+<script type="text/javascript" src="public/scripts/scrollToTop.js"></script>

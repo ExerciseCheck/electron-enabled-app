@@ -949,7 +949,7 @@ function action(nextMode, type) {
     var exerciseId = parsedURL.exerciseId;
 
     function redirect() {
-      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      var redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
 
@@ -1011,7 +1011,7 @@ function saveReference() {
   const pathToArray = window.location.pathname.split('/');
   const exerciseId = pathToArray[5];
   const patientId = pathToArray[6];
-  const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
+  const redirectToUrl = 'userexercise/setting/' + exerciseId +'/' + patientId;
 
   let values = {};
   // save to referenceExercise
@@ -1035,7 +1035,7 @@ function saveReference() {
 
   $.ajax({
     type: 'PUT',
-    url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
+    url: 'api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
       window.location = redirectToUrl
@@ -1158,7 +1158,7 @@ function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
-  let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  let url ='api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
   values.bodyFrames = JSON.stringify(recentFrames);
@@ -1225,10 +1225,10 @@ function savePractice() {
     //   };
     //
     //   if(isComplete) {
-    //     window.location = '/userexercise/session/end/practice/' +
+    //     window.location = 'userexercise/session/end/practice/' +
     //       exerciseId + '/' + patientId;
     //   } else {
-    //     window.location = '/userexercise/session/start/practice/' +
+    //     window.location = 'userexercise/session/start/practice/' +
     //       exerciseId + '/' + patientId;
     //   }
     //
@@ -1237,13 +1237,13 @@ function savePractice() {
 }
 
 function goTodashBoard() {
-  window.location = '/dashboard';
+  window.location = 'dashboard';
 }
 
 function goToExercises() {
 
   const patientId = window.location .pathname.split('/').pop();
-  window.location = '/clinician/patientexercises/' + patientId;
+  window.location = 'clinician/patientexercises/' + patientId;
 }
 
 (function ()
@@ -1270,7 +1270,7 @@ function goToExercises() {
   let bodyHeight; // neck to spineBase
   let threshold_flag, direction;
   // fetch data before start exercise
-  let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
+  let url = 'api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
   (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
   $.get(url, function(data){
     dataForCntReps = data;

@@ -18,13 +18,12 @@ $('#signup').click((event) => {
     delete values['confirmPassword'];
     $.ajax({
       type: 'POST',
-      url: '/api/signup',
+      url: 'api/signup',
       data: values,
       success: function (result) {
-        window.location = '/';
+        window.location = '';
       },
       error: function (result) {
-        alert("oye")
         errorAlert(result.responseJSON.message);
       }
     });

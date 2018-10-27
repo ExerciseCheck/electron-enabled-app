@@ -11,7 +11,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/events/' + id,
+      url: 'api/events/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('Event Deleted');

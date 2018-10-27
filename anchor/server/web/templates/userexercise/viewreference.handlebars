@@ -46,7 +46,7 @@
                 'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
             ],
             ajax: {
-                url: "../api/table/refexercise",
+                url : "api/table/refexercise",
                 data: function (d) {
                     d.fields = "userId exerciseId numSets createdAt diffLevel name exerciseName numRepetition";
                 }
@@ -115,5 +115,5 @@
         });
     });
 </script>
-<script type="text/javascript" src="../../public/scripts/userexercise/viewreference.js"></script>
-<link rel="stylesheet" href="../public/css/styleSheet/genericStyles.css">
+<script type="text/javascript" src="public/scripts/userexercise/viewreference.js"></script>
+<link rel="stylesheet" href="public/css/styleSheet/genericStyles.css">

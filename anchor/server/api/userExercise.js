@@ -2,7 +2,7 @@
 const Async = require('async');
 const Boom = require('boom');
 const Joi = require('joi');
-const DTW = require('dtw');
+const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
 const Pako = require('pako');
@@ -375,26 +375,29 @@ internals.applyRoutes = function (server, next) {
         }],
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findMostRecentReference[0];
-          let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
+
+          if(reference && reference.bodyFrames.length > 0 ){
+            let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
+            if (refBodyframes && refBodyframes[0] !== undefined) {
+              console.log("reference.bodyFrames exists, and decompressed: ");
+              dataForCntReps['refMin'] = reference.refMin;
+              dataForCntReps['refMax'] = reference.refMax;
+              dataForCntReps['bodyHeight'] = reference.neck2spineBase;
+              dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
+              dataForCntReps['jointNeck'] = refBodyframes[0].joints[2];
+              // time for one repetition in reference, in seconds
+              dataForCntReps['refTime'] = reference.refTime;
+              // numbers between [0,1]
+              dataForCntReps['diffLevel'] = reference.diffLevel;
+            }
+          }
           let exercise = results.findExercise;
 
           dataForCntReps['joint'] = exercise.joint;
           dataForCntReps['axis'] = exercise.axis;
           dataForCntReps['direction'] = exercise.direction;
-          // numbers between [0,1]
-          dataForCntReps['diffLevel'] = reference.diffLevel;
 
-          if (refBodyframes[0] !== undefined) {
-            console.log("reference.bodyFrames exists, and decompressed: ");
-            dataForCntReps['refMin'] = reference.refMin;
-            dataForCntReps['refMax'] = reference.refMax;
-            dataForCntReps['bodyHeight'] = reference.neck2spineBase;
-            dataForCntReps['bodyWidth'] = reference.shoulder2shoulder;
-            dataForCntReps['jointNeck'] = refBodyframes[0].joints[2];
-            // time for one repetition in reference, in seconds
-            dataForCntReps['refTime'] = reference.refTime;
-          }
-          //console.log(dataForCntReps);
+
           done();
         }]
       }, (err, results) => {
@@ -499,7 +502,9 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: ReferenceExercise.referencePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 
@@ -637,7 +642,9 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
       /*validate: {
         payload: ReferenceExercise.updatePayload
       }*/
@@ -680,7 +687,9 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: ReferenceExercise.updatePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 
@@ -738,7 +747,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: ReferenceExercise.dataPayload
       },
-      payload:{ maxBytes: 1048576 * 100 }
+      payload:{ maxBytes: 1048576 * 500 }
     },
     handler: function (request, reply) {
 
@@ -791,7 +800,7 @@ internals.applyRoutes = function (server, next) {
   //updates practice document with new set information
   //it also calculates dtw and rep time offline
   server.route({
-    method: 'PUT',
+    method: ['PUT','POST'],
     path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
     config: {
       auth: {
@@ -860,7 +869,7 @@ internals.applyRoutes = function (server, next) {
           // For normalization:
           // console.log("requestPayload=", requestPayload.bodyFrames);
           let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
-          // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+         // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
           let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
           let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
           //let prac_depth = ??
@@ -1016,7 +1025,9 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: ReferenceExercise.updatePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 

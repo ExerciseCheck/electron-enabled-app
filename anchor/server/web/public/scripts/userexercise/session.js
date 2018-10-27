@@ -3,7 +3,7 @@
 // liveFrames is a temporary name/status for currently recorded frames.
 // ref frames refers to either the updated ref (liveFrames -> refFrames) OR one from database
 // recentFrames refers to practice exercise 'stop' page (liveFrames -> recentFrames)
-let liveFrames, refFrames, recentFrames, liveFrames_compressed, refFrames_compressed, recentFrames_compressed;
+let liveFrames = [], refFrames = [], recentFrames  = [], liveFrames_compressed  = [], refFrames_compressed  = [], recentFrames_compressed = [];
 let req, db;
 let dataForCntReps = {};
 let liveBodyColor="#7BE39F";
@@ -11,6 +11,7 @@ let commonBlue = "#1E89FB";
 let refJointColor = "#FF6786";
 let MAX_BODYFRAMES_STORED = 4400;
 let framesExceededLimit = false;
+let threshold_flag, direction;
 
 window.actionBtn = false;
 
@@ -38,20 +39,13 @@ function parseURL(url)
   let patientId = null;
   let mode = null;
   let type = null;
-  const urlToArray = url.split('/');
+  const urlToArray = url.split("/").reverse();
+  //TODO We assume that logged in user is a clinician. The below logic will not work for a patient login since they have no patient id and url length will be different. We shall handle that case later, for now we asssume only clinicians or root logs in.
+    exerciseId = urlToArray[1];
+    patientId = urlToArray[0];
+    mode = urlToArray[3];
+    type = urlToArray[2];
 
-  mode = urlToArray[3];
-  type = urlToArray[4];
-  //logged-in user is a clinician
-  if (urlToArray.length === 7) {
-    exerciseId = urlToArray[5];
-    patientId = urlToArray[6];
-  }
-  //logged-in user is a patient
-  else if (urlToArray.length === 6) {
-    exerciseId = urlToArray.pop();
-    patientId = null;
-  }
   return {
     mode: mode,
     patientId: patientId,
@@ -76,6 +70,26 @@ Ladda.bind('.ladda-button', {
       }
     });
 
+const parsedURL = parseURL(window.location.pathname);
+
+let url = 'api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
+url =(!parsedURL.patientId) ? url: url + parsedURL.patientId;
+$.get(url, function(data){
+  dataForCntReps = data;
+  //group: (down, L2R) + and (up, R2L) -
+  if(dataForCntReps.direction === 'L2R') {
+    direction = "down";
+    threshold_flag = "down";
+  } else if (dataForCntReps.direction === 'R2L') {
+    direction = "up";
+    threshold_flag = "up";
+  } else {
+    direction = dataForCntReps.direction;
+    threshold_flag = dataForCntReps.direction;
+  }
+  // redirect();
+})
+
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
@@ -83,10 +97,14 @@ function action(nextMode, type) {
     var exerciseId = parsedURL.exerciseId;
 
     function redirect() {
-      var redirectToUrl = '/userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      var redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
+    // if(nextMode === 'play'){
+      //call data for count reps here and redicrect on success
+      // fetch data before start exercise
 
+//    }
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
@@ -137,6 +155,7 @@ function action(nextMode, type) {
         let request = bodyFramesStore.put(updatedLiveFrames);
       }
       redirect();
+
     }
   });
 }
@@ -153,11 +172,11 @@ function getMinMax_joint(joint, array, axis) {
 
 // assuming the save button is clicked by someone else
 function saveReference() {
-
-  const pathToArray = window.location.pathname.split('/');
-  const exerciseId = pathToArray[5];
-  const patientId = pathToArray[6];
-  const redirectToUrl = '/userexercise/setting/' + exerciseId +'/' + patientId;
+  const parsedURL = parseURL(window.location.pathname);
+  let patientId = parsedURL.patientId;
+  let exerciseId = parsedURL.exerciseId;
+  parseURL(window.location.pathname);
+  const redirectToUrl = 'userexercise/setting/' + exerciseId +'/' + patientId;
 
   let values = {};
   // save to referenceExercise
@@ -181,7 +200,7 @@ function saveReference() {
 
   $.ajax({
     type: 'PUT',
-    url: '/api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
+    url: 'api/userexercise/reference/mostrecent/data/' + exerciseId + '/' + patientId,
     data: values,
     success: function (result) {
       window.location = redirectToUrl
@@ -196,10 +215,10 @@ function saveReference() {
 function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
   $("#fdbkOK").click(function (e) {
     if(isComplete) {
-      window.location = '/userexercise/session/end/practice/' +
+      window.location = 'userexercise/session/end/practice/' +
         exerciseId + '/' + patientId;
     } else {
-      window.location = '/userexercise/session/start/practice/' +
+      window.location = 'userexercise/session/start/practice/' +
         exerciseId + '/' + patientId;
     }
   });
@@ -219,7 +238,7 @@ function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
-  let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  let url ='api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
   values.bodyFrames = recentFrames_compressed;
@@ -251,19 +270,20 @@ function savePractice() {
 
     },
     error: function (result) {
-      errorAlert(result.responseJSON.message);
+      errorAlert(result);
     }
   })
 }
 
 function goTodashBoard() {
-  window.location = '/dashboard';
+  window.location = 'dashboard';
 }
 
 function goToExercises() {
 
-  const patientId = window.location .pathname.split('/').pop();
-  window.location = '/clinician/patientexercises/' + patientId;
+  const parsedURL = parseURL(window.location.pathname);
+  let patientId = parsedURL.patientId;
+  window.location = 'clinician/patientexercises/' + patientId;
 }
 
 window.onbeforeunload = (e) => {
@@ -307,24 +327,7 @@ $('.actionBtn').click(function() {
   let nx_1stFrame, ny_1stFrame, nz_1stFrame; // neck position
   let bodyWidth; // shoulderLeft to shoulderRight
   let bodyHeight; // neck to spineBase
-  let threshold_flag, direction;
   // fetch data before start exercise
-  let url = '/api/userexercise/dataforcount/' + parsedURL.exerciseId + '/';
-  (!parsedURL.patientId) ? url = url: url = url + parsedURL.patientId;
-  $.get(url, function(data){
-    dataForCntReps = data;
-    //group: (down, L2R) + and (up, R2L) -
-    if(dataForCntReps.direction === 'L2R') {
-      direction = "down";
-      threshold_flag = "down";
-    } else if (dataForCntReps.direction === 'R2L') {
-      direction = "up";
-      threshold_flag = "up";
-    } else {
-      direction = dataForCntReps.direction;
-      threshold_flag = dataForCntReps.direction;
-    }
-  });
 
   if (isElectron())
   {
@@ -355,7 +358,7 @@ $('.actionBtn').click(function() {
       openDB(function() {
         let getref = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('refFrames');
         getref.onsuccess = function(e) {
-          if(getref.result.body) {
+          if(getref.result && getref.result.body && getref.result.body.length > 0 ) {
             try {
               refFrames_compressed = getref.result.body;
               refFrames = JSON.parse(pako.inflate(getref.result.body, { to: 'string' }));
@@ -371,7 +374,7 @@ $('.actionBtn').click(function() {
         let getrecent = db.transaction(['bodyFrames']).objectStore('bodyFrames').get('liveFrames');
         console.log("getrecent=", getrecent);
         getrecent.onsuccess = function(e) {
-          if(getrecent.result.body) {
+          if(getrecent.result && getrecent.result.body && getrecent.result.body.length > 0) {
             try {
               recentFrames_compressed = getrecent.result.body;
               recentFrames = JSON.parse(pako.inflate(getrecent.result.body, { to: 'string' }));
@@ -400,10 +403,15 @@ $('.actionBtn').click(function() {
     {
       ref_index = 0;
       exe_index = 0;
-      //nothing should be shown
-       refCanvas.style.display = "none";
+      //showing the live view
+      refCanvas.style.display = "none";
       exeCanvas.style.display = "none";
-      outputCanvas.style.display = "none";
+      outputCanvas.style.display = "block";
+      let ctx = refCanvas.getContext('2d');
+      //ctx.fillText("Click the Start button to record your first reference", canvas.width/2, canvas.height/20);
+      drawGrids(ctx);
+      drawFloorPlane(ctx);
+
     }
     // start of updating reference and practice
     else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
@@ -411,7 +419,7 @@ $('.actionBtn').click(function() {
       ref_index = 0;
       exe_index = 0;
       //show reference canvas only
-       refCanvas.style.display = "block";
+      refCanvas.style.display = "block";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "none";
       let ctx = refCanvas.getContext('2d');
@@ -705,7 +713,7 @@ $('.actionBtn').click(function() {
     ctx.font="20px Arial";
     (notAligned) ? ctx.fillStyle = "red" : ctx.fillStyle = "#23D160";
     ctx.textAlign = "center";
-    ctx.fillText("Current Set", canvas.width/2, canvas.height/20);
+    ctx.fillText("Live View", canvas.width/2, canvas.height/20);
     drawGrids(ctx);
     drawFloorPlane(ctx);
 

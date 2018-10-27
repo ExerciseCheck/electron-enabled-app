@@ -14,7 +14,7 @@ $(document).ready(function() {
       'copy', 'csv', 'excel', 'pdf', 'print','colvis'
     ],
     ajax: {
-      url: '/api/table/clinicians/' + userId,
+      url: 'api/table/clinicians/' + userId,
       data: function (d) {
         d.fields = 'name';
       }
@@ -37,7 +37,7 @@ $(document).ready(function() {
   $('#clinicians').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/clinicians',
+      url: 'api/select2/clinicians',
       dataType: 'json',
       processResults: function (data) {
         var results = [];
@@ -61,7 +61,7 @@ $(document).ready(function() {
     if(clinicainId) {
       $.ajax({
         type: 'PUT',
-        url: '/api/clinicians/' + userId +'/'+ clinicainId,
+        url: 'api/clinicians/' + userId +'/'+ clinicainId,
         success: function (result) {
           table.ajax.reload();
         },
@@ -81,7 +81,7 @@ function remove(clinicainId) {
   else {
     $.ajax({
       type: 'DELETE',
-      url: '/api/clinicians/'+ userId +'/'+ clinicainId,
+      url: 'api/clinicians/'+ userId +'/'+ clinicainId,
       success: function (result) {
         table.ajax.reload();
       },

@@ -10,10 +10,10 @@ $('#login').click((event) => {
   values.password = password;
   $.ajax({
     type: 'POST',
-    url: '/api/login',
+    url: 'api/login',
     data: values,
     success: function (result) {
-      location.reload();
+      window.location = baseUrl;
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

@@ -27,10 +27,10 @@ $('#update').click((event) => {
   values.direction = $('#direction').val();
   $.ajax({
     type: 'PUT',
-    url: '/api/exercise/' + exerciseId,
+    url: 'api/exercise/' + exerciseId,
     data: values,
     success: function (result) {
-      window.location = '/exercise'
+      window.location = 'exercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
