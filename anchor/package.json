@@ -10,7 +10,8 @@
     "lint": "lab -dL --leaks",
     "lint-fix": "lab -dL --lint-fix",
     "coveralls": "lab -r lcov | ./node_modules/.bin/coveralls",
-    "mongo": "mongod --dbpath db"
+    "mongo": "mongod --dbpath db",
+    "production": "forever start -o excheck.log -e echeck-err.log server.js"
   },
   "author": "Boston University Software & Application Innovation Lab",
   "license": "MIT",
