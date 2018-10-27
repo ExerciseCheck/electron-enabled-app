@@ -172,10 +172,10 @@ function getMinMax_joint(joint, array, axis) {
 
 // assuming the save button is clicked by someone else
 function saveReference() {
-
-  const pathToArray = window.location.pathname.split('/');
-  const exerciseId = pathToArray[5];
-  const patientId = pathToArray[6];
+  const parsedURL = parseURL(window.location.pathname);
+  let patientId = parsedURL.patientId;
+  let exerciseId = parsedURL.exerciseId;
+  parseURL(window.location.pathname);
   const redirectToUrl = 'userexercise/setting/' + exerciseId +'/' + patientId;
 
   let values = {};
@@ -281,7 +281,8 @@ function goTodashBoard() {
 
 function goToExercises() {
 
-  const patientId = window.location .pathname.split('/').pop();
+  const parsedURL = parseURL(window.location.pathname);
+  let patientId = parsedURL.patientId;
   window.location = 'clinician/patientexercises/' + patientId;
 }
 

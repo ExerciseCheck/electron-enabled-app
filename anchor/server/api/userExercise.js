@@ -198,7 +198,9 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 
@@ -504,7 +506,9 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: ReferenceExercise.referencePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 
@@ -642,7 +646,9 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
       /*validate: {
         payload: ReferenceExercise.updatePayload
       }*/
@@ -685,7 +691,9 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: ReferenceExercise.updatePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 
@@ -743,7 +751,7 @@ internals.applyRoutes = function (server, next) {
       validate: {
         payload: ReferenceExercise.dataPayload
       },
-      payload:{ maxBytes: 1048576 * 100 }
+      payload:{ maxBytes: 1048576 * 500 }
     },
     handler: function (request, reply) {
 
@@ -1021,7 +1029,9 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         payload: ReferenceExercise.updatePayload
-      }
+      },
+      payload:{ maxBytes: 1048576 * 100 }
+
     },
     handler: function (request, reply) {
 
