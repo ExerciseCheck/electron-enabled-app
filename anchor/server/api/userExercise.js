@@ -376,9 +376,9 @@ internals.applyRoutes = function (server, next) {
         getDataForCntReps: ['findExercise', function(results, done) {
           let reference = results.findMostRecentReference[0];
 
-          if(reference.bodyFrames.length > 0 ){
+          if(reference && reference.bodyFrames.length > 0 ){
             let refBodyframes = JSON.parse(Pako.inflate(reference.bodyFrames, { to: 'string' }));
-            if (refBodyframes[0] !== undefined) {
+            if (refBodyframes && refBodyframes[0] !== undefined) {
               console.log("reference.bodyFrames exists, and decompressed: ");
               dataForCntReps['refMin'] = reference.refMin;
               dataForCntReps['refMax'] = reference.refMax;
@@ -389,7 +389,6 @@ internals.applyRoutes = function (server, next) {
               dataForCntReps['refTime'] = reference.refTime;
               // numbers between [0,1]
               dataForCntReps['diffLevel'] = reference.diffLevel;
-
             }
           }
           let exercise = results.findExercise;
@@ -399,7 +398,6 @@ internals.applyRoutes = function (server, next) {
           dataForCntReps['direction'] = exercise.direction;
 
 
-          //console.log(dataForCntReps);
           done();
         }]
       }, (err, results) => {
@@ -802,7 +800,7 @@ internals.applyRoutes = function (server, next) {
   //updates practice document with new set information
   //it also calculates dtw and rep time offline
   server.route({
-    method: 'PUT',
+    method: ['PUT','POST'],
     path: '/userexercise/practice/mostrecent/data/{exerciseId}/{patientId?}',
     config: {
       auth: {
