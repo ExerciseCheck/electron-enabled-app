@@ -198,9 +198,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
-      },
-      payload:{ maxBytes: 1048576 * 100 }
-
+      }
     },
     handler: function (request, reply) {
 
