@@ -39,20 +39,13 @@ function parseURL(url)
   let patientId = null;
   let mode = null;
   let type = null;
-  const urlToArray = url.split('/');
+  const urlToArray = url.split("/").reverse();
+  //TODO We assume that logged in user is a clinician. The below logic will not work for a patient login since they have no patient id and url length will be different. We shall handle that case later, for now we asssume only clinicians or root logs in.
+    exerciseId = urlToArray[1];
+    patientId = urlToArray[0];
+    mode = urlToArray[3];
+    type = urlToArray[2];
 
-  mode = urlToArray[3];
-  type = urlToArray[4];
-  //logged-in user is a clinician
-  if (urlToArray.length === 7) {
-    exerciseId = urlToArray[5];
-    patientId = urlToArray[6];
-  }
-  //logged-in user is a patient
-  else if (urlToArray.length === 6) {
-    exerciseId = urlToArray.pop();
-    patientId = null;
-  }
   return {
     mode: mode,
     patientId: patientId,
