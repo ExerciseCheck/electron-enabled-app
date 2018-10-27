@@ -406,10 +406,11 @@ $('.actionBtn').click(function() {
       refCanvas.style.display = "none";
       exeCanvas.style.display = "none";
       outputCanvas.style.display = "block";
-      let ctx = Canvas.getContext('2d');
+      let ctx = refCanvas.getContext('2d');
       //ctx.fillText("Click the Start button to record your first reference", canvas.width/2, canvas.height/20);
       drawGrids(ctx);
       drawFloorPlane(ctx);
+
     }
     // start of updating reference and practice
     else if((parsedURL.mode === 'start' || parsedURL.mode === 'end') && refFrames)
