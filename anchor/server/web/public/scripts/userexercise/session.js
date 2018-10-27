@@ -238,7 +238,7 @@ function savePractice() {
   const parsedURL = parseURL(window.location.pathname);
   let patientId = parsedURL.patientId;
   let exerciseId = parsedURL.exerciseId;
-  let url ='/api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
+  let url ='api/userexercise/practice/mostrecent/data/' + exerciseId + '/';
   let isComplete = false;
   let values = {};
   values.bodyFrames = recentFrames_compressed;
@@ -270,7 +270,7 @@ function savePractice() {
 
     },
     error: function (result) {
-      errorAlert(result.responseJSON.message);
+      errorAlert(result);
     }
   })
 }
