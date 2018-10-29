@@ -3,7 +3,7 @@
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
-  // instructions: Joi.string().required()
+ // instructions: Joi.string().required()
 });
 
 
@@ -23,6 +23,8 @@ $('#create').click((event) => {
   values.refLowerJoint = $('#refLowerJoint').val();
   values.refUpperJoint = $('#refUpperJoint').val();
   values.instructions = $('#instructions').val();
+  values.videoURLs = $('#videoURLs').val();
+
 
   console.log( values);
   $.ajax({

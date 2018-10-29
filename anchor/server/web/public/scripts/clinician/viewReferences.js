@@ -22,11 +22,13 @@ function deleteDoc(id) {
 
 function editDoc(id) {
 
-  const url = '/api/userexercise/exerciseId/' + id;
+  let exerciseName = request.payload.exerciseName;
+  console.log(findexerciseName());
+  const url = 'api/userexercise/setting/' + exerciseName;
   const patientId = window.location.pathname.split('/').pop();
   $.get(url, function(data){
 
-    window.location = '/userexercise/setting/' + data.exerciseId + '/' + patientId;
+    window.location = 'userexercise/setting/' + exerciseName;
 
   });
 }

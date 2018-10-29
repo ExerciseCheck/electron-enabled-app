@@ -160,6 +160,7 @@ internals.applyRoutes = function (server, next) {
         request.payload.exerciseName,
         request.payload.description,
         request.payload.instructions.split(","),
+        request.payload.videoURLs.split(","),
         request.payload.joint,
         request.payload.axis,
         request.payload.direction,

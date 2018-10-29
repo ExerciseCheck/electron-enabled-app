@@ -211,7 +211,7 @@ internals.applyRoutes = function (server, next) {
       let defaultNumSets = 1;
       //let exerciseName = request.params.exerciseName;
 
-      console.log(exerciseName);
+      //console.log(exerciseName);
 
       Async.auto({
 
@@ -272,7 +272,7 @@ internals.applyRoutes = function (server, next) {
           }
         }
 
-        return reply.view('userexercise/setting', {
+        return reply.view('/userexercise/setting', {
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           exerciseName : results.findExerciseName.exerciseName,
@@ -579,14 +579,16 @@ internals.applyRoutes = function (server, next) {
     console.log(exerciseName)
 
     //db call db.exercise.find( exercisename: request.params.exerciseName)
-    Exercise.findOne({'exerciseName': request.params.exerciseName},(err, result) => {
+    Exercise.findOne({'exerciseName': request.params.exerciseName},
+    {'videoURLs': request.params.videoURLs},(err, result) => {
       return reply.view('userexercise/info', {
         user: request.auth.credentials.user,
         exerciseName : exerciseName,
         projectName: Config.get('/projectName'),
       // title: exerciseName + ' Information',
-        instructions: result.instructions //mongo, ["a","b"]
+        instructions: result.instructions, //mongo, ["a","b"]
       //  goal: Info[exerciseName]['Goal']
+        videoURLs: result.videoURLs
 
       });
     })

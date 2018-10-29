@@ -2,6 +2,7 @@
 
   <div class="row h-100">
       {{>dashboardNav}}
+
     <div class="col-sm-9 col-md-10">
 
       <div style="padding: 30px">
@@ -13,7 +14,11 @@
               <div id="formFields"></div>
               <label for="instructions" class="label"> Instructions</label>
               <div class="form-group">
-                <input id="instructions"></input>
+                <input class="form-control" id="JoiFormInputInstructions" aria-describedby="" placeholder="Enter Instructions" onkeyup="validate('instructions')">
+              </div>
+              <label for="videoURLs" class="label"> Video URLs</label>
+              <div class="form-group">
+                <input class="form-control" id="JoiFormInputURLs" aria-describedby="" placeholder="Enter Reference Video URLs" onkeyup="validate('videoURLs')">
               </div>
               <label for="impJoint" class="label">Most Important Joint</label>
               <div class="form-group">

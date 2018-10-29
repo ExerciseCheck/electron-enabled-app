@@ -4,6 +4,7 @@ const schema = Joi.object({
   exerciseName: Joi.string().required(),
   description: Joi.string().required(),
   instructions: Joi.string().required(),
+  videoURLs: Joi.string().required(),
   joint: Joi.number().integer().required(),
   axis: Joi.string().required(),
   direction: Joi.string().required(),
