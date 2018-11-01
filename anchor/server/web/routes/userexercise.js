@@ -579,8 +579,7 @@ internals.applyRoutes = function (server, next) {
     console.log(exerciseName)
 
     //db call db.exercise.find( exercisename: request.params.exerciseName)
-    Exercise.findOne({'exerciseName': request.params.exerciseName},
-    {'videoURLs': request.params.videoURLs},(err, result) => {
+    Exercise.findOne({'exerciseName': request.params.exerciseName},(err, result) => {
       return reply.view('userexercise/info', {
         user: request.auth.credentials.user,
         exerciseName : exerciseName,
@@ -588,7 +587,7 @@ internals.applyRoutes = function (server, next) {
       // title: exerciseName + ' Information',
         instructions: result.instructions, //mongo, ["a","b"]
       //  goal: Info[exerciseName]['Goal']
-        videoURLs: result.videoURLs
+        refVideoLinks: result.refVideoLinks
 
       });
     })
