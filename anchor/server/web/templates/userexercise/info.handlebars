@@ -25,15 +25,13 @@
       <div class="container" id="button-container">
 
         {{#each refVideoLinks}}
-            <button type="button" id="ref-button" class="btn btn-primary video-btn" data-toggle="modal"
+            <button type="button" id="ref-button-1" class="btn btn-primary video-btn"
+            data-toggle="modal" data-target="#myModal"
+            data-src="{{this}}">Play Video</button>
         {{/each}}
-        
-      <div class="button-wrapper-2">
+
+      <!-- <div class="button-wrapper-2">
       <button type="button" id="ref-button-1" class="btn btn-primary video-btn" data-toggle="modal"
-
-       data-src5="https://www.youtube.com/embed/Av8WcZ-7sPU"
-       data-src7="https://www.youtube.com/embed/Av8WcZ-7sPU"
-
 
 
 
@@ -41,25 +39,8 @@
 
 
         Play Video 1
-      </button></div>
+      </button></div> -->
 
-      <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary video-btn" id="ref-button-2" data-toggle="modal"
-
-      data-src5="https://www.youtube.com/embed/Av8WcZ-7sPU"
-      data-src7="https://youtube.com/embed/VLvZXDkVwys"
-
-
-
-
-
-
-
-
-
- data-target="#myModal">
-Play Video 2
-</button>
 
         <div class="button-wrapper-1">
           <a href ='/userexercise/setting/{{exerciseName}}/'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
@@ -69,10 +50,6 @@ Play Video 2
 
 
         <div class="container">
-          <!-- <h1>Reference Video:</h1> -->
-
-
-          <!-- Button trigger modal -->
 
 
           <!-- Modal -->
@@ -106,6 +83,10 @@ Play Video 2
     </div>
   </div>
 </div>
+
+<script> let src = "{{refVideoLinks}}";
+console.log(src);
+</script>
 
 <script> let exerciseName = "{{exerciseName}}"; </script>
 <script type="text/javascript" src="/public/scripts/userexercise/exerciseinfo.js"></script>
