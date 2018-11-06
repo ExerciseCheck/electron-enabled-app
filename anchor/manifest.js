@@ -69,8 +69,7 @@ const manifest = {
             Session: './server/models/session',
             Template: './server/models/template',
             PracticeExercise: './server/models/practiceExercise',
-            ReferenceExercise: './server/models/ReferenceExercise',
-            // PracticeExercise: './server/models/PracticeExercise',
+            ReferenceExercise: './server/models/referenceExercise',
             Exercise: './server/models/exercise',
             Token: './server/models/token',
             User: './server/models/user'
@@ -89,7 +88,7 @@ const manifest = {
             timezone: 'America/New_York',
             request: {
               method: 'POST',
-              url: '/api/backups/internal',
+              url: 'api/backups/internal',
               allowInternals: true
             }
           }]

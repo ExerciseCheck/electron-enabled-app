@@ -3,9 +3,7 @@
 const schema = Joi.object({
   numSets: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required()
-  // rangeScale: Joi.number().min(0).max(1).required(),
-  // topThresh: Joi.number().min(0).max(1).required(),
-  // bottomThresh: Joi.number().min(0).max(1).required(),
+  // diffLevel: Joi.number().min(0).max(1).required(),
 });
 
 joiToForm('formFields',schema);
@@ -20,10 +18,10 @@ $('#create').click((event) => {
   values.exerciseId = $('#exerciseId').val();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
-      window.location = '/userexercise'
+      window.location = 'userexercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -36,7 +34,7 @@ $(document).ready(function() {
     $('#exerciseId').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/exercise',
+      url: 'api/select2/exercise',
       dataType: 'json',
       processResults: function (data) {
         var results = [];
@@ -58,7 +56,7 @@ $(document).ready(function() {
   $('#userId').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/users',
+      url: 'api/select2/users',
       dataType: 'json',
       processResults: function (data) {
         var results = [];

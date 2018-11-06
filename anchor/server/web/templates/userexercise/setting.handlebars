@@ -23,16 +23,16 @@
                 </div>
                 <div class="form-group">
                   <label for="difficultyLevel" class="label">Difficulty Level</label>
-                  <select class="form-control" id="rangeScale">
-                    <option value="0.7">Hard</option>
-                    <option value="0.5" selected="selected">Medium</option>
-                    <option value="0.3">Easy</option>
+                  <select class="form-control" id="diffLevel">
+                    <option value="0.9">Hard</option>
+                    <option value="0.75" selected="selected">Medium</option>
+                    <option value="0.5">Easy</option>
                   </select>
                 </div>
                {{#if referenceExists}}
-               <a id="save" href="#" onclick="update()">Update settings</a>
+               <a id="save" href="">Update settings</a>
                {{else}}
-               <a id="save" href="#" onclick="changeSetting()">Update settings</a>
+               <a id="save" href="">Update settings</a>
                {{/if}}
              </form>
             </div>
@@ -40,7 +40,7 @@
         </div>
         <div class="col-xl-6">
          <div class="row">
-            <div class="col-xl-8">
+            <div class="col-xl-11">
               <div class="row">
                 <div class="col">
                   <p id ="refExercise">Reference Exercise <br></p>
@@ -67,26 +67,21 @@
                 </div>
               </div>
               {{#if referenceExists}}
-              <div class="row" style="margin-top:30px;">
+              <div class="row">
                 <div class="col">
-                   <a id="view" href="#" onclick="viewReferences()">View reference exercises</a>
+                   <a id="update" href="">Update reference exercise</a>
                 </div>
               </div>
               <div class="row">
                 <div class="col">
-                   <a id="update" href="#" onclick="updateReference()">Update reference exercise</a>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                   <a id="start" href="#" onclick="StartPracticeSession()">Start exercise session</a>
+                   <a id="start" href="">Start exercise session</a>
                 </div>
               </div>
 
              {{else}}
              <div class="row" style="margin-top:30px;">
                 <div class="col">
-                   <a id="createRef" href="#" onclick="createRef()">Create reference exercise</a>
+                   <a id="createRef" href="">Create reference exercise</a>
                 </div>
               </div>
              {{/if}}
@@ -99,5 +94,24 @@
 </div>
 
 
-<link rel="stylesheet" href="/public/css/styleSheet/setting.css">
-<script type="text/javascript" src="/public/scripts/userexercise/setting.js"></script>
+<link rel="stylesheet" href="public/css/styleSheet/setting.css">
+<script type="text/javascript" src="public/scripts/userexercise/setting.js"></script>
+<script>
+  let defaultDiffLevel = {{defaultDiffLevel}};
+  let doesReferenceExist = {{referenceExists}};
+
+  console.log(defaultDiffLevel);
+  let diffLevel = document.getElementById('diffLevel');
+  for (let i = 0; i < diffLevel.options.length; ++i) {
+    if (parseFloat(diffLevel.options[i].value) !== defaultDiffLevel) {
+      diffLevel.options[i].selected = false;
+    } else {
+      diffLevel.options[i].selected = true;
+    }
+  }
+</script>
+
+
+
+
+

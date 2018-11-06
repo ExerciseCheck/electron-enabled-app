@@ -16,9 +16,7 @@
                                 <th>ExerciseId</th>
                                 <th>numSets</th>
                                 <th>numRepetition</th>
-                                <th>rangeScale</th>
-                                <th>topThresh</th>
-                                <th>bottomThresh</th>
+                                <th>difficultyLevel</th>
                                 <th>createdAt</th>
                               {{#role user 'admin'}}
                                   <th>Edit</th>
@@ -48,9 +46,9 @@
                 'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
             ],
             ajax: {
-                url: "../api/table/refexercise",
+                url : "api/table/refexercise",
                 data: function (d) {
-                    d.fields = "userId exerciseId numSets createdAt rangeScale topThresh bottomThresh name exerciseName numRepetition";
+                    d.fields = "userId exerciseId numSets createdAt diffLevel name exerciseName numRepetition";
                 }
             },
             columns: [
@@ -81,15 +79,7 @@
                     defaultContent: ""
                 },
                 {
-                    data: "rangeScale",
-                    defaultContent: ""
-                },
-                {
-                    data: "topThresh",
-                    defaultContent: ""
-                },
-                {
-                    data: "bottomThresh",
+                    data: "diffLevel",
                     defaultContent: ""
                 },
                 {
@@ -125,5 +115,5 @@
         });
     });
 </script>
-<script type="text/javascript" src="../../public/scripts/userexercise/viewreference.js"></script>
-<link rel="stylesheet" href="../public/css/styleSheet/genericStyles.css">
+<script type="text/javascript" src="public/scripts/userexercise/viewreference.js"></script>
+<link rel="stylesheet" href="public/css/styleSheet/genericStyles.css">

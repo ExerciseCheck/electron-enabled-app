@@ -3,9 +3,7 @@
 const schema = Joi.object({
   numSets: Joi.number().integer().required(),
   numRepetition: Joi.number().integer().required()
-  // rangeScale: Joi.number().min(0).max(1).required(),
-  // topThresh: Joi.number().min(0).max(1).required(),
-  // bottomThresh: Joi.number().min(0).max(1).required(),
+  // diffLevel: Joi.number().min(0).max(1).required(),
 });
 
 joiToForm('formFields',schema);
@@ -19,10 +17,10 @@ $('#update').click((event) => {
   });
   $.ajax({
     type: 'PUT',
-    url: '/api/userexercise/reference/' + userExerciseId,
+    url: 'api/userexercise/reference/' + userExerciseId,
     data: values,
     success: function (result) {
-      window.location = '/userexercise'
+      window.location = 'userexercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

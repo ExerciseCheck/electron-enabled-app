@@ -63,7 +63,7 @@ internals.applyRoutes = function (server, next) {
 
         request.cookieAuth.clear();
 
-        return reply.redirect('/');
+        return reply.redirect(Config.get('/baseUrl'));
       });
     }
   });

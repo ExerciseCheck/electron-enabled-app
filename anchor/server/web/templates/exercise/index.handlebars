@@ -4,7 +4,7 @@
     <div class="col-sm-9 col-md-10">
       <div style="padding: 30px">
         <h3>Exercises</h3>
-          <a class="btn btn-primary" href="/exercise/create">Create</a>
+          <a class="btn btn-primary" href="exercise/create">Create</a>
         <hr>
         <div class="card">
           <div style="padding: 20px;">
@@ -13,14 +13,10 @@
               <tr>
                 <th>Exercise Name</th>
                 <th>Description</th>
-                <th>Instructions</th>
-                <th>Video URLs</th>
                 <th>Created At</th>
-                <th>impJoint</th>
-                <th>impAxis</th>
-                <th>direction</th>
-                <th>lowerJoint</th>
-                <th>upperJoint</th>
+                <th>Joint</th>
+                <th>Axis</th>
+                <th>Direction</th>
                 {{#role user 'clinician'}}
                   <th>ID</th>
                   <th>Edit</th>
@@ -51,9 +47,9 @@
         'copy', 'csv', 'excel', 'pdf', 'print','colvis'
       ],
       ajax: {
-        url: "../api/table/exercise",
+        url : "api/table/exercise",
         data: function (d) {
-          d.fields = "exerciseName description instructions refVideoLinks createdAt impJoint impAxis direction lowerJoint upperJoint";
+          d.fields = "exerciseName description createdAt joint axis direction";
         }
       },
       columns: [
@@ -66,16 +62,6 @@
           defaultContent: ""
         },
         {
-          data: "instructions",
-          defaultContent: ""
-        },
-
-        {
-          data: "refVideoLinks",
-          defaultContent: ""
-        },
-
-        {
           data: "createdAt",
           render: function (data, type, row) {
             var date = new Date(row.createdAt);
@@ -83,23 +69,15 @@
           }
         },
         {
-          data: "impJoint",
+          data: "joint",
           defaultContent: ""
         },
         {
-          data: "impAxis",
+          data: "axis",
           defaultContent: ""
         },
         {
           data: "direction",
-          defaultContent: ""
-        },
-        {
-          data: "lowerJoint",
-          defaultContent: ""
-        },
-        {
-          data: "upperJoint",
           defaultContent: ""
         },
         {{#role user 'clinician'}}
@@ -127,4 +105,4 @@
   });
 
 </script>
-<script type="text/javascript" src="../../public/scripts/exercise/index.js"></script>
+<script type="text/javascript" src="public/scripts/exercise/index.js"></script>

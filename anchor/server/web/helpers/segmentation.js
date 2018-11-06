@@ -12,7 +12,7 @@ module.exports = function getSegmentation(x, theDirection, time_thresh) {
     console.log("You should not see this")
   }
 
-  let v_thresh = 0.02;
+  let v_thresh = 0;
   let idx=[];
   for (let i=0; i<x.length - 1; i++) {
     let v = x[i+1] - x[i];
@@ -24,6 +24,11 @@ module.exports = function getSegmentation(x, theDirection, time_thresh) {
   }
   // console.log("first: " + idx[0]);
   // console.log("last: " + idx[idx.length-1]);
+  if (idx.length === 0) {
+    // no movement return a total num of frames
+    return [x.length];
+  }
+
 
   let idx_st=[]; // records the idx of the first true
   let timing = [];

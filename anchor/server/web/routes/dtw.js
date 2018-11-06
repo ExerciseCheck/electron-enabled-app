@@ -1,7 +1,7 @@
 'use strict';
 const internals = {};
 const Config = require('../../../config');
-const Algorithm = require('../public/scripts/algorithm');
+const Algorithm = require('public/scripts/algorithm');
 
 
 internals.applyRoutes = function (server, next) {

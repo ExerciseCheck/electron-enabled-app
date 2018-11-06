@@ -2,13 +2,10 @@
 
 const schema = Joi.object({
   exerciseName: Joi.string().required(),
-  description: Joi.string().required(),
-  // instructions: Joi.string().required()
+  description: Joi.string().required()
 });
 
-
-
-joiToForm('formFields',schema);
+joiToForm('formFields', schema);
 
 $('#create').click((event) => {
   event.preventDefault();
@@ -20,19 +17,13 @@ $('#create').click((event) => {
   values.joint = $('#impJoint').val();
   values.axis = $('#impAxis').val();
   values.direction = $('#direction').val();
-  values.refLowerJoint = $('#refLowerJoint').val();
-  values.refUpperJoint = $('#refUpperJoint').val();
-  values.instructions = $('#instructions').val();
-  values.refVideoLinks = $('#refVideoLinks').val();
 
-
-  console.log( values);
   $.ajax({
     type: 'POST',
-    url: '/api/exercise',
+    url: 'api/exercise',
     data: values,
     success: function (result) {
-      window.location = '/exercise'
+      window.location = 'exercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);

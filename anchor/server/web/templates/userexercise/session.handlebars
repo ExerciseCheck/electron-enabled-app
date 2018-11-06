@@ -66,14 +66,32 @@
             <button type="button" class="btn btn-primary blueBackground white actionBtn" onclick="action('play','{{type}}')">START</button>
           {{/compare}}
           {{#compare mode 'play'}}
-              <button type="button" class="red white actionBtn btn btn-primary actionBtn" onclick="action('stop', '{{type}}')">STOP</button>
+              <button type="button" id="stop" class="red white actionBtn btn btn-primary actionBtn ladda-button" data-style="expand-right" onclick="action('stop', '{{type}}')">STOP</button>
           {{/compare}}
           {{#compare mode 'stop'}}
             {{#compare type 'reference'}}
-              <button class="btn btn-primary blueBackground white actionBtn" onclick="saveReference()">SAVE REFERENCE</button>
+              <button class="btn btn-primary blueBackground white actionBtn ladda-button" onclick="saveReference()">SAVE REFERENCE</button>
             {{/compare}}
             {{#compare type 'practice'}}
-              <button class="btn btn-primary blueBackground white actionBtn" onclick="savePractice()">SAVE SET</button>
+              <button class="btn btn-primary blueBackground white actionBtn ladda-button" onclick="savePractice()">SAVE SET</button>
+
+              <div class="modal" id="fdbkModal" tabindex="-1"  role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Here is how you performed: </h5>
+                    </div>
+                    <div class="modal-body">
+                      <div> Your average repetition accuracy: <span id="acc" style="color: #007bff">__</span></div>
+                      <div> Your average repetition speed: <span id="spd" style="color: #007bff">__</span></div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" id="fdbkOK" class="btn btn-primary">OK</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             {{/compare}}
             <button class="btn btn-primary red actionBtn" id="discard" onclick="action('start', '{{type}}')">DISCARD & RESTART</button>
           {{/compare}}
@@ -83,14 +101,12 @@
   </div>
 </div>
 
-<link rel="stylesheet" href="/public/css/styleSheet/session.css">
-<link rel="stylesheet" href="/public/css/styleSheet/color.css">
-<link rel="stylesheet" href="/public/css/styleSheet/genericStyles.css">
+<link rel="stylesheet" href="public/css/styleSheet/session.css">
+<link rel="stylesheet" href="public/css/styleSheet/color.css">
+<link rel="stylesheet" href="public/css/styleSheet/genericStyles.css">
 <script>
   //handlebars variables to pass into session.js
   let setNumber = {{setNumber}};
   let numSets = {{numSets}};
 </script>
-<script type="text/javascript" src="/public/scripts/userexercise/session.js"></script>
-<script src="/public/data.js"></script>
-<script src="/public/bundle.js"></script>
+<script type="text/javascript" src="public/scripts/userexercise/session.js"></script>

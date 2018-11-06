@@ -2,39 +2,66 @@
 
 let req, db;
 
+$(document).ready(function(){
+  //attach click handlers
+  document.getElementById("save").addEventListener("click",function(event){
+    event.preventDefault();
+    if(doesReferenceExist){
+      update();
+    }else{
+      changeSetting();
+    }
+  });
+
+  if(doesReferenceExist){
+
+    //TODO bring back later when view button is enabled again
+    // document.getElementById("view").addEventListener("click",function(event) {
+    //   event.preventDefault();
+    //   viewReferences();
+    // });
+
+    document.getElementById("start").addEventListener("click",function(event) {
+      event.preventDefault();
+      StartPracticeSession();
+    });
+
+    document.getElementById("update").addEventListener("click",function(event) {
+      event.preventDefault();
+      updateReference();
+    });
+  }else{
+    document.getElementById("createRef").addEventListener("click",function(event) {
+      event.preventDefault();
+      createRef();
+    });
+  }
+
+
+});
+
 function getExerciseId() {
 
-  return (window.location.pathname.split('/'))[3];
+  return (window.location.pathname.split("/").reverse()[1]);
 }
 
 function getPatientId() {
 
-  return (window.location.pathname.split('/'))[4];
+  return (window.location.pathname.split("/").reverse()[0]);
 }
 
-// not needed? since already declared in the helperMethod.js
-// Date.prototype.getWeekNumber = function(){
-//   var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-//   var dayNum = d.getUTCDay() || 7;
-//   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-//   var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-//   return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
-// };
-
-function initialSetting(numSets, numReps, rangeScale, exerciseId, patientId, redirectToUrl) {
+function initialSetting(numSets, numReps, diffLevel, exerciseId, patientId, redirectToUrl) {
 
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
   values.numSets = numSets;
   values.numRepetition = numReps;
-  values.rangeScale = rangeScale;
-  values.topThresh = 0.25; // default values
-  values.bottomThresh = 0.75; // defalut values
+  values.diffLevel = diffLevel;
 
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
@@ -55,7 +82,7 @@ function initializePractice() {
   values.weekStart = new Date().getWeekNumber();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/practice/' + getPatientId(),
+    url: 'api/userexercise/practice/' + getPatientId(),
     data: values,
     success: function (result) {
         successAlert('Starting new practice session');
@@ -67,21 +94,19 @@ function initializePractice() {
   });
 }
 
-function updateSetting(numSets, numReps, rangeScale, exerciseId, patientId) {
+function updateSetting(numSets, numReps, diffLevel, exerciseId, patientId) {
 
   const values = {};
   values.exerciseId = exerciseId;
   values.userId = patientId;
   values.numSets = numSets;
   values.numRepetition = numReps;
-  values.rangeScale = rangeScale;
-  values.topThresh = 0.25; // dummy
-  values.bottomThresh = 0.75;//dummy values
+  values.diffLevel = diffLevel;
 
   //updating settings creates a new reference document with the latest reference bodyframes
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/reference',
+    url: 'api/userexercise/reference',
     data: values,
     success: function (result) {
         successAlert('Setting successfully updated');
@@ -97,18 +122,18 @@ function changeSetting() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const rangeScale = $("#rangeScale").val();
+  const diffLevel = $("#diffLevel").val();
 
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
 
-  $.get('/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
+  $.get('api/userexercise/reference/' + getExerciseId() + '/' + getPatientId(), function(data){
 
     if ( data.settingIsUpdated ) {
-      updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
+      updateSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId());
     }
 
     else {
-      initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
+      initialSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId());
     }
   });
 }
@@ -117,16 +142,16 @@ function update() {
 
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const rangeScale = $("#rangeScale").val();
+  const diffLevel = $("#diffLevel").val();
 
   //const url = '/userexercise/setting/' + getExerciseId() +'/' + getPatientId();
-  updateSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId());
+  updateSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId());
 }
 
 function createRef() {
 
-  const url = '/api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/reference/' +
+  const url = 'api/userexercise/reference/' + getExerciseId() + '/' + getPatientId();
+  const redirectToUrl = 'userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
@@ -136,23 +161,23 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, 0.5, getExerciseId(), getPatientId(), redirectToUrl);
+      initialSetting(1, 1, 0.75, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
 }
 
 function viewReferences() {
 
-  window.location = '/userexercise/reference/' + getPatientId();
+  window.location = 'api/userexercise/reference/'+ getExerciseId() + '/' + getPatientId();
 }
 
 function updateReference() {
   const numSets = $("#numSets").val();
   const numReps = $("#numReps").val();
-  const rangeScale = $("#rangeScale").val();
+  const diffLevel = $("#diffLevel").val();
 
-  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
-  const redirectToUrl = '/userexercise/session/start/' + 'reference' + '/' +
+  const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const redirectToUrl = 'userexercise/session/start/' + 'reference' + '/' +
     getExerciseId() + '/' + getPatientId();
 
   $.get(url, function(data){
@@ -161,7 +186,7 @@ function updateReference() {
       let bodyFramesStore = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames');
       let req = bodyFramesStore.put(refEntry);
       req.onsuccess = function(e) {
-        initialSetting(numSets, numReps, rangeScale, getExerciseId(), getPatientId(), redirectToUrl);
+        initialSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId(), redirectToUrl);
       };
     });
   });
@@ -170,7 +195,7 @@ function updateReference() {
 //TODO: everytime we start exercise a new document is created but it could be empty
 function StartPracticeSession() {
 
-  const url = '/api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/practice/' + getExerciseId() + '/' + getPatientId();
   // $.get(url, function(data) {
   //   if (data === true) {
   //     loadReferenceandStart('practice');
@@ -183,7 +208,7 @@ function StartPracticeSession() {
 }
 
 function loadReferenceandStart(type) {
-  const url = '/api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
+  const url = 'api/userexercise/loadreference/' + getExerciseId() + '/' + getPatientId();
   $.get(url, function(data){
     openDB(function() {
       let refEntry = {type: 'refFrames', body: data};
@@ -197,6 +222,7 @@ function loadReferenceandStart(type) {
 }
 
 function redirect(type) {
-  window.location = '/userexercise/session/start/' + type + '/' +
+  window.location = 'userexercise/session/start/' + type + '/' +
     getExerciseId() + '/' + getPatientId();
 }
+

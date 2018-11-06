@@ -28,12 +28,9 @@
          </form>
          <br><br>
          <ul>
-           <!-- <div> patient id {{patientId}} </div>
-           <div> exerciseid {{exerciseId}} </div> -->
            {{#each exercises}}
              <li class="listButtons">
-               <a href= '/userexercise/info/{{exerciseName}}'>{{formatName this.exerciseName}}</a>
-               <!--<a href= '/userexercise/setting/{{this._id}}/{{../patientId}}'>{{formatName this.exerciseName}}</a>-->
+               <a href= 'userexercise/setting/{{this._id}}/{{../patientId}}'>{{formatName this.exerciseName}}</a>
              </li>
           {{/each}}
         </ul>
@@ -43,7 +40,9 @@
    </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../public/css/styleSheet/viewPatientExercises.css">
-<link rel="stylesheet" href="../public/css/styleSheet/scrollToTop.css">
-<script type="text/javascript" src="../public/scripts/scrollToTop.js"></script>
-<script type="text/javascript" src="../public/scripts/clinician.js"></script>
+<link rel="stylesheet" href="public/css/styleSheet/viewPatientExercises.css">
+<link rel="stylesheet" href="public/css/styleSheet/scrollToTop.css">
+<script type="text/javascript" src="public/scripts/scrollToTop.js"></script>
+<script type="text/javascript" src="public/scripts/clinician.js"></script>
+
+

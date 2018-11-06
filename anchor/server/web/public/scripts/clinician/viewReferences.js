@@ -7,7 +7,7 @@ function deleteDoc(id) {
   }
   else {
     $.ajax({
-      url: '/api/userexercise/' + id,
+      url: 'api/userexercise/' + id,
       type: 'DELETE',
       success: function (result) {
         successAlert('ReferenceExercise Deleted');
@@ -22,13 +22,11 @@ function deleteDoc(id) {
 
 function editDoc(id) {
 
-  let exerciseName = request.payload.exerciseName;
-  console.log(findexerciseName());
-  const url = 'api/userexercise/setting/' + exerciseName;
+  const url = 'api/userexercise/exerciseId/' + id;
   const patientId = window.location.pathname.split('/').pop();
   $.get(url, function(data){
 
-    window.location = 'userexercise/setting/' + exerciseName;
+    window.location = 'userexercise/setting/' + data.exerciseId + '/' + patientId;
 
   });
 }

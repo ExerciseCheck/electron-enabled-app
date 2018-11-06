@@ -1,5 +1,5 @@
 'use strict';
- 
+
 
 $('#create').click((event) => {
   event.preventDefault();
@@ -8,10 +8,10 @@ $('#create').click((event) => {
   values.exerciseId = $('#exerciseId').val();
   $.ajax({
     type: 'POST',
-    url: '/api/userexercise/practice',
+    url: 'api/userexercise/practice',
     data: values,
     success: function (result) {
-      window.location = '/userexercise'
+      window.location = 'userexercise'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
@@ -20,11 +20,11 @@ $('#create').click((event) => {
 });
 
 $(document).ready(function() {
-   
+
     $('#exerciseId').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/exercise',
+      url: 'api/select2/exercise',
       dataType: 'json',
       processResults: function (data) {
         var results = [];
@@ -46,7 +46,7 @@ $(document).ready(function() {
   $('#userId').select2({
     ajax: {
       delay: 250,
-      url: '/api/select2/users',
+      url: 'api/select2/users',
       dataType: 'json',
       processResults: function (data) {
         var results = [];

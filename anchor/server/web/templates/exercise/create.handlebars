@@ -27,22 +27,11 @@
                   {{> jointList}}
                 </select>
               </div>
-              <label for="impAxis" class="label">Axis</label>
+              <label for="impAxis" class="label">Moving Pattern</label>
               {{> axis}}
-              <label for="direction" class="label">Direction</label>
+              <label for="direction" class="label">Starting Direction</label>
               {{> direction}}
-              <label for="lowerJoint" class="label">Reference Lower Joint</label>
-              <div class="form-group">
-                <select type="number" class="form-control" id="refLowerJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>
-                  {{> jointList}}
-                </select>
-              </div>
-              <label for="upperJoint" class="label">Reference Upper Joint</label>
-              <div class="form-group">
-                <select type="number" class="form-control" id="refUpperJoint" aria-describedby="" placeholder="" value={{defaultJoint}}>
-                  {{> jointList}}
-                </select>
-              </div>
+
               <button id="create" type="submit" class="btn btn-primary">Create</button>
             </form>
           </div>
@@ -51,4 +40,4 @@
     </div>
   </div>
 </div>
-<script type="text/javascript" src="/public/scripts/exercise/create.js"></script>
+<script type="text/javascript" src="public/scripts/exercise/create.js"></script>

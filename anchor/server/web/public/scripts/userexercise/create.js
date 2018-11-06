@@ -1,7 +1,7 @@
 'use strict';
 
 const schema = Joi.object().keys({
-  bodyFrames: Joi.array().required()
+  bodyFrames: Joi.string().required()
 });
 joiToForm('formFields',schema);
 
@@ -13,10 +13,10 @@ $('#create').click((event) => {
   });
   $.ajax({
     type: 'POST',
-    url: '../api/refexercises',
+    url: 'api/refexercises',
     data: values,
     success: function (result) {
-      window.location = '../refexercises'
+      window.location = 'refexercises'
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
