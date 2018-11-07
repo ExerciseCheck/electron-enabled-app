@@ -52,6 +52,14 @@
                 }
             },
             columns: [
+              {
+                  data: "_id",
+                  //visible: false,
+                  render: function (data, type, row) {
+                      return '<button class="btn btn-danger" id="select' + row._id + '" onclick="deleteDoc(\'' + row._id + '\')">Select</button>';
+                  }
+
+              },
                  {
                     data: "exerciseName",
                     defaultContent: ""

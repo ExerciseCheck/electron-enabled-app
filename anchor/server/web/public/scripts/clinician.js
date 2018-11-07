@@ -10,7 +10,7 @@ $(document).ready(function() {
     lengthChange: false,
     dom: 'Bfrtip',
     buttons: [
-      'copy', 'csv', 'excel', 'pdf', 'print','colvis'
+      'download data', 'copy', 'csv', 'excel', 'pdf', 'print','colvis'
     ],
     ajax: {
       url: '/api/table/clinicians',
@@ -92,12 +92,12 @@ function remove(clinicainId) {
 }
 
 function addExr() {
-   
+
   window.location = '/exercise/create';
 }
 
 function filter() {
-   
+
   const  input = $("#search");
   const filter = input.val().toUpperCase();
 
@@ -107,7 +107,7 @@ function filter() {
     }
     else {
       $(this).hide();
-             
+
     }
   })
 }
