@@ -10,6 +10,7 @@
                         <table id="userTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
                             <tr>
+                                <th></th>
                                 <th>name</th>
                                 <th>exerciseName</th>
                                 <th>UserId</th>
@@ -34,6 +35,7 @@
 <script>
     var table;
     $(document).ready(function () {
+        bodyFrameList = []
         table = $('#userTable').DataTable({
             processing: true,
             serverSide: true,
@@ -48,10 +50,25 @@
             ajax: {
                 url : "api/table/refexercise",
                 data: function (d) {
-                    d.fields = "userId exerciseId numSets createdAt diffLevel name exerciseName numRepetition";
+                    d.fields = "userId exerciseId numSets createdAt diffLevel name exerciseName numRepetition bodyFrames";
                 }
             },
             columns: [
+                {{#role user 'clinician'}}
+                {
+                  data: "createdAt",
+                  render: function (data, type, row) {
+                    // console.log(data, type, row);
+                    // var date = new Date(row.createdAt);
+                    var x = JSON.parse(pako.inflate(row.bodyFrames, { to: 'string' }));
+                    bodyFrameList.push(x);
+                    console.log(bodyFrameList.length)
+                    return '<button class="btn btn-primary btm-sm" id="download'+row._id+'" href="#" value="Generate data" onclick="downloadData(\'' + bodyFrameList + '\')">Generate data</button>';
+                    // return '<input id="download" type="button" class="btn btn-primary btn-sm" value="Download"/>';
+                  }
+
+                },
+                {{/role}}
                  {
                     data: "name",
                     defaultContent: ""

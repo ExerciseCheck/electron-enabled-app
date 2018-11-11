@@ -1,5 +1,10 @@
 'use strict';
 
+function downloadData(bodyFrames) {
+  console.log(bodyFrames);
+
+}
+
 function deleteDoc(id) {
   const button = $('#delete' + id);
   if (button.text() === 'Delete') {
