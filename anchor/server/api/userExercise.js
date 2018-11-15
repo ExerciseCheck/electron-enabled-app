@@ -5,6 +5,7 @@ const Joi = require('joi');
 const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
+const getSpeed = require('../web/helpers/getSpeed');
 const Pako = require('pako');
 
 const internals = {};
@@ -932,6 +933,7 @@ internals.applyRoutes = function (server, next) {
           console.log(msg_dtw_XYZ);
           console.log(msg_dtw_max);
 
+          /*
           // speed analysis, using dtw, no smoothing
           if (theAxis === "depthX") {
             prac_impt_joint = prac_impt_joint_X;
@@ -940,6 +942,8 @@ internals.applyRoutes = function (server, next) {
             prac_impt_joint = prac_impt_joint_Y;
             ref_impt_joint = ref_impt_joint_Y;
           }
+
+          //dtw for speed analysis
           let options = { distanceMetric: 'euclidean' };
           //let dtw_seg = new DTW(options);
           let dtw_seg = new DTW();
@@ -962,7 +966,14 @@ internals.applyRoutes = function (server, next) {
           console.log("original speed ratio: " + spd_ratio);
           console.log("final speed ratio: " + fin_spd_ratio);
 
-          let analysis = {"accuracy": acc, "speed": fin_spd_ratio };
+          */
+
+          let refSpeed = getSpeed(ref_impt_joint_X_smoothed, ref_impt_joint_Y_smoothed, ref_impt_joint_Z_smoothed);
+          let pracSpeed = getSpeed(prac_impt_joint_X_smoothed, prac_impt_joint_Y_smoothed, prac_impt_joint_Z_smoothed);
+          console.log("speed ref, prac: " + refSpeed + ' ' + pracSpeed);
+          let spd_ratio = pracSpeed / refSpeed;
+
+          let analysis = {"accuracy": acc, "speed": spd_ratio };
           let acc_str = (acc * 100).toFixed(2) + "%";
           let spd_str = (fin_spd_ratio * 100).toFixed(2) + "%";
           // let analysis = {"accuracy": acc_str, "speed": spd_str };

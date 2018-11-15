@@ -2,58 +2,25 @@
 //x: the 1D trajectory
 //theDirection: the direction defined by the exercise
 //time_thresh: the threshold below which not included, default 30 = 1 sec
-module.exports = function getSegmentation(x, theDirection, time_thresh) {
-  let ifIncreased; // direction flag
-  if(theDirection === 'L2R' || theDirection === 'down') {
-    ifIncreased = true;
-  } else if (theDirection === 'R2L' || theDirection === 'up') {
-    ifIncreased = false;
-  } else {
-    console.log("You should not see this")
+module.exports = function getSpeed(x,y,z) {
+  // consider 3-D
+  let speedArray=[];
+  let i;
+  for (i=0; i<x.length - 1; i++) {
+    let v = Math.abs(Math.sqrt(Math.pow(x[i+1] - x[i],2) + Math.pow(y[i+1] - y[i],2) + Math.pow(z[i+1] - z[i],2)));
+    speedArray.push(v)
   }
+  let thresh = Math.max(speedArray) / 10.0; //Movement Arrest Period Ratio
 
-  let v_thresh = 0;
-  let idx=[];
-  for (let i=0; i<x.length - 1; i++) {
-    let v = x[i+1] - x[i];
-    if(v > v_thresh) {
-      idx.push([i, ifIncreased]); //true if moving in the same direction as the exercise
-    } else if(v < (-1)*v_thresh) {
-      idx.push([i, !ifIncreased]);
+  //let filtered = speedArray.filter(v => v > thresh); //returns elements
+
+  let sumSpeed = 0;
+  for (i=0; i<speedArray.length; i++){
+    if(speedArray[i] > thresh){
+      sumSpeed += speedArray[i];
     }
   }
-  // console.log("first: " + idx[0]);
-  // console.log("last: " + idx[idx.length-1]);
-  if (idx.length === 0) {
-    // no movement return a total num of frames
-    return [x.length];
-  }
-
-
-  let idx_st=[]; // records the idx of the first true
-  let timing = [];
-  let ifFirst = true; //if is the first true
-  //one rep is the first true to last false, incl
-  let ii, j;
-  for (ii=0; ii<idx.length-1; ii++) {
-    if(idx[ii][1] && ifFirst) {
-      idx_st.push(idx[ii][0]);
-      ifFirst = false;
-    } else if (idx[ii][1] === false && idx[ii+1][1]) {
-      ifFirst = true;
-    }
-  }
-  if (idx[idx.length-1][1] === false) {
-    idx_st.push(idx[idx.length-1][0] + 1);
-  }
-
-  for (j=1; j<idx_st.length; j++) {
-    let delta = idx_st[j] - idx_st[j-1];
-    if(delta >= time_thresh) {
-      timing.push(delta);
-    }
-  }
-
-  return timing;
+  let avgSpeed = sumSpeed / speedArray.length;
+  return avgSpeed;
 }
 
