@@ -920,6 +920,9 @@ internals.applyRoutes = function (server, next) {
 
           let dtw_impt_joint_XYZ = new DTW();
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
+          console.log("ref: " + ref_impt_joint_XYZ);
+          console.log("prac: " + prac_impt_joint_XYZ);
+          console.log("still: " + std_impt_joint_XYZ);
           //let path_XYZ = dtw_impt_joint_XYZ.path();
 
           let dtw_maxCost = new DTW();
@@ -975,7 +978,7 @@ internals.applyRoutes = function (server, next) {
 
           let analysis = {"accuracy": acc, "speed": spd_ratio };
           let acc_str = (acc * 100).toFixed(2) + "%";
-          let spd_str = (fin_spd_ratio * 100).toFixed(2) + "%";
+          let spd_str = (spd_ratio * 100).toFixed(2) + "%";
           // let analysis = {"accuracy": acc_str, "speed": spd_str };
           console.log("accuracy: " + acc_str + "\nspeed: " + spd_str);
           done(null, analysis);

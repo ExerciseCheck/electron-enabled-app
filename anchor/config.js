@@ -49,9 +49,9 @@ const config = {
       uri: {
         $filter: 'env',
         production: process.env.MONGODB_URI,
-        test: 'mongodb://localhost:27017/exercisecheck-test',
+        test: 'mongodb://localhost:27017/exeChk_db-test',
         local: process.env.MONGODB_URI,
-        $default: 'mongodb://localhost:27017/exercisecheck'
+        $default: 'mongodb://localhost:27017/exeChk_db'
       }
     },
     autoIndex: true
