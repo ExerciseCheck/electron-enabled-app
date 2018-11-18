@@ -1,48 +1,82 @@
 'use strict';
 
 // api/table/refexercise: all ref ex data
+var userData = {}
+var refExerciseData = {}
 
+function getValues(result, db, a) {
+    if(result){
+      Object.keys(result).forEach(function (k) {
+          if (typeof result[k] === 'object') {
+              getValues(result[k], db, [].concat(a, k));
+              return;
+          }
+          if(db === 'user')
+            userData[[].concat(a, k).join('_')] = result[k];
+          else if(db === 'refExercise')
+            refExerciseData[[].concat(a, k).join('_')] = result[k];
+      });
+    }
+    else{
+      console.log("Skipping over null values")
+    }
+}
 
-function downloadData(id) {
+function downloadData(id, exerciseName) {
   $(this).val('clicked');
-  var exerciseData = [];
-  var exerciseDataString;
-  console.log(typeof exerciseData);
+  let userList = {}
+  let patientUserIds = []
+
   $.ajax({
     type: 'GET',
-    url: '/api/table/userexercise/reference' + '/' + '5be60bf4efa3ed3cbcfe856b',
+    url: '/api/table/users?search[value]=""',
     success: function (result) {
-      console.log("data=", result.data[0].exerciseId);
-      for ( var i=0; i<result.data.length; i++ )
-      {
-        if(result.data[i].exerciseId == id)
-        {
-          console.log("Found exercise", id);
-          // console.log(result.data[i].bodyFrames.length);
-          result.data[i].bodyFrames = JSON.parse(pako.inflate(result.data[i].bodyFrames, { to: 'string' }));
-          exerciseDataString = exerciseDataString + JSON.stringify(result.data[i].bodyFrames);
-          console.log(exerciseDataString.length)
-          // exerciseData.push(result.data[i].bodyFrames);
-          exerciseData.push(exerciseDataString);
-        }
-      }
+      getValues(result, 'user');
     },
+    async: false,
     error: function (result) {
       errorAlert(result.responseJSON.message);
     }
   });
+  console.log("userData=", userData);
 
-  console.log("typeof:", typeof exerciseDataString);
-  // var blob = new Blob(exerciseData, {type: "text/plain;charset=utf-8"});
-  // var blob = new Blob(exerciseData[0], {type: "application/json"});
-    console.log(typeof String(exerciseDataString), String(exerciseDataString));
-    var blob = new Blob(String(exerciseDataString), {type: "text/plain;charset=utf-8"});
-    // var file = new File(String(exerciseDataString), Date()+".txt", {type: "text/plain;charset=utf-8"});
-    // saveAs(file)
-    saveAs(file, Date() + '.txt');
+  patientUserIds = jQuery.map(Object.keys(userData), function(val, i) {
+  if (val.indexOf("__id") != -1) {
+    return userData[val];
+    }
+  });
 
-  // saveAs(blob, "works.txt");
-  console.log("Done downloading!");
+  console.log("IDs=", patientUserIds)
+
+  for(var i=0; i<patientUserIds.length; i++)
+  {
+    $.ajax({
+      type: 'GET',
+      url: '/api/table/userexercise/reference' + '/' + patientUserIds[i],
+      success: function (result) {
+        for ( var i=0; i<result.data.length; i++ )
+        {
+          if(result.data[i].exerciseId == id)
+          {
+            // Decompress the data and put it back into the result variable
+            result.data[i].bodyFrames = JSON.parse(pako.inflate(result.data[i].bodyFrames, { to: 'string' }));
+          }
+        }
+        console.log("data=", result);
+        getValues(result, 'refExercise');
+      },
+      async: false,
+      error: function (result) {
+        errorAlert(result.responseJSON.message);
+      }
+    });
+  }
+  console.log("userData:", JSON.stringify(userData));
+  var file = new File([JSON.stringify(refExerciseData)], {type: "text/plain;charset=utf-8"});
+  let date = new Date();
+  let filename = id + '_' + date.toLocaleTimeString() + '_' + '.json' ;
+  saveAs(file, filename);
+  console.log("Data ready for download");
 }
 
 function deleteDoc(id) {
