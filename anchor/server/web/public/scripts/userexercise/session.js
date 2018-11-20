@@ -93,20 +93,16 @@ $.get(url, function(data){
 function action(nextMode, type) {
   openDB(function() {
     const parsedURL = parseURL(window.location.pathname);
-    var patientId = parsedURL.patientId;
-    var exerciseId = parsedURL.exerciseId;
+    let patientId = parsedURL.patientId;
+    let exerciseId = parsedURL.exerciseId;
 
     function redirect() {
-      var redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
+      let redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
-    // if(nextMode === 'play'){
-      //call data for count reps here and redicrect on success
-      // fetch data before start exercise
 
-//    }
-    //This condition describes the end of an update or create reference.
-    //The refFrames data in local storage gets set to the most recent frames.
+    // This condition describes the end of an update or create reference.
+    // The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
         console.log("liveFrames before compression=", (JSON.stringify(liveFrames).length*2) / 1048576, "MB");
         liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
@@ -223,9 +219,36 @@ function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
     }
   });
 
-  //TODO: set threshold for comment and return feedback as words
-  document.getElementById("acc").innerHTML = (accuracy*100).toFixed(2) + "%";
-  document.getElementById("spd").innerHTML = (speed*100).toFixed(2) + "%";
+  let acc_words, spd_words;
+  switch (true) {
+    case(accuracy >= 0.9):
+      acc_words = "Excellent! Your movement accuracy was very high.";
+      break;
+    case(accuracy < 0.9 && accuracy >= 0.75):
+      acc_words = "Well done! Your movement accuracy was above average.";
+      break;
+    case(accuracy < 0.75 && accuracy >= 0.5):
+      acc_words = "Not bad! Your movement accuracy is on the right track.";
+      break;
+    case(accuracy < 0.5):
+      acc_words = "It looks like you had some difficulty with movement accuracy."
+      break;
+  }
+
+  switch (true) {
+    case(speed >= 1.2):
+      spd_words = "You were going too fast. Try to slow down next time.";
+      break;
+    case(speed >= 0.5 && speed < 1.2):
+      spd_words = "Well done! You were performing at a regular pace.";
+      break;
+    case(speed < 0.5):
+      spd_words = "You were going too slow. Try a faster pace next time.";
+      break;
+  }
+
+  document.getElementById("acc").innerHTML = acc_words;
+  document.getElementById("spd").innerHTML = spd_words;
 
   // Get the modal
   let modal = document.getElementById('fdbkModal');
@@ -313,8 +336,9 @@ $('.actionBtn').click(function() {
   let width = 0;
   let height = 0;
   let radius=9; //radius of joint circle
-  let circle_radius = 30//radius of calibration circle
-  let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19];//re visit and draw in a line
+  let circle_radius = 30; //radius of calibration circle
+  //let jointType = [7,6,5,4,2,8,9,10,11,10,9,8,2,3,2,1,0,12,13,14,15,14,13,12,0,16,17,18,19]; //re visit and draw in a line
+  let jointType = [6,5,4,2,8,9,10,9,8,2,3,2,1,0,12,13,14,13,12,0,16,17,18];//remove handtips and feet
   let notAligned = true; // whether person has aligned in circle for the first time or not
   let useTimer = true; // whether or not to use the startTimer() function
   // index of reference frame
