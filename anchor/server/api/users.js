@@ -17,7 +17,8 @@ internals.applyRoutes = function (server, next) {
     path: '/table/users',
     config: {
       auth: {
-        strategies: ['simple', 'jwt', 'session']
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root','clinician', 'analyst', 'admin']
       },
       validate: {
         query: Joi.any()
@@ -56,8 +57,8 @@ internals.applyRoutes = function (server, next) {
         }
         query.inStudy = true;
       }
-      //clinician
-      else if (accessLevel === 2) {
+      //clinician or root
+      else if (accessLevel === 2 || accessLevel === 3) {
 
         const userAccess =  JSON.parse(request.auth.credentials.user.roles.clinician.userAccess);
         const patientsObjectIds = [];
@@ -226,7 +227,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
-        scope: 'admin'
+        scope: ['root','admin']
       }
     },
     handler: function (request, reply) {
@@ -245,6 +246,7 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
 
 
   server.route({
@@ -394,7 +396,7 @@ internals.applyRoutes = function (server, next) {
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
-        scope: 'admin'
+        scope: ['admin', 'root']
       },
       validate: {
         params: {
