@@ -24,3 +24,7 @@ label {
   padding-right: 30px;
   /* padding-top: 30px; */
 }
+
+body > div.container-fluid.h-100 > div > nav{
+  height: 130%;
+}
