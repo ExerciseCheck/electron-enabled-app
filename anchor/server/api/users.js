@@ -400,7 +400,8 @@ internals.applyRoutes = function (server, next) {
       },
       validate: {
         params: {
-          id: Joi.string().invalid('000000000000000000000000')
+          id: Joi.string()
+          // .invalid('000000000000000000000000')
         },
         payload: {
           username: Joi.string().token().lowercase().required(),
