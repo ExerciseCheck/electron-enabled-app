@@ -919,9 +919,9 @@ internals.applyRoutes = function (server, next) {
 
           let dtw_impt_joint_XYZ = new DTW();
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
-          console.log("ref: " + ref_impt_joint_XYZ);
-          console.log("prac: " + prac_impt_joint_XYZ);
-          console.log("still: " + std_impt_joint_XYZ);
+          // console.log("ref: " + ref_impt_joint_XYZ);
+          // console.log("prac: " + prac_impt_joint_XYZ);
+          // console.log("still: " + std_impt_joint_XYZ);
           //let path_XYZ = dtw_impt_joint_XYZ.path();
 
           let dtw_maxCost = new DTW();

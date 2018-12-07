@@ -6,5 +6,4 @@ server/backups
 .coveralls.yml
 db
 .orig
-config.js
-first-time-setup.js
+
