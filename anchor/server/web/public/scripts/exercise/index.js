@@ -71,7 +71,7 @@ function downloadData(id, exerciseName) {
       }
     });
   }
-  console.log("userData:", JSON.stringify(userData));
+  // console.log("userData:", JSON.stringify(userData));
   var file = new File([JSON.stringify(refExerciseData)], {type: "text/plain;charset=utf-8"});
   let date = new Date();
   let filename = id + '_' + date.toLocaleTimeString() + '_' + '.json' ;
