@@ -13,6 +13,11 @@
               <tr>
                 <th>Exercise Name</th>
                 <th>Description</th>
+<<<<<<< Updated upstream
+=======
+                <th>Instructions</th>
+                <th>Reference Video URLs</th>
+>>>>>>> Stashed changes
                 <th>Created At</th>
                 <th>Joint</th>
                 <th>Axis</th>
@@ -49,7 +54,11 @@
       ajax: {
         url : "api/table/exercise",
         data: function (d) {
+<<<<<<< Updated upstream
           d.fields = "exerciseName description createdAt joint axis direction";
+=======
+          d.fields = "exerciseName description instructions videoURLs createdAt impJoint impAxis direction lowerJoint upperJoint";
+>>>>>>> Stashed changes
         }
       },
       columns: [
@@ -62,6 +71,19 @@
           defaultContent: ""
         },
         {
+<<<<<<< Updated upstream
+=======
+          data: "instructions",
+          defaultContent: ""
+        },
+
+        {
+          data: "videoURLs",
+          defaultContent: ""
+        },
+
+        {
+>>>>>>> Stashed changes
           data: "createdAt",
           render: function (data, type, row) {
             var date = new Date(row.createdAt);

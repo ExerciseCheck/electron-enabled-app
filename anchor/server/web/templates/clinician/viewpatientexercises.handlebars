@@ -30,7 +30,7 @@
          <ul>
            {{#each exercises}}
              <li class="listButtons">
-               <a href= 'userexercise/setting/{{this._id}}/{{../patientId}}'>{{formatName this.exerciseName}}</a>
+               <a href= '/userexercise/info/{{exerciseName}}'>{{formatName this.exerciseName}}</a>
              </li>
           {{/each}}
         </ul>
@@ -44,5 +44,3 @@
 <link rel="stylesheet" href="public/css/styleSheet/scrollToTop.css">
 <script type="text/javascript" src="public/scripts/scrollToTop.js"></script>
 <script type="text/javascript" src="public/scripts/clinician.js"></script>
-
-

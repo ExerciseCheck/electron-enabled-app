@@ -49,8 +49,6 @@ if (exerciseName === "Squat" || exerciseName === "squat")
 
 
 
-squat: ["",]
-
 
 
 // function goToSettings() {

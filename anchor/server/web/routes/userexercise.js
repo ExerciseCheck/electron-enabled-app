@@ -16,7 +16,7 @@ internals.applyRoutes = function (server, next) {
     path: '/refexercise',
     config: {
       auth: {
-        strategy: 'session'
+         strategy: 'session'
       }
     },
     handler: function (request, reply) {
@@ -216,6 +216,12 @@ internals.applyRoutes = function (server, next) {
       let defaultNumSets = 1;
       let defaultDiffLevel = 0.75;
 
+// =======
+//       //let exerciseName = request.params.exerciseName;
+//
+//       //console.log(exerciseName);
+// >>>>>>> Stashed changes
+
       Async.auto({
 
         findReference: function (done) {
@@ -281,6 +287,7 @@ internals.applyRoutes = function (server, next) {
         console.log("defaultDiffLevel,defaultNumReps,defaultNumSets ");
         console.log(defaultDiffLevel,defaultNumReps,defaultNumSets);
         return reply.view('userexercise/setting', {
+
           user: request.auth.credentials.user,
           projectName: Config.get('/projectName'),
           exerciseName : results.findExerciseName.exerciseName,
@@ -579,6 +586,40 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
+
+  server.route({
+  method: 'GET',
+  path: '/userexercise/info/{exerciseName}',
+  config: {
+    auth: {
+      strategy: 'session'
+    }
+  },
+  handler: function (request, reply) {
+
+    //console.log("trying to find patient id and exercise id")
+    //console.log(request.params)
+    let exerciseName = request.params.exerciseName;
+    console.log(exerciseName)
+
+    //db call db.exercise.find( exercisename: request.params.exerciseName)
+    Exercise.findOne({'exerciseName': request.params.exerciseName},
+    {'videoURLs': request.params.videoURLs},(err, result) => {
+      return reply.view('userexercise/info', {
+        user: request.auth.credentials.user,
+        exerciseName : exerciseName,
+        // projectName: Config.get('/projectName'),
+      // title: exerciseName + ' Information',
+        instructions: result.instructions, //mongo, ["a","b"]
+      //  goal: Info[exerciseName]['Goal']
+        videoURLs: result.videoURLs
+
+      });
+    })
+
+  }
+});
 
   next();
 };
