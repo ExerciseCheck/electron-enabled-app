@@ -1,5 +1,5 @@
 //function for coarse segmentation, used for offline speed analysis
-//x: the 1D trajectory
+//x, y ,z: 3D trajectory
 //theDirection: the direction defined by the exercise
 //time_thresh: the threshold below which not included, default 30 = 1 sec
 module.exports = function getSpeed(x,y,z) {
@@ -8,15 +8,12 @@ module.exports = function getSpeed(x,y,z) {
   // consider 3-D
   let speedArray=[];
   let i;
-  for (i=0; i<x.length - 15; i++) {
-    let v = Math.abs(Math.sqrt(Math.pow(x[i+15] - x[i],2) + Math.pow(y[i+15] - y[i],2) + Math.pow(z[i+15] - z[i],2)));
+  let window = 15; // the window
+  for (i=0; i<x.length - window; i++) {
+    let v = Math.abs(Math.sqrt(Math.pow(x[i+window] - x[i],2) + Math.pow(y[i+window] - y[i],2) + Math.pow(z[i+window] - z[i],2)));
     speedArray.push(v)
   }
   let thresh = Math.max.apply(null, speedArray) / 5.0; //Movement Arrest Period Ratio
-  //console.log("thresh: " + thresh);
-  //let filtered = speedArray.filter(v => v > thresh); //returns elements
-  //console.log("filtered: " + filtered);
-
   //console.log("Speed Array: " + speedArray);
 
   let sumSpeed = 0;
