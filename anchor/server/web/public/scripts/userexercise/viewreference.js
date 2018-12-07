@@ -1,8 +1,94 @@
 'use strict';
 
-function downloadData(bodyFrames) {
-  console.log(bodyFrames);
+var userData = {}
+var refExerciseData = {}
 
+function saveToFile(result, userId, exerciseId) {
+  // Initialize workbook
+  var wb = {SheetNames:[], Sheets:{}};
+  wb.Props = {
+              Title: "ExerciseCheck data",
+              Subject: userId,
+              Author: "Boston University",
+              CreatedDate: new Date()
+      };
+
+  let completeSheet = [];
+  let exName, patientName;
+  result.data.forEach(function(collection) {
+    if(collection.exerciseId == exerciseId)
+    {
+      // console.log("collection:", collection);
+      exName = collection.exerciseName;
+      patientName = collection.name;
+      wb.SheetNames.push(collection.createdAt.replace(/:\s*/g, "-").replace(".", " "));
+      collection.bodyFrames.forEach(function(frame) {
+        let eachRow = []
+        frame.joints.forEach(function(joint) {
+          eachRow.push(joint.cameraX, joint.cameraY, joint.cameraZ, joint.colorX, joint.colorY, joint.depthX, joint.depthY, joint.orientationW, joint.orientationX, joint.orientationY, joint.orientationZ)
+        })
+        completeSheet.push(eachRow);
+      })
+    }
+  });
+
+  console.log("SheetNames:", wb.SheetNames);
+  // Workbook format:
+  // 1. Each sheet is a reference exercise and sheet name is the timestamp
+  // 2. Each row of the sheet represents a bodyFrame has 220 data-points i.e. 20 joints * 11 data points -> joint[0].cameraX, joint[0].cameraY...joint[0].orientationY, joint[0].orientationZ.....joint[19].orientationY, joint[19].orientationZ.
+  // Row sample: joint[0].cameraX, joint[0].cameraY...joint[0].orientationY, joint[0].orientationZ.....joint[19].orientationY, joint[19].orientationZ.
+  // 3. Each sheet has as many rows as the bodyFrames recorded for that reference exercise
+  // 4. If there are more than one reference exercise (old stale data which we aren't deleting right now) then multiple sheets will be created in the workbook based on timestamp
+
+  var ws = XLSX.utils.aoa_to_sheet(completeSheet);
+  wb.SheetNames.forEach(function(sheet) {
+    wb.Sheets[sheet] = ws;
+  });
+
+  var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+  function s2ab(s) {
+          var buf = new ArrayBuffer(s.length);
+          var view = new Uint8Array(buf);
+          for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+          return buf;
+  }
+  let date = new Date();
+  let filename = patientName + '_' + exName + '_' + date.toLocaleTimeString() ;
+  saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), filename + '.xlsx');
+  console.log("Data ready for download!");
+}
+
+function downloadData(userAndExerciseIds) {
+  successAlert('Data is being prepared, please wait.');
+  var userId = userAndExerciseIds.split(",")[0]
+  var exerciseId = userAndExerciseIds.split(",")[1]
+  console.log("ids:", userId, exerciseId);
+  $(this).val('clicked');
+  let userList = {}
+  let patientUserIds = []
+
+  console.log("IDs=", patientUserIds)
+
+  $.ajax({
+    type: 'GET',
+    url: '/api/table/userexercise/reference' + '/' + userId,
+    success: function (result) {
+      for ( var i=0; i<result.data.length; i++ )
+      {
+        if(result.data[i].userId == userId)
+        {
+          // Decompress the data and put it back into the result variable
+          result.data[i].bodyFrames = JSON.parse(pako.inflate(result.data[i].bodyFrames, { to: 'string' }));
+        }
+      }
+      console.log("data=", result);
+      saveToFile(result, userId, exerciseId);
+    },
+    async: false,
+    error: function (result) {
+      errorAlert(result.responseJSON.message);
+    }
+  });
 }
 
 function deleteDoc(id) {

@@ -35,7 +35,7 @@
 <script>
     var table;
     $(document).ready(function () {
-        bodyFrameList = []
+        let userAndExerciseIds = [];
         table = $('#userTable').DataTable({
             processing: true,
             serverSide: true,
@@ -60,11 +60,10 @@
                   render: function (data, type, row) {
                     // console.log(data, type, row);
                     // var date = new Date(row.createdAt);
-                    var x = JSON.parse(pako.inflate(row.bodyFrames, { to: 'string' }));
-                    bodyFrameList.push(x);
-                    console.log(bodyFrameList.length)
-                    return '<button class="btn btn-primary btm-sm" id="download'+row._id+'" href="#" value="Generate data" onclick="downloadData(\'' + bodyFrameList + '\')">Generate data</button>';
-                    // return '<input id="download" type="button" class="btn btn-primary btn-sm" value="Download"/>';
+                    // var x = JSON.parse(pako.inflate(row.bodyFrames, { to: 'string' }));
+
+                    userAndExerciseIds = [row.userId, row.exerciseId];
+                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadData(\'' + userAndExerciseIds + '\')">Download data</button>';
                   }
 
                 },
