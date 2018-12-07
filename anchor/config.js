@@ -51,7 +51,7 @@ const config = {
         production: process.env.MONGODB_URI,
         test: 'mongodb://localhost:27017/exercisecheck-test',
         local: process.env.MONGODB_URI,
-        $default: 'mongodb://localhost:27017/exercisecheck'
+        $default: 'mongodb://localhost:27017/_exercisecheck'
       }
     },
     autoIndex: true

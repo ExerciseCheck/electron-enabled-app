@@ -10,10 +10,10 @@ $(document).ready(function() {
     lengthChange: false,
     dom: 'Bfrtip',
     buttons: [
-      'copy', 'csv', 'excel', 'pdf', 'print','colvis'
+      'download data', 'copy', 'csv', 'excel', 'pdf', 'print','colvis'
     ],
     ajax: {
-      url: 'api/table/clinicians',
+      url: '/api/table/clinicians',
       data: function (d) {
         d.fields = 'name';
       }
@@ -36,7 +36,7 @@ $(document).ready(function() {
   $('#clinicians').select2({
     ajax: {
       delay: 250,
-      url: 'api/select2/clinicians',
+      url: '/api/select2/clinicians',
       dataType: 'json',
       processResults: function (data) {
         var results = [];
@@ -60,7 +60,7 @@ $(document).ready(function() {
     if(clinicainId) {
       $.ajax({
         type: 'PUT',
-        url: 'api/clinicians/' + clinicainId,
+        url: '/api/clinicians/' + clinicainId,
         success: function (result) {
           table.ajax.reload();
         },
@@ -80,7 +80,7 @@ function remove(clinicainId) {
   else {
     $.ajax({
       type: 'DELETE',
-      url: 'api/clinicians/' + clinicainId,
+      url: '/api/clinicians/' + clinicainId,
       success: function (result) {
         table.ajax.reload();
       },
@@ -93,7 +93,7 @@ function remove(clinicainId) {
 
 function addExr() {
 
-  window.location = 'exercise/create';
+  window.location = '/exercise/create';
 }
 
 function filter() {

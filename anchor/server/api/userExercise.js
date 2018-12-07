@@ -5,7 +5,7 @@ const Joi = require('joi');
 const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
-const Pako = require('pako');
+//const Pako = require('pako');
 
 const internals = {};
 

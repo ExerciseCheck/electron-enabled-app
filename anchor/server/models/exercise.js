@@ -4,11 +4,8 @@ const MongoModels = require('hicsail-mongo-models');
 
 class Exercise extends MongoModels {
 
-<<<<<<< HEAD
   static create(exerciseName, description, instructions, refVideoLinks, joint, axis, direction, refLowerJoint, refUpperJoint, userId, callback) {
-=======
-  static create(exerciseName, description, joint, axis, direction, userId, callback) {
->>>>>>> origin/sail3-deploy
+
 
     const document = {
       exerciseName,
