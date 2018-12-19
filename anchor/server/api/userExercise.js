@@ -921,6 +921,18 @@ internals.applyRoutes = function (server, next) {
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
           //let path_XYZ = dtw_impt_joint_XYZ.path();
 
+
+          //////////////////////////////////////////////////////////////////////////////
+          for (let i = 0; i< numJoints; i++) {
+            if i != dominant_idx:
+              acc_tmp = calculateAccOther(path_xyz, ref_all_joints[i], prac_all_joints[i]);
+              acc_all.append(acc_tmp)
+            else:
+              acc_all.append(acc_dominant)
+
+          }
+
+////////////////////
           let dtw_maxCost = new DTW();
           let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint_XYZ);
 
@@ -931,6 +943,7 @@ internals.applyRoutes = function (server, next) {
           let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
           console.log(msg_dtw_XYZ);
           console.log(msg_dtw_max);
+////////////////////////////////
 
           // speed analysis, using dtw, no smoothing
           if (theAxis === "depthX") {
