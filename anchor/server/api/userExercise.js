@@ -4,7 +4,7 @@ const Boom = require('boom');
 const Joi = require('joi');
 const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
-const Discard = require('../web/helpers/discardIndices');
+const getSpeed = require('../web/helpers/getSpeed');
 const Pako = require('pako');
 
 const internals = {};
@@ -919,6 +919,9 @@ internals.applyRoutes = function (server, next) {
 
           let dtw_impt_joint_XYZ = new DTW();
           let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
+          // console.log("ref: " + ref_impt_joint_XYZ);
+          // console.log("prac: " + prac_impt_joint_XYZ);
+          // console.log("still: " + std_impt_joint_XYZ);
           //let path_XYZ = dtw_impt_joint_XYZ.path();
 
 
@@ -945,48 +948,19 @@ internals.applyRoutes = function (server, next) {
           console.log(msg_dtw_max);
 ////////////////////////////////
 
-          // speed analysis, using dtw, no smoothing
-          if (theAxis === "depthX") {
-            prac_impt_joint = prac_impt_joint_X;
-            ref_impt_joint = ref_impt_joint_X;
-          } else if (theAxis === "depthY") {
-            prac_impt_joint = prac_impt_joint_Y;
-            ref_impt_joint = ref_impt_joint_Y;
-          }
-          let options = { distanceMetric: 'euclidean' };
-          //let dtw_seg = new DTW(options);
-          let dtw_seg = new DTW();
-          let cost_seg = dtw_seg.compute(ref_impt_joint, prac_impt_joint);
-          let path_seg = dtw_seg.path();
-          // console.log(path_seg);
-          let ref_indices = [];
-          let prac_indices = [];
-          path_seg.forEach(function(pair){
-            ref_indices.push(pair[0]);
-            prac_indices.push(pair[1]);
-          });
-          // console.log(ref_indices, ref_indices.length);
-          // console.log(prac_indices, prac_indices.length);
-          let discard_ref = Discard(prac_indices, 24);
-          let discard_prac = Discard(ref_indices, 24);
-          let spd_ratio = ref_impt_joint.length / prac_impt_joint.length;
-          let fin_spd_ratio = (ref_impt_joint.length - discard_ref) / (prac_impt_joint.length - discard_prac);
+          let refSpeed = getSpeed(ref_impt_joint_X_smoothed, ref_impt_joint_Y_smoothed, ref_impt_joint_Z_smoothed);
+          let pracSpeed = getSpeed(prac_impt_joint_X_smoothed, prac_impt_joint_Y_smoothed, prac_impt_joint_Z_smoothed);
+          console.log("speed ref, prac: " + refSpeed + ' ' + pracSpeed);
+          let spd_ratio = pracSpeed / refSpeed;
 
-          console.log("original speed ratio: " + spd_ratio);
-          console.log("final speed ratio: " + fin_spd_ratio);
-
-          let analysis = {"accuracy": acc, "speed": fin_spd_ratio };
+          let analysis = {"accuracy": acc, "speed": spd_ratio };
           let acc_str = (acc * 100).toFixed(2) + "%";
-          let spd_str = (fin_spd_ratio * 100).toFixed(2) + "%";
+          let spd_str = (spd_ratio * 100).toFixed(2) + "%";
           // let analysis = {"accuracy": acc_str, "speed": spd_str };
           console.log("accuracy: " + acc_str + "\nspeed: " + spd_str);
           done(null, analysis);
         }],
         findPracticeandUpdate: ['analyzePractice', function(results, done) {
-
-          // console.log("results.analyzePractice: " + results.analyzePractice); //[object object]
-          // console.log("stringify: " + JSON.stringify(results.analyzePractice)); //{"accuracy": 0.945..., "speed": 0.729...}
-          // console.log("results.analyzePractice.accuracy: " + results.analyzePractice.accuracy); //0.945...
 
           const query = {
             userId: patientId,
