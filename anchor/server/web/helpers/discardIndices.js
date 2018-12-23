@@ -53,5 +53,5 @@ module.exports = function discardIndices(x, threshold) {
   }
   console.log(discard);
   return discard;
-}
+};
 
