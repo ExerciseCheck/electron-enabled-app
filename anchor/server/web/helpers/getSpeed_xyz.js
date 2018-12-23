@@ -2,16 +2,15 @@
 //x, y ,z: 3D trajectory
 //theDirection: the direction defined by the exercise
 //time_thresh: the threshold below which not included, default 30 = 1 sec
-// arr is 3D: [(x1,y1,z1), (x2,y2,z2),...]
-module.exports = function getSpeed(arr) {
-  console.log(arr[0]);
+module.exports = function getSpeed(x,y,z) {
+  console.log(x[0], y[0], z[0]);
 
+  // consider 3-D
   let speedArray=[];
   let i;
   let window = 15; // the window
-  for (i=0; i<arr.length - window; i++) {
-    let v = Math.abs(
-      Math.sqrt(Math.pow(arr[i+window][0] - arr[i][0],2) + Math.pow(arr[i+window][1] - arr[i][1],2) + Math.pow(arr[i+window][2] - arr[i][2],2)));
+  for (i=0; i<x.length - window; i++) {
+    let v = Math.abs(Math.sqrt(Math.pow(x[i+window] - x[i],2) + Math.pow(y[i+window] - y[i],2) + Math.pow(z[i+window] - z[i],2)));
     speedArray.push(v)
   }
   let thresh = Math.max.apply(null, speedArray) / 5.0; //Movement Arrest Period Ratio

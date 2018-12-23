@@ -784,8 +784,8 @@ $('.actionBtn').click(function() {
 
         if(JSON.parse(localStorage.getItem('canStartRecording')) === true)
         {
-          //filter joints, remove fingertips and spineShoulder for they are not used
-          body.joints.splice(20,5);
+          //filter joints, remove fingertips for they are not used, nor accurate
+          body.joints.splice(21,4);
           liveFrames.push(body);
           if(liveFrames.length >= MAX_BODYFRAMES_STORED)
           {

@@ -5,13 +5,12 @@ const Joi = require('joi');
 const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const getSpeed = require('../web/helpers/getSpeed');
+const calculateAccOther = require('../web/helpers/accuracyAllJoints')
 const Pako = require('pako');
-
 const internals = {};
 
 
 internals.applyRoutes = function (server, next) {
-
   const PracticeExercise = server.plugins['hicsail-hapi-mongo-models'].PracticeExercise;
   const ReferenceExercise = server.plugins['hicsail-hapi-mongo-models'].ReferenceExercise;
   const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
@@ -853,103 +852,138 @@ internals.applyRoutes = function (server, next) {
           PracticeExercise.findOne(query, {sort: {$natural: -1}}, done);
         }],
         analyzePractice: ['findPracticeExercise', function(results, done) {
-          //TODO: currently only one joint is used for the accuracy
           // from exercise
           let theJoint = results.findExercise.joint;
           let theAxis = results.findExercise.axis;
           // from reference
           let refBodyframes = JSON.parse(Pako.inflate(results.findMostRecentReference[0].bodyFrames, { to: 'string' }));
           let refJointNeck = refBodyframes[0].joints[2];
-
-          let prac_impt_joint_X = []; //separate X,Y,Z for smoothing
-          let prac_impt_joint_Y = [];
-          let prac_impt_joint_Z = [];
-          let prac_impt_joint; // the chosen axis
-          let prac_impt_joint_XYZ = [];
-          // For normalization:
-          // console.log("requestPayload=", requestPayload.bodyFrames);
           let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
-         // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+
+
+          let allJoints = _.range(21);
+          // let allJoints_noHandsFeet = allJoints.filter(function (val, idx, arr) {
+          //   if (val === 7 || val === 11 || val === 15 || val === 19) return false;
+          //   else return true;
+          // });
+          console.log(allJoints);
+          let i,j,k;
+
+          // For normalization:
           let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
           let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
           //let prac_depth = ??
-
-          for (let i=0; i<bodyFrames_decompressed.length; ++i) {
-            prac_impt_joint_X.push((bodyFrames_decompressed[i].joints[theJoint]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
-            prac_impt_joint_Y.push((bodyFrames_decompressed[i].joints[theJoint]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
-            prac_impt_joint_Z.push(bodyFrames_decompressed[i].joints[theJoint]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
-          }
-
-          let prac_impt_joint_X_smoothed = Smoothing(prac_impt_joint_X, 5);
-          let prac_impt_joint_Y_smoothed = Smoothing(prac_impt_joint_Y, 5);
-          let prac_impt_joint_Z_smoothed = Smoothing(prac_impt_joint_Z, 5);
-          let std_impt_joint_XYZ = []; // for establishing the max cost in dtw
-          for (let i=0; i<prac_impt_joint_X_smoothed.length; ++i) {
-            prac_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[i],prac_impt_joint_Y_smoothed[i],prac_impt_joint_Z_smoothed[i]]);
-            std_impt_joint_XYZ.push([prac_impt_joint_X_smoothed[0], prac_impt_joint_Y_smoothed[0], prac_impt_joint_Z_smoothed[0]]);
-          }
-
-          let ref_impt_joint_X = [];
-          let ref_impt_joint_Y = [];
-          let ref_impt_joint_Z = [];
-          let ref_impt_joint;
-          let ref_impt_joint_XYZ = [];
-
-          // For normalization:
           let ref_shoulderL2R = refBodyframes[0].joints[8]["depthX"] - refBodyframes[0].joints[4]["depthX"];
           let ref_neck2base = refBodyframes[0].joints[0]["depthY"] - refBodyframes[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          for (let i=0; i<refBodyframes.length; ++i) {
-            ref_impt_joint_X.push(
-              (refBodyframes[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
-            ref_impt_joint_Y.push(
-              (refBodyframes[i].joints[theJoint]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
-            ref_impt_joint_Z.push(refBodyframes[i].joints[theJoint]["cameraZ"] - refJointNeck["cameraZ"]);
+          let prac_all_joints = [];
+          let ref_all_joints = [];
+          for (j=0; j<allJoints.length; j++) {
+            let prac_joint_X = []; //separate X,Y,Z for smoothing
+            let prac_joint_Y = [];
+            let prac_joint_Z = [];
+            let prac_joint_XYZ = [];
+            // normalization
+            for (i=0; i<bodyFrames_decompressed.length; ++i) {
+              prac_joint_X.push((bodyFrames_decompressed[i].joints[j]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
+              prac_joint_Y.push((bodyFrames_decompressed[i].joints[j]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
+              prac_joint_Z.push(bodyFrames_decompressed[i].joints[j]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
+            }
+            // smoothing
+            let prac_joint_X_smoothed = Smoothing(prac_joint_X, 5);
+            let prac_joint_Y_smoothed = Smoothing(prac_joint_Y, 5);
+            let prac_joint_Z_smoothed = Smoothing(prac_joint_Z, 5);
+            for (i=0; i< prac_joint_X_smoothed.length; ++i) {
+              prac_joint_XYZ.push([prac_joint_X_smoothed[i],prac_joint_Y_smoothed[i],prac_joint_Z_smoothed[i]]);
+            }
+
+            prac_all_joints.push(prac_joint_XYZ); // imptJoint = allJoints[theJoint]
+
+
+            let ref_joint_X = [];
+            let ref_joint_Y = [];
+            let ref_joint_Z = [];
+            let ref_joint_XYZ = [];
+            // normalization
+            for (k=0; k<refBodyframes.length; ++k) {
+              ref_joint_X.push(
+                (refBodyframes[k].joints[j]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
+              ref_joint_Y.push(
+                (refBodyframes[k].joints[j]["depthY"] - refJointNeck["depthY"]) / ref_neck2base);
+              ref_joint_Z.push(refBodyframes[k].joints[j]["cameraZ"] - refJointNeck["cameraZ"]);
+            }
+            // smoothing
+            let ref_joint_X_smoothed = Smoothing(ref_joint_X, 5);
+            let ref_joint_Y_smoothed = Smoothing(ref_joint_Y, 5);
+            let ref_joint_Z_smoothed = Smoothing(ref_joint_Z, 5);
+            // Assumption: patient does N repetitions per referenceExercise, where N is required by clinician
+            for (k=0; k<ref_joint_X_smoothed.length; ++k) {
+              ref_joint_XYZ.push([ref_joint_X_smoothed[k],ref_joint_Y_smoothed[k],ref_joint_Z_smoothed[k]]);
+            }
+
+            ref_all_joints.push(ref_joint_XYZ);
           }
 
-          let ref_impt_joint_X_smoothed = Smoothing(ref_impt_joint_X, 5);
-          let ref_impt_joint_Y_smoothed = Smoothing(ref_impt_joint_Y, 5);
-          let ref_impt_joint_Z_smoothed = Smoothing(ref_impt_joint_Z, 5);
-          // Assumption:
-          // patient does N repetitions per referenceExercise, where N is required by clinician
-          for (let i=0; i<ref_impt_joint_X_smoothed.length; ++i) {
-            ref_impt_joint_XYZ.push([ref_impt_joint_X_smoothed[i],ref_impt_joint_Y_smoothed[i],ref_impt_joint_Z_smoothed[i]]);
-          }
+          console.log(ref_all_joints.length); //21
+          console.log(ref_all_joints[0].length); //num of frames
+          console.log(ref_all_joints[0][0]); //x,y,z
+          console.log(ref_all_joints[0].slice(0,5)); //all frames for joint0, first 5
+          console.log(ref_all_joints.slice(0,10)); //[joints[frames[x,y,z]]], first 10
+
+
+
 
           let dtw_impt_joint_XYZ = new DTW();
-          let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_impt_joint_XYZ, prac_impt_joint_XYZ);
-          // console.log("ref: " + ref_impt_joint_XYZ);
-          // console.log("prac: " + prac_impt_joint_XYZ);
-          // console.log("still: " + std_impt_joint_XYZ);
-          //let path_XYZ = dtw_impt_joint_XYZ.path();
-
+          let cost_XYZ = dtw_impt_joint_XYZ.compute(ref_all_joints[theJoint], prac_all_joints[theJoint]);
+          let path_XYZ = dtw_impt_joint_XYZ.path();
 
           //////////////////////////////////////////////////////////////////////////////
-          for (let i = 0; i< numJoints; i++) {
-            if i != dominant_idx:
-              acc_tmp = calculateAccOther(path_xyz, ref_all_joints[i], prac_all_joints[i]);
-              acc_all.append(acc_tmp)
-            else:
-              acc_all.append(acc_dominant)
+          // calculate for all joints, 0-20 (20: spineShoulder)
+          // except for the dominant joint: theJoint, which is already done
+
+          let cost_all = [];
+          let cost_max = [];
+          for (j = 0; i < allJoints.length; i++) {
+            let joint_max = new Array(prac_all_joints[0].length);
+            joint_max.fill(prac_all_joints[j][0]);
+            console.log(joint_max.slice(0,3));
+            let max_tmp = calculateAccOther(path_XYZ, ref_all_joints[j], joint_max);
+            cost_max.push(max_tmp);
+            if (j !== theJoint){
+              let cost_tmp = calculateAccOther(path_XYZ, ref_all_joints[j], prac_all_joints[j]);
+              cost_all.push(cost_tmp);
+            }
+            else {
+              cost_all.push(cost_XYZ)
+            }
 
           }
+          console.log(cost_all); // 21 values
+          console.log(cost_max);
 
-////////////////////
-          let dtw_maxCost = new DTW();
-          let cost_max = dtw_maxCost.compute(ref_impt_joint_XYZ, std_impt_joint_XYZ);
+          let acc_all = [];
+          for(j=0; j<allJoints.length; j++){
+            let acc = 1 - cost_all[j] / cost_max[j];
+            console.log(acc);
+            if(acc<0) acc=0;
+            acc_all.push(acc);
+          }
+          console.log(acc_all);
 
-          let acc = 1 - cost_XYZ / cost_max;
-          if(acc<0) acc=0;
+          //TODO: save to practice model
 
-          let msg_dtw_XYZ = "DTW cost: " + cost_XYZ + '\n';
-          let msg_dtw_max = "Maximum cost: " + cost_max + '\n';
+          let acc_theJoint = acc_all[theJoint];
+          let msg_dtw_XYZ = "DTW cost: " + acc_theJoint + '\n';
           console.log(msg_dtw_XYZ);
-          console.log(msg_dtw_max);
-////////////////////////////////
 
-          let refSpeed = getSpeed(ref_impt_joint_X_smoothed, ref_impt_joint_Y_smoothed, ref_impt_joint_Z_smoothed);
-          let pracSpeed = getSpeed(prac_impt_joint_X_smoothed, prac_impt_joint_Y_smoothed, prac_impt_joint_Z_smoothed);
+          ////////////////////////////////////////////////////////////////////////////////
+
+
+          // let refSpeed = getSpeed(ref_impt_joint_X_smoothed, ref_impt_joint_Y_smoothed, ref_impt_joint_Z_smoothed);
+          // let pracSpeed = getSpeed(prac_impt_joint_X_smoothed, prac_impt_joint_Y_smoothed, prac_impt_joint_Z_smoothed);
+          let refSpeed = getSpeed(ref_all_joints[theJoint]);
+          let pracSpeed = getSpeed(prac_all_joints[theJoint]);
           console.log("speed ref, prac: " + refSpeed + ' ' + pracSpeed);
           let spd_ratio = pracSpeed / refSpeed;
 
