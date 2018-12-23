@@ -986,8 +986,8 @@ internals.applyRoutes = function (server, next) {
           let pracSpeed = getSpeed(prac_all_joints[theJoint]);
           console.log("speed ref, prac: " + refSpeed + ' ' + pracSpeed);
           let spd_ratio = pracSpeed / refSpeed;
-
-          let analysis = {"accuracy": acc_theJoint, "speed": spd_ratio };
+          //TODO: acc_all should be an array of 21 elements, CHECK
+          let analysis = {"accuracy": acc_theJoint, "speed": spd_ratio, "allJoints": acc_all};
           let acc_str = (acc_theJoint * 100).toFixed(2) + "%";
           let spd_str = (spd_ratio * 100).toFixed(2) + "%";
           // let analysis = {"accuracy": acc_str, "speed": spd_str };
