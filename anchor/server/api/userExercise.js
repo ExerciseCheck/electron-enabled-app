@@ -987,8 +987,8 @@ internals.applyRoutes = function (server, next) {
           console.log("speed ref, prac: " + refSpeed + ' ' + pracSpeed);
           let spd_ratio = pracSpeed / refSpeed;
 
-          let analysis = {"accuracy": acc, "speed": spd_ratio };
-          let acc_str = (acc * 100).toFixed(2) + "%";
+          let analysis = {"accuracy": acc_theJoint, "speed": spd_ratio };
+          let acc_str = (acc_theJoint * 100).toFixed(2) + "%";
           let spd_str = (spd_ratio * 100).toFixed(2) + "%";
           // let analysis = {"accuracy": acc_str, "speed": spd_str };
           console.log("accuracy: " + acc_str + "\nspeed: " + spd_str);
