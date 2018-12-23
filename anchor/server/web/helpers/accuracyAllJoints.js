@@ -20,7 +20,7 @@ module.exports = function calculateAccOther(path, ref_joint, prac_joint) {
       err += distance_formula(ref_joint[path[i][0]], prac_joint[path[i][1]]);
     }
 
-    err = err/len(path);
+    err = err/path.length;
     return err;
-}
+};
 
