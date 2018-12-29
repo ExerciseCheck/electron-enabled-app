@@ -111,10 +111,12 @@ function savereferenceToFile(result, userId, exerciseName, exerciseId, patientNa
 
 function downloadDataForPractice(userAndExerciseIds, id) {
   successAlert('Data is being prepared, please wait.');
-  var userId = userAndExerciseIds.split(",")[0]
-  var exerciseId = userAndExerciseIds.split(",")[1]
-  var exerciseName = userAndExerciseIds[2].split(/[\s,]+/).join("_")
-  var patientName = userAndExerciseIds[3].split(/[\s,]+/).join("_")
+  var spiltData = userAndExerciseIds.split(",");
+  var userId = spiltData[0]
+  var exerciseId = spiltData[1]
+  var exerciseName = spiltData[2]
+  var patientName = spiltData[3]
+
   $(this).val('clicked');
 
   $.ajax({
@@ -138,10 +140,11 @@ function downloadDataForPractice(userAndExerciseIds, id) {
 
 function downloadDataForReference(userAndExerciseIds, id) {
   successAlert('Data is being prepared, please wait.');
-  var userId = userAndExerciseIds[0]
-  var exerciseId = userAndExerciseIds[1]
-  var exerciseName = userAndExerciseIds[2].split(/[\s,]+/).join("_")
-  var patientName = userAndExerciseIds[3].split(/[\s,]+/).join("_")
+  var spiltData = userAndExerciseIds.split(",");
+  var userId = spiltData[0]
+  var exerciseId = spiltData[1]
+  var exerciseName = spiltData[2]
+  var patientName = spiltData[3]
 
   $(this).val('clicked');
 
