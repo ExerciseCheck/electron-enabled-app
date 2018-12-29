@@ -6,6 +6,7 @@ const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
 const Pako = require('pako');
+const ObjectID = require('mongodb').ObjectID;
 
 const internals = {};
 
@@ -86,7 +87,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/table/userexercise/reference/{userId}',
+    path: 'userExercise/{type}/{id}',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -97,57 +98,65 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
-      const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
-      const limit = Number(request.query.length);
-      const page = Math.ceil(Number(request.query.start) / limit) + 1;
-      const fields = request.query.fields;
+      // const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
+      // const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
+      // const limit = Number(request.query.length);
+      // const page = Math.ceil(Number(request.query.start) / limit) + 1;
+      // const fields = request.query.fields;
+      //
+      //
+      console.log(ObjectID(request.params.id));
 
       const query = {
-        userId: request.params.userId,
+        _id: new ObjectID(request.params.id)
       };
 
-      ReferenceExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
-
-        const referenceExercises = [];
-        Async.each(results.data, (referenceExercise, done) => {
-
-          User.findById(referenceExercise.userId, (err, user) => {
-
-            if (err) {
-              done(err);
-            }
-            if (user) {
-              referenceExercise.name = user.name;
-            }
-          });
-
-          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
-
-            if (err) {
-              done(err);
-            }
-            if (exercise) {
-              referenceExercise.exerciseName = exercise.exerciseName;
-            }
-
-          });
-
-          referenceExercises.push(referenceExercise);
-        });
-
-        if (err) {
-          return reply(err);
-        }
-
-        reply({
-          draw: request.query.draw,
-          recordsTotal: results.data.length,
-          recordsFiltered: results.items.total,
-          data: referenceExercises,
-          error: err
-        });
-      });
+      let modelName = request.params.type === 'reference' ? ReferenceExercise:PracticeExercise;
+      PracticeExercise.findOne(query, (err, results) => {
+        console.log("ggggggg");
+        console.log(results);
+      })
+      // modelName.pagedFind(query, fields, sort, limit, page, (err, results) => {
+      //
+      //   const referenceExercises = [];
+      //   Async.each(results.data, (referenceExercise, done) => {
+      //
+      //     User.findById(referenceExercise.userId, (err, user) => {
+      //
+      //       if (err) {
+      //         done(err);
+      //       }
+      //       if (user) {
+      //         referenceExercise.name = user.name;
+      //       }
+      //     });
+      //
+      //     Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+      //
+      //       if (err) {
+      //         done(err);
+      //       }
+      //       if (exercise) {
+      //         referenceExercise.exerciseName = exercise.exerciseName;
+      //       }
+      //
+      //     });
+      //
+      //     referenceExercises.push(referenceExercise);
+      //   });
+      //
+      //   if (err) {
+      //     return reply(err);
+      //   }
+      //
+      //   reply({
+      //     draw: request.query.draw,
+      //     recordsTotal: results.data.length,
+      //     recordsFiltered: results.items.total,
+      //     data: referenceExercises,
+      //     error: err
+      //   });
+      // });
     }
   });
 
@@ -469,7 +478,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise/{id}',
+    path: '/reference/{id}',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -478,6 +487,31 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       ReferenceExercise.findById(request.params.id, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!document) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(document);
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/practice/{id}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      }
+    },
+    handler: function (request, reply) {
+
+      PracticeExercise.findById(request.params.id, (err, document) => {
 
         if (err) {
           return reply(err);

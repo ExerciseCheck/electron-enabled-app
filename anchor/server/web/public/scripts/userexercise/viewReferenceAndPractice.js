@@ -1,7 +1,5 @@
 'use strict';
 
-var userData = {}
-var refExerciseData = {}
 
 function saveToFile(result, userId, exerciseId) {
   // Initialize workbook
@@ -14,21 +12,21 @@ function saveToFile(result, userId, exerciseId) {
       };
 
   let completeSheet = [];
-  let exName, patientName;
-  result.data.forEach(function(collection) {
-    if(collection.exerciseId == exerciseId)
+  result.forEach(function(collection) {
+    if(collection.exerciseId === exerciseId)
     {
       // console.log("collection:", collection);
-      exName = collection.exerciseName;
-      patientName = collection.name;
       wb.SheetNames.push(collection.createdAt.replace(/:\s*/g, "-").replace(".", " "));
-      collection.bodyFrames.forEach(function(frame) {
-        let eachRow = []
-        frame.joints.forEach(function(joint) {
-          eachRow.push(joint.cameraX, joint.cameraY, joint.cameraZ, joint.colorX, joint.colorY, joint.depthX, joint.depthY, joint.orientationW, joint.orientationX, joint.orientationY, joint.orientationZ)
+      collection.sets.forEach(function(set){
+        set.bodyFrames.forEach(function(frame) {
+          let eachRow = [];
+          frame.joints.forEach(function(joint) {
+            eachRow.push(joint.cameraX, joint.cameraY, joint.cameraZ, joint.colorX, joint.colorY, joint.depthX, joint.depthY, joint.orientationW, joint.orientationX, joint.orientationY, joint.orientationZ)
+          });
+          completeSheet.push(eachRow);
         })
-        completeSheet.push(eachRow);
-      })
+
+      });
     }
   });
 
@@ -53,36 +51,28 @@ function saveToFile(result, userId, exerciseId) {
           return buf;
   }
   let date = new Date();
-  let filename = patientName + '_' + exName + '_' + date.toLocaleTimeString() ;
+  let filename = userId + '_' + exerciseId + '_' + date.toLocaleTimeString() ;
   saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), filename + '.xlsx');
   console.log("Data ready for download!");
 }
 
-function downloadData(userAndExerciseIds) {
+function downloadData(userAndExerciseIds, id,isPractice) {
   successAlert('Data is being prepared, please wait.');
   var userId = userAndExerciseIds.split(",")[0]
   var exerciseId = userAndExerciseIds.split(",")[1]
-  console.log("ids:", userId, exerciseId);
   $(this).val('clicked');
-  let userList = {}
-  let patientUserIds = []
-
-  console.log("IDs=", patientUserIds)
 
   $.ajax({
     type: 'GET',
-    url: '/api/table/userexercise/reference' + '/' + userId,
+    url: '/api/practice/' + id,
     success: function (result) {
-      for ( var i=0; i<result.data.length; i++ )
+
+      for ( var i=0; i<result.sets.length; i++ )
       {
-        if(result.data[i].userId == userId)
-        {
-          // Decompress the data and put it back into the result variable
-          result.data[i].bodyFrames = JSON.parse(pako.inflate(result.data[i].bodyFrames, { to: 'string' }));
-        }
+        result.sets[i].bodyFrames = JSON.parse(pako.inflate(result.sets[i].bodyFrames, { to: 'string' }));
       }
       console.log("data=", result);
-      saveToFile(result, userId, exerciseId);
+      saveToFile([result], userId, exerciseId);
     },
     async: false,
     error: function (result) {
