@@ -12,14 +12,28 @@ function savePracticeToFile(result, userId, exerciseName, exerciseId, patientNam
       };
 
   let completeSheet = [];
+  let header = ["setIndex"];
+  let jointNum = 20;
+  let jointInfo = "joint.cameraX, joint.cameraY, joint.cameraZ, joint.colorX, joint.colorY, joint.depthX, joint.depthY, joint.orientationW, joint.orientationX, joint.orientationY, joint.orientationZ";
+  //creates column names
+  jointInfo = jointInfo.split(",").map(x => x.split(".")[1]);
+
+  for(var i = 0; i < jointNum; i++){
+    var cols = jointInfo.map(x => x+"_joint"+ i);
+    header = header.concat(cols);
+  }
+
+  completeSheet.push(header);
+
   result.forEach(function(collection) {
     if(collection.exerciseId === exerciseId)
     {
       // console.log("collection:", collection);
       wb.SheetNames.push(collection.createdAt.replace(/:\s*/g, "-").replace(".", " "));
-      collection.sets.forEach(function(set){
+      collection.sets.forEach(function(set,setIndex){
         set.bodyFrames.forEach(function(frame) {
           let eachRow = [];
+          eachRow.push(setIndex);
           frame.joints.forEach(function(joint) {
             eachRow.push(joint.cameraX, joint.cameraY, joint.cameraZ, joint.colorX, joint.colorY, joint.depthX, joint.depthY, joint.orientationW, joint.orientationX, joint.orientationY, joint.orientationZ)
           });
@@ -33,7 +47,7 @@ function savePracticeToFile(result, userId, exerciseName, exerciseId, patientNam
   console.log("SheetNames:", wb.SheetNames);
   // Workbook format:
   // 1. Each sheet is a reference exercise and sheet name is the timestamp
-  // 2. Each row of the sheet represents a bodyFrame has 220 data-points i.e. 20 joints * 11 data points -> joint[0].cameraX, joint[0].cameraY...joint[0].orientationY, joint[0].orientationZ.....joint[19].orientationY, joint[19].orientationZ.
+  // 2. Each row of the sheet represents a bodyFrame has 240 data-points i.e. 25 joints * 11 data points -> joint[0].cameraX, joint[0].cameraY...joint[0].orientationY, joint[0].orientationZ.....joint[19].orientationY, joint[19].orientationZ.
   // Row sample: joint[0].cameraX, joint[0].cameraY...joint[0].orientationY, joint[0].orientationZ.....joint[19].orientationY, joint[19].orientationZ.
   // 3. Each sheet has as many rows as the bodyFrames recorded for that reference exercise
   // 4. If there are more than one reference exercise (old stale data which we aren't deleting right now) then multiple sheets will be created in the workbook based on timestamp
@@ -44,6 +58,7 @@ function savePracticeToFile(result, userId, exerciseName, exerciseId, patientNam
   });
 
   var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
   function s2ab(s) {
           var buf = new ArrayBuffer(s.length);
           var view = new Uint8Array(buf);
