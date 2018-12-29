@@ -49,7 +49,7 @@
             ajax: {
                 url : "api/table/practiceExercise",
                 data: function (d) {
-                    d.fields = "_id exerciseName userId name exerciseId referenceId createdAt";
+                    d.fields = "_id exerciseName userId exerciseId referenceId createdAt";
                 }
             },
             columns: [
@@ -57,9 +57,6 @@
                 {
                   data: "createdAt",
                   render: function (data, type, row) {
-                    // console.log(data, type, row);
-                    // var date = new Date(row.createdAt);
-                    // var x = JSON.parse(pako.inflate(row.bodyFrames, { to: 'string' }));
 
                     userAndExerciseIds = [row.userId, row.exerciseId];
                     recordId =  row._id;

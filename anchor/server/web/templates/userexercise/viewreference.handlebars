@@ -10,7 +10,7 @@
                         <table id="userTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
                             <tr>
-                                <th></th>
+                                <th>Download Data</th>
                                 <th>name</th>
                                 <th>exerciseName</th>
                                 <th>UserId</th>
@@ -58,12 +58,9 @@
                 {
                   data: "createdAt",
                   render: function (data, type, row) {
-                    // console.log(data, type, row);
-                    // var date = new Date(row.createdAt);
-                    // var x = JSON.parse(pako.inflate(row.bodyFrames, { to: 'string' }));
 
                     userAndExerciseIds = [row.userId, row.exerciseId];
-                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadData(\'' + userAndExerciseIds + '\')">Download data</button>';
+                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadData(row._id, false)">Download data</button>';
                   }
 
                 },
@@ -131,5 +128,5 @@
         });
     });
 </script>
-<script type="text/javascript" src="public/scripts/userexercise/viewreference.js"></script>
+<script type="text/javascript" src="public/scripts/userexercise/viewReferenceAndPractice.js"></script>
 <link rel="stylesheet" href="public/css/styleSheet/genericStyles.css">
