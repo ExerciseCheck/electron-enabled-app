@@ -11,9 +11,10 @@
                             <thead>
                             <tr>
                                 <th>Data</th>
-                                <th>Record id</th>
+                                <th>Record Id</th>
                                 <th>exerciseName</th>
                                 <th>UserId</th>
+                                <th>Name</th>
                                 <th>ExerciseId</th>
                                 <th>createdAt</th>
                               {{#role user 'admin'}}
@@ -48,7 +49,7 @@
             ajax: {
                 url : "api/table/practiceExercise",
                 data: function (d) {
-                    d.fields = "_id exerciseName userId exerciseId createdAt";
+                    d.fields = "_id exerciseName userId name exerciseId referenceId createdAt";
                 }
             },
             columns: [
@@ -82,6 +83,11 @@
                     defaultContent: ""
                 },
                 {
+                  data: "name",
+                  visible: true,
+                  defaultContent: ""
+                },
+              {
                     data: "exerciseId",
                     visible: false,
                     defaultContent: ""

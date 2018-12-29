@@ -87,7 +87,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: 'userExercise/{type}/{id}',
+    path: '/table/practiceExercise',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -98,68 +98,59 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      // const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
-      // const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
-      // const limit = Number(request.query.length);
-      // const page = Math.ceil(Number(request.query.start) / limit) + 1;
-      // const fields = request.query.fields;
-      //
-      //
-      console.log(ObjectID(request.params.id));
+      const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
+      const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
+      const limit = Number(request.query.length);
+      const page = Math.ceil(Number(request.query.start) / limit) + 1;
+      const fields = request.query.fields;
 
-      const query = {
-        _id: new ObjectID(request.params.id)
-      };
+      PracticeExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
-      let modelName = request.params.type === 'reference' ? ReferenceExercise:PracticeExercise;
-      PracticeExercise.findOne(query, (err, results) => {
-        console.log("ggggggg");
-        console.log(results);
-      })
-      // modelName.pagedFind(query, fields, sort, limit, page, (err, results) => {
-      //
-      //   const referenceExercises = [];
-      //   Async.each(results.data, (referenceExercise, done) => {
-      //
-      //     User.findById(referenceExercise.userId, (err, user) => {
-      //
-      //       if (err) {
-      //         done(err);
-      //       }
-      //       if (user) {
-      //         referenceExercise.name = user.name;
-      //       }
-      //     });
-      //
-      //     Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
-      //
-      //       if (err) {
-      //         done(err);
-      //       }
-      //       if (exercise) {
-      //         referenceExercise.exerciseName = exercise.exerciseName;
-      //       }
-      //
-      //     });
-      //
-      //     referenceExercises.push(referenceExercise);
-      //   });
-      //
-      //   if (err) {
-      //     return reply(err);
-      //   }
-      //
-      //   reply({
-      //     draw: request.query.draw,
-      //     recordsTotal: results.data.length,
-      //     recordsFiltered: results.items.total,
-      //     data: referenceExercises,
-      //     error: err
-      //   });
-      // });
+        const referenceExercises = [];
+
+        Async.each(results.data, (referenceExercise, done) => {
+
+
+          User.findById(referenceExercise.userId, (err, user) => {
+
+            if (err) {
+              done(err);
+            }
+            //need this check because they might have been deleted
+            if (user) {
+              referenceExercise.name = user.name;
+            }
+          });
+
+          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+
+            if (err) {
+              done(err);
+            }
+            //need this check because they might have been deleted
+            if (exercise) {
+              referenceExercise.exerciseName = exercise.exerciseName;
+            }
+
+          });
+
+          referenceExercises.push(referenceExercise);
+        });
+
+        if (err) {
+          return reply(err);
+        }
+
+        reply({
+          draw: request.query.draw,
+          recordsTotal: results.data.length,
+          recordsFiltered: results.items.total,
+          data: referenceExercises,
+          error: err
+        });
+      });
     }
   });
-
 
 
   // this call does not seem to be used?
