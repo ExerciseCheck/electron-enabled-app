@@ -56,19 +56,6 @@
                 }
             },
             columns: [
-                {{#role user 'clinician'}}
-                {
-                  data: "createdAt",
-                  render: function (data, type, row) {
-                    recordId =  row._id;
-
-                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName.split(/[\s,]+/).join("_"), row.name.split(/[\s,]+/).join("_")];
-                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
-
-                  }
-
-                },
-                {{/role}}
                  {
                     data: "name",
                     defaultContent: ""
@@ -91,6 +78,19 @@
                     data: "numSets",
                     defaultContent: ""
                 },
+              {{#role user 'clinician'}}
+                {
+                  data: "createdAt",
+                  render: function (data, type, row) {
+                    recordId =  row._id;
+
+                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName, row.name];
+                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(userAndExerciseIds  ,\'' + recordId + '\')">Download</button>';
+
+                  }
+
+                },
+              {{/role}}
                 {
                     data: "numRepetition",
                     defaultContent: ""

@@ -113,8 +113,8 @@ function downloadDataForPractice(userAndExerciseIds, id) {
   successAlert('Data is being prepared, please wait.');
   var userId = userAndExerciseIds.split(",")[0]
   var exerciseId = userAndExerciseIds.split(",")[1]
-  var exerciseName = userAndExerciseIds.split(",")[2]
-  var patientName = userAndExerciseIds.split(",")[3]
+  var exerciseName = userAndExerciseIds[2].split(/[\s,]+/).join("_")
+  var patientName = userAndExerciseIds[3].split(/[\s,]+/).join("_")
   $(this).val('clicked');
 
   $.ajax({
@@ -138,10 +138,10 @@ function downloadDataForPractice(userAndExerciseIds, id) {
 
 function downloadDataForReference(userAndExerciseIds, id) {
   successAlert('Data is being prepared, please wait.');
-  var userId = userAndExerciseIds.split(",")[0]
-  var exerciseId = userAndExerciseIds.split(",")[1]
-  var exerciseName = userAndExerciseIds.split(",")[2]
-  var patientName = userAndExerciseIds.split(",")[3]
+  var userId = userAndExerciseIds[0]
+  var exerciseId = userAndExerciseIds[1]
+  var exerciseName = userAndExerciseIds[2].split(/[\s,]+/).join("_")
+  var patientName = userAndExerciseIds[3].split(/[\s,]+/).join("_")
 
   $(this).val('clicked');
 
@@ -152,7 +152,7 @@ function downloadDataForReference(userAndExerciseIds, id) {
       result.bodyFrames = JSON.parse(pako.inflate(result.bodyFrames, { to: 'string' }));
 
       console.log("data=", result);
-      savereferenceToFile([result], userId, exerciseName, exerciseId), patientName;
+      savereferenceToFile([result], userId, exerciseName, exerciseId, patientName);
     },
     async: false,
     error: function (result) {
