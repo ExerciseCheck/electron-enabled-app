@@ -60,8 +60,7 @@
 
                     userAndExerciseIds = [row.userId, row.exerciseId];
                     recordId =  row._id;
-                    // return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadData(\'' + userAndExerciseIds + '\', true)">Download data</button>';
-                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadData(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\', true)">Download</button>';
+                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForPractice(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
                   }
 
                 },

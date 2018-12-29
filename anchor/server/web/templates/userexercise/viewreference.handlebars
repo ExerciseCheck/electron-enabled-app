@@ -36,7 +36,9 @@
     var table;
     $(document).ready(function () {
         let userAndExerciseIds = [];
-        table = $('#userTable').DataTable({
+        let recordId = '';
+
+      table = $('#userTable').DataTable({
             processing: true,
             serverSide: true,
             scrollX: true,
@@ -50,7 +52,7 @@
             ajax: {
                 url : "api/table/refexercise",
                 data: function (d) {
-                    d.fields = "userId exerciseId numSets createdAt diffLevel name exerciseName numRepetition bodyFrames";
+                    d.fields = " _id userId exerciseId numSets createdAt diffLevel name exerciseName numRepetition";
                 }
             },
             columns: [
@@ -58,9 +60,10 @@
                 {
                   data: "createdAt",
                   render: function (data, type, row) {
-
+                    recordId =  row._id;
                     userAndExerciseIds = [row.userId, row.exerciseId];
-                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadData(row._id, false)">Download data</button>';
+                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
+
                   }
 
                 },
