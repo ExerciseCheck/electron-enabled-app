@@ -1,7 +1,7 @@
 'use strict';
 
 
-function savePracticeToFile(result, userId, exerciseId) {
+function savePracticeToFile(result, userId, exerciseName, exerciseId, patientName) {
   // Initialize workbook
   var wb = {SheetNames:[], Sheets:{}};
   wb.Props = {
@@ -51,13 +51,13 @@ function savePracticeToFile(result, userId, exerciseId) {
           return buf;
   }
   let date = new Date();
-  let filename = userId + '_' + exerciseId + '_' + date.toLocaleTimeString() ;
+  let filename = patientName + '_' + exerciseName + '_' + date.toLocaleTimeString() ;
   saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), filename + '.xlsx');
   console.log("Data ready for download!");
 }
 
 
-function savereferenceToFile(result, userId, exerciseId) {
+function savereferenceToFile(result, userId, exerciseName, exerciseId, patientName) {
   // Initialize workbook
   var wb = {SheetNames:[], Sheets:{}};
   wb.Props = {
@@ -104,7 +104,7 @@ function savereferenceToFile(result, userId, exerciseId) {
     return buf;
   }
   let date = new Date();
-  let filename = userId + '_' + exerciseId + '_' + date.toLocaleTimeString() ;
+  let filename = patientName + '_' + exerciseName + '_' + date.toLocaleTimeString() ;
   saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), filename + '.xlsx');
   console.log("Data ready for download!");
 }
@@ -113,6 +113,8 @@ function downloadDataForPractice(userAndExerciseIds, id) {
   successAlert('Data is being prepared, please wait.');
   var userId = userAndExerciseIds.split(",")[0]
   var exerciseId = userAndExerciseIds.split(",")[1]
+  var exerciseName = userAndExerciseIds.split(",")[2]
+  var patientName = userAndExerciseIds.split(",")[3]
   $(this).val('clicked');
 
   $.ajax({
@@ -125,7 +127,7 @@ function downloadDataForPractice(userAndExerciseIds, id) {
         result.sets[i].bodyFrames = JSON.parse(pako.inflate(result.sets[i].bodyFrames, { to: 'string' }));
       }
       console.log("data=", result);
-      savePracticeToFile([result], userId, exerciseId);
+      savePracticeToFile([result], userId, exerciseName, exerciseId, patientName);
     },
     async: false,
     error: function (result) {
@@ -138,6 +140,9 @@ function downloadDataForReference(userAndExerciseIds, id) {
   successAlert('Data is being prepared, please wait.');
   var userId = userAndExerciseIds.split(",")[0]
   var exerciseId = userAndExerciseIds.split(",")[1]
+  var exerciseName = userAndExerciseIds.split(",")[2]
+  var patientName = userAndExerciseIds.split(",")[3]
+
   $(this).val('clicked');
 
   $.ajax({
@@ -147,7 +152,7 @@ function downloadDataForReference(userAndExerciseIds, id) {
       result.bodyFrames = JSON.parse(pako.inflate(result.bodyFrames, { to: 'string' }));
 
       console.log("data=", result);
-      savereferenceToFile([result], userId, exerciseId);
+      savereferenceToFile([result], userId, exerciseName, exerciseId), patientName;
     },
     async: false,
     error: function (result) {

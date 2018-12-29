@@ -58,7 +58,7 @@
                   data: "createdAt",
                   render: function (data, type, row) {
 
-                    userAndExerciseIds = [row.userId, row.exerciseId];
+                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName.split(/[\s,]+/).join("_"), row.name.split(/[\s,]+/).join("_")];
                     recordId =  row._id;
                     return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForPractice(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
                   }
