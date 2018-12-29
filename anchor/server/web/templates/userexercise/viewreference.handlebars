@@ -10,7 +10,7 @@
                         <table id="userTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
                             <tr>
-                                <th>Download Data</th>
+                                <th>Data</th>
                                 <th>name</th>
                                 <th>exerciseName</th>
                                 <th>UserId</th>
@@ -61,7 +61,8 @@
                   data: "createdAt",
                   render: function (data, type, row) {
                     recordId =  row._id;
-                    userAndExerciseIds = [row.userId, row.exerciseId];
+
+                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName.split(/[\s,]+/).join("_"), row.name.split(/[\s,]+/).join("_")];
                     return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
 
                   }
