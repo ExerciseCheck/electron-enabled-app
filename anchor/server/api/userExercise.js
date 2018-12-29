@@ -40,9 +40,11 @@ internals.applyRoutes = function (server, next) {
 
       ReferenceExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
-        const referenceExercises = [];
-        Async.each(results.data, (referenceExercise, done) => {
+        var referenceExercises = [];
 
+        Async.each(results.data,
+
+          (referenceExercise, done) => {
 
           User.findById(referenceExercise.userId, (err, user) => {
 
@@ -52,35 +54,38 @@ internals.applyRoutes = function (server, next) {
             //need this check because they might have been deleted
             if (user) {
               referenceExercise.name = user.name;
+              Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+
+                if (err) {
+                  done(err);
+                }
+                //need this check because they might have been deleted
+                if (exercise) {
+                  referenceExercise.exerciseName = exercise.exerciseName;
+                }
+                referenceExercises.push(referenceExercise);
+                done();
+              });
+
             }
           });
+        },
 
-          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+          function(err){
+          if (err) {
+            return reply(err);
+          }
 
-            if (err) {
-              done(err);
-            }
-            //need this check because they might have been deleted
-            if (exercise) {
-              referenceExercise.exerciseName = exercise.exerciseName;
-            }
-
+          reply({
+            draw: request.query.draw,
+            recordsTotal: results.data.length,
+            recordsFiltered: results.items.total,
+            data: referenceExercises,
+            error: err
           });
 
-          referenceExercises.push(referenceExercise);
         });
 
-        if (err) {
-          return reply(err);
-        }
-
-        reply({
-          draw: request.query.draw,
-          recordsTotal: results.data.length,
-          recordsFiltered: results.items.total,
-          data: referenceExercises,
-          error: err
-        });
       });
     }
   });
@@ -106,10 +111,11 @@ internals.applyRoutes = function (server, next) {
 
       PracticeExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
-        const referenceExercises = [];
+        var referenceExercises = [];
 
-        Async.each(results.data, (referenceExercise, done) => {
+        Async.each(results.data,
 
+          (referenceExercise, done) => {
 
           User.findById(referenceExercise.userId, (err, user) => {
 
@@ -119,38 +125,42 @@ internals.applyRoutes = function (server, next) {
             //need this check because they might have been deleted
             if (user) {
               referenceExercise.name = user.name;
+              Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+
+                if (err) {
+                  done(err);
+                }
+                //need this check because they might have been deleted
+                if (exercise) {
+                  referenceExercise.exerciseName = exercise.exerciseName;
+                }
+                referenceExercises.push(referenceExercise);
+                done();
+              });
+
             }
           });
+        },
 
-          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+          function(err){
+          if (err) {
+            return reply(err);
+          }
 
-            if (err) {
-              done(err);
-            }
-            //need this check because they might have been deleted
-            if (exercise) {
-              referenceExercise.exerciseName = exercise.exerciseName;
-            }
-
+          reply({
+            draw: request.query.draw,
+            recordsTotal: results.data.length,
+            recordsFiltered: results.items.total,
+            data: referenceExercises,
+            error: err
           });
 
-          referenceExercises.push(referenceExercise);
         });
 
-        if (err) {
-          return reply(err);
-        }
-
-        reply({
-          draw: request.query.draw,
-          recordsTotal: results.data.length,
-          recordsFiltered: results.items.total,
-          data: referenceExercises,
-          error: err
-        });
       });
     }
   });
+
 
 
   // this call does not seem to be used?
