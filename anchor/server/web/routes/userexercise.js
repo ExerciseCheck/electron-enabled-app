@@ -31,6 +31,24 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
+    path: '/pracExercise',
+    config: {
+      auth: {
+        strategy: 'session'
+      }
+    },
+    handler: function (request, reply) {
+
+      return reply.view('userexercise/viewpractice', {
+        user: request.auth.credentials.user,
+        baseUrl: Config.get('/baseUrl'),
+        projectName: Config.get('/projectName')
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
     path: '/userexercise/reference/{userId}',
     config: {
       auth: {

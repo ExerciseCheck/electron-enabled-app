@@ -6,6 +6,7 @@ const DTW = require('../../../dtw');
 const Smoothing = require('../web/helpers/smoothingMethod');
 const Discard = require('../web/helpers/discardIndices');
 const Pako = require('pako');
+const ObjectID = require('mongodb').ObjectID;
 
 const internals = {};
 
@@ -39,9 +40,11 @@ internals.applyRoutes = function (server, next) {
 
       ReferenceExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
-        const referenceExercises = [];
-        Async.each(results.data, (referenceExercise, done) => {
+        var referenceExercises = [];
 
+        Async.each(results.data,
+
+          (referenceExercise, done) => {
 
           User.findById(referenceExercise.userId, (err, user) => {
 
@@ -51,42 +54,45 @@ internals.applyRoutes = function (server, next) {
             //need this check because they might have been deleted
             if (user) {
               referenceExercise.name = user.name;
+              Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+
+                if (err) {
+                  done(err);
+                }
+                //need this check because they might have been deleted
+                if (exercise) {
+                  referenceExercise.exerciseName = exercise.exerciseName;
+                }
+                referenceExercises.push(referenceExercise);
+                done();
+              });
+
             }
           });
+        },
 
-          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+          function(err){
+          if (err) {
+            return reply(err);
+          }
 
-            if (err) {
-              done(err);
-            }
-            //need this check because they might have been deleted
-            if (exercise) {
-              referenceExercise.exerciseName = exercise.exerciseName;
-            }
-
+          reply({
+            draw: request.query.draw,
+            recordsTotal: results.data.length,
+            recordsFiltered: results.items.total,
+            data: referenceExercises,
+            error: err
           });
 
-          referenceExercises.push(referenceExercise);
         });
 
-        if (err) {
-          return reply(err);
-        }
-
-        reply({
-          draw: request.query.draw,
-          recordsTotal: results.data.length,
-          recordsFiltered: results.items.total,
-          data: referenceExercises,
-          error: err
-        });
       });
     }
   });
 
   server.route({
     method: 'GET',
-    path: '/table/userexercise/reference/{userId}',
+    path: '/table/practiceExercise',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -103,50 +109,54 @@ internals.applyRoutes = function (server, next) {
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
 
-      const query = {
-        userId: request.params.userId,
-      };
+      PracticeExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
 
-      ReferenceExercise.pagedFind(query, fields, sort, limit, page, (err, results) => {
+        var referenceExercises = [];
 
-        const referenceExercises = [];
-        Async.each(results.data, (referenceExercise, done) => {
+        Async.each(results.data,
+
+          (referenceExercise, done) => {
 
           User.findById(referenceExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
             }
+            //need this check because they might have been deleted
             if (user) {
               referenceExercise.name = user.name;
+              Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+
+                if (err) {
+                  done(err);
+                }
+                //need this check because they might have been deleted
+                if (exercise) {
+                  referenceExercise.exerciseName = exercise.exerciseName;
+                }
+                referenceExercises.push(referenceExercise);
+                done();
+              });
+
             }
           });
+        },
 
-          Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+          function(err){
+          if (err) {
+            return reply(err);
+          }
 
-            if (err) {
-              done(err);
-            }
-            if (exercise) {
-              referenceExercise.exerciseName = exercise.exerciseName;
-            }
-
+          reply({
+            draw: request.query.draw,
+            recordsTotal: results.data.length,
+            recordsFiltered: results.items.total,
+            data: referenceExercises,
+            error: err
           });
 
-          referenceExercises.push(referenceExercise);
         });
 
-        if (err) {
-          return reply(err);
-        }
-
-        reply({
-          draw: request.query.draw,
-          recordsTotal: results.data.length,
-          recordsFiltered: results.items.total,
-          data: referenceExercises,
-          error: err
-        });
       });
     }
   });
@@ -469,7 +479,7 @@ internals.applyRoutes = function (server, next) {
 
   server.route({
     method: 'GET',
-    path: '/userexercise/{id}',
+    path: '/reference/{id}',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -478,6 +488,31 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       ReferenceExercise.findById(request.params.id, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!document) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply(document);
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/practice/{id}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session']
+      }
+    },
+    handler: function (request, reply) {
+
+      PracticeExercise.findById(request.params.id, (err, document) => {
 
         if (err) {
           return reply(err);
