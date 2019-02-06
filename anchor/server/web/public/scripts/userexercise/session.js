@@ -673,10 +673,8 @@ $('.actionBtn').click(function() {
     console.log("top_thresh: " + top_thresh);
     console.log("bottom_thresh: " + bottom_thresh);
 
-    console.log("required num of Repetitions: " + numReps);
-    console.log("reps completed: " + document.getElementById("cntReps").innerHTML);
-
-    if (document.getElementById("cntReps").innerHTML < numReps) {
+    let n = parseInt(document.getElementById("cntReps").innerHTML);
+    if (n < numReps) {
       // direction group: (down, right), (up, left)
       if ((threshold_flag === 'up') && (currR < top_thresh)) {
         // goes up and pass the top_thresh
@@ -696,18 +694,11 @@ $('.actionBtn').click(function() {
         // console.log("No flip");
         return [reps, threshold_flag];
       }
-    } else if (document.getElementById("cntReps").innerHTML === numReps && threshold_flag !== direction) {
+    } else if (n === numReps && threshold_flag !== direction) {
       // goes back to the resting position
       if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
-        //TODO
-        //wait for two seconds
-        stateChange(-1);
-        //stop recording
-        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
-        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames_compressed});
-        request.onsuccess = function(e) {
-          redirect();
-        }
+        stateChange(-1); //wait for two seconds
+        //TODO: stop recording
       }
       return [reps, threshold_flag];
     }
@@ -715,7 +706,7 @@ $('.actionBtn').click(function() {
     function stateChange(newState) {
       setTimeout(function () {
         if (newState == -1) {
-          alert('Recording stopped');
+          alert('Recording should stop now');
         }
       }, 2000);
     }
@@ -812,10 +803,6 @@ $('.actionBtn').click(function() {
             document.getElementById("cntReps").innerHTML = n;
             localStorage.setItem("numRepsCompleted", n);
 
-            if (tempCnt[2] === n) {
-              //TODO
-              //wait then auto stop
-            }
           }
         }
       }
