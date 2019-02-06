@@ -626,7 +626,9 @@ $('.actionBtn').click(function() {
   /*
    * diff_level = {(easy:0.5), (normal:0.75), (hard:0.9)}
    * base_thresh = 0.1
-   * numReps is used for detecting when to stop
+   *
+   * returns [reps, direction_flag, stop_flag]
+   * reps is either 0 or 1
    */
   function countReps(body, threshold_flag, diff_level, base_thresh, numReps) {
 
@@ -671,7 +673,10 @@ $('.actionBtn').click(function() {
     console.log("top_thresh: " + top_thresh);
     console.log("bottom_thresh: " + bottom_thresh);
 
-    if (reps < numReps) {
+    console.log("required num of Repetitions: " + numReps);
+    console.log("reps completed: " + document.getElementById("cntReps").innerHTML);
+
+    if (document.getElementById("cntReps").innerHTML < numReps) {
       // direction group: (down, right), (up, left)
       if ((threshold_flag === 'up') && (currR < top_thresh)) {
         // goes up and pass the top_thresh
@@ -691,7 +696,7 @@ $('.actionBtn').click(function() {
         // console.log("No flip");
         return [reps, threshold_flag];
       }
-    } else if (threshold_flag !== direction) {
+    } else if (document.getElementById("cntReps").innerHTML === numReps && threshold_flag !== direction) {
       // goes back to the resting position
       if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
         //TODO
@@ -704,6 +709,7 @@ $('.actionBtn').click(function() {
           redirect();
         }
       }
+      return [reps, threshold_flag];
     }
 
     function stateChange(newState) {
@@ -797,13 +803,19 @@ $('.actionBtn').click(function() {
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
             console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
-            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.1, dataForCntReps.numRepetition);
+
+            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.1, dataForCntReps.numReps);
             // let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
             let n = parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
             document.getElementById("cntReps").innerHTML = n;
             localStorage.setItem("numRepsCompleted", n);
+
+            if (tempCnt[2] === n) {
+              //TODO
+              //wait then auto stop
+            }
           }
         }
       }

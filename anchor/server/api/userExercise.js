@@ -399,7 +399,7 @@ internals.applyRoutes = function (server, next) {
               dataForCntReps['refTime'] = reference.refTime;
               // numbers between [0,1]
               dataForCntReps['diffLevel'] = reference.diffLevel;
-              dataForCntReps['numRep'] = reference.numRepetition;
+              dataForCntReps['numReps'] = reference.numRepetition;
             }
           }
           let exercise = results.findExercise;
