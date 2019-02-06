@@ -223,7 +223,6 @@ function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
     }
   });
 
-  //TODO: set threshold for comment and return feedback as words
   document.getElementById("acc").innerHTML = (accuracy*100).toFixed(2) + "%";
   document.getElementById("spd").innerHTML = (speed*100).toFixed(2) + "%";
 
@@ -626,9 +625,10 @@ $('.actionBtn').click(function() {
 
   /*
    * diff_level = {(easy:0.5), (normal:0.75), (hard:0.9)}
-   * base_thresh = 0.25
+   * base_thresh = 0.1
+   * numReps is used for detecting when to stop
    */
-  function countReps(body, threshold_flag, diff_level, base_thresh) {
+  function countReps(body, threshold_flag, diff_level, base_thresh, numReps) {
 
     let reps = 0;
     let norm, ref_norm; // the position of the joint-for-norm
@@ -660,6 +660,7 @@ $('.actionBtn').click(function() {
     let range = ref_max - ref_min;
     let top_thresh, bottom_thresh;
     console.log("ref_min, ref_max: " + ref_min + "\t" + ref_max);
+
     if (direction === 'up') {
       top_thresh = ref_min + range * (1-diff_level);
       bottom_thresh = ref_max - range * base_thresh;
@@ -669,25 +670,50 @@ $('.actionBtn').click(function() {
     }
     console.log("top_thresh: " + top_thresh);
     console.log("bottom_thresh: " + bottom_thresh);
-    // direction group: (down, right), (up, left)
-    if ((threshold_flag === 'up') && (currR < top_thresh)) {
-      // goes up and pass the top_thresh
-      // only increase reps when moving in the same direction as defined in the exercise:
-      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-        reps++;
+
+    if (reps < numReps) {
+      // direction group: (down, right), (up, left)
+      if ((threshold_flag === 'up') && (currR < top_thresh)) {
+        // goes up and pass the top_thresh
+        // only increase reps when moving in the same direction as defined in the exercise:
+        if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+          reps++;
+        }
+        return [reps, 'down'];
+      } else if ((threshold_flag === 'down') && (currR > bottom_thresh)) {
+        // goes down and pass the bottom_thresh
+        // only increase reps when moving in the same direction as defined in the exercise:
+        if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+          reps++;
+        }
+        return [reps, 'up'];
+      } else {
+        // console.log("No flip");
+        return [reps, threshold_flag];
       }
-      return [reps, 'down'];
-    } else if ((threshold_flag === 'down') && (currR > bottom_thresh)) {
-      // goes down and pass the bottom_thresh
-      // only increase reps when moving in the same direction as defined in the exercise:
-      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-        reps++;
+    } else if (threshold_flag !== direction) {
+      // goes back to the resting position
+      if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
+        //TODO
+        //wait for two seconds
+        stateChange(-1);
+        //stop recording
+        liveFrames_compressed = pako.deflate(JSON.stringify(liveFrames), { to: 'string' });
+        let request = db.transaction(['bodyFrames'], 'readwrite').objectStore('bodyFrames').put({type: 'liveFrames', body: liveFrames_compressed});
+        request.onsuccess = function(e) {
+          redirect();
+        }
       }
-      return [reps, 'up'];
-    } else {
-      // console.log("No flip");
-      return [reps, threshold_flag];
     }
+
+    function stateChange(newState) {
+      setTimeout(function () {
+        if (newState == -1) {
+          alert('Recording stopped');
+        }
+      }, 2000);
+    }
+
   }
 
   // patient reaching out for button makes body NOT in plane
@@ -771,7 +797,8 @@ $('.actionBtn').click(function() {
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
             console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
-            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
+            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.1, dataForCntReps.numRepetition);
+            // let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
             let n = parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
