@@ -50,12 +50,7 @@ li.text {
   }
 
 
-#ref-button-1 {
-  background-color: #35d503;
-  border-color: #35d503;
-}
-
-#ref-button-2 {
+#ref-button {
   background-color: #35d503;
   border-color: #35d503;
 }

@@ -23,13 +23,16 @@
 
 
       <div class="container" id="button-container">
+      <div class="button-wrapper-2">
 
         {{#each refVideoLinks}}
             <button type="button" id="ref-button" class="btn btn-primary video-btn" data-toggle="modal"
+            data-src={{this}}> Play Video
         {{/each}}
-        
-      <div class="button-wrapper-2">
-      <button type="button" id="ref-button-1" class="btn btn-primary video-btn" data-toggle="modal"
+
+      </div>
+
+      <!-- <button type="button" id="ref-button" class="btn btn-primary video-btn" data-toggle="modal"
 
        data-src5="https://www.youtube.com/embed/Av8WcZ-7sPU"
        data-src7="https://www.youtube.com/embed/Av8WcZ-7sPU"
@@ -41,28 +44,19 @@
 
 
         Play Video 1
-      </button></div>
+      </button></div> -->
 
       <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary video-btn" id="ref-button-2" data-toggle="modal"
-
-      data-src5="https://www.youtube.com/embed/Av8WcZ-7sPU"
-      data-src7="https://youtube.com/embed/VLvZXDkVwys"
-
-
-
-
-
-
+<!-- <button type="button" class="btn btn-primary video-btn" id="ref-button" data-toggle="modal"
 
 
 
  data-target="#myModal">
 Play Video 2
-</button>
+</button> -->
 
         <div class="button-wrapper-1">
-          <a href ='/userexercise/setting/{{exerciseName}}/'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
+          <a href ='/userexercise/setting/'><button class="btn btn-primary blueBackground white actionBtn">Continue</button></a>
         </div>
       </div>
         <br><br>
@@ -108,7 +102,10 @@ Play Video 2
 </div>
 
 <script> let exerciseName = "{{exerciseName}}"; </script>
+<script> let refVideoLinks = "{{{refVideoLinks}}}"; </script>
 <script type="text/javascript" src="/public/scripts/userexercise/exerciseinfo.js"></script>
 <script type="text/javascript" src="/public/scripts/userexercise/setting.js"></script>
 <script type="text/javascript" src="/public/scripts/clinician.js"></script>
+
+
 <link rel="stylesheet" href="/public/css/styleSheet/exerciseInfo.css">

@@ -20,6 +20,8 @@ $('#update').click((event) => {
   const values = {};
   $.each($('#form').serializeArray(), (i, field) => {
     values[field.name] = field.value;
+
+
   });
   $.ajax({
     type: 'PUT',
@@ -27,6 +29,7 @@ $('#update').click((event) => {
     data: values,
     success: function (result) {
       window.location = '/exercise'
+
     },
     error: function (result) {
       errorAlert(result.responseJSON.message);
