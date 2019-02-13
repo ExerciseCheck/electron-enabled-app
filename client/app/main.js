@@ -44,7 +44,7 @@ function createWindow() {
         type: 'question',
         buttons: ['Yes', 'No'],
         title: 'Confirm',
-        message: 'Are you sure you want to quit? Any unsaved progress will be lost.'
+        message: 'Are you sure you want to quit? Any unsaved progress will be lost. '
       });
     if(choice == 1){
       e.preventDefault();

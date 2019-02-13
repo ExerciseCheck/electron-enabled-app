@@ -19,12 +19,14 @@ window.onbeforeunload = (e) => {
   if (window.actionBtn) {
     return;
   }
-
-  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
-    return;
-  }
-  else {
-    return false;
+  //TODO: test
+  if (parseInt(document.getElementById("cntReps").innerHTML) !== dataForCntReps.numReps) {
+    if (confirm('Are you sure you want to quit? Incomplete session data will be lost. Hahahah')) {
+      return;
+    }
+    else {
+      return false;
+    }
   }
 }
 
@@ -100,11 +102,7 @@ function action(nextMode, type) {
       var redirectToUrl = 'userexercise/session/' + nextMode + '/' + type + '/' + exerciseId + '/';
       window.location = (!parsedURL.patientId) ? redirectToUrl : redirectToUrl + patientId;
     }
-    // if(nextMode === 'play'){
-      //call data for count reps here and redicrect on success
-      // fetch data before start exercise
 
-//    }
     //This condition describes the end of an update or create reference.
     //The refFrames data in local storage gets set to the most recent frames.
     if(nextMode === 'stop' && type === 'reference') {
@@ -285,24 +283,6 @@ function goToExercises() {
   window.location = 'clinician/patientexercises/' + patientId;
 }
 
-window.onbeforeunload = (e) => {
-
-  if (actionBtn) {
-    return;
-  }
-
-  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
-    return;
-  }
-  else {
-    // electron treats any return value that is not 'null' as intent to stay on the page
-    return false;
-  }
-};
-
-$('.actionBtn').click(function() {
-  actionBtn = true;
-});
 
 (function ()
 {
@@ -697,18 +677,10 @@ $('.actionBtn').click(function() {
     } else if (n === numReps && threshold_flag !== direction) {
       // goes back to the resting position
       if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
-        stateChange(-1); //wait for two seconds
-        //TODO: stop recording
+        setTimeout(action('stop', 'practice'), 2000);
+        // action('stop', 'practice');
       }
       return [reps, threshold_flag];
-    }
-
-    function stateChange(newState) {
-      setTimeout(function () {
-        if (newState == -1) {
-          alert('Recording should stop now');
-        }
-      }, 2000);
     }
 
   }
