@@ -19,12 +19,14 @@ window.onbeforeunload = (e) => {
   if (window.actionBtn) {
     return;
   }
-
-  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
-    return;
-  }
-  else {
-    return false;
+  //TODO: test
+  if (parseInt(document.getElementById("cntReps").innerHTML) !== dataForCntReps.numReps) {
+    if (confirm('Are you sure you want to quit? Incomplete session data will be lost. Hahahah')) {
+      return;
+    }
+    else {
+      return false;
+    }
   }
 }
 
@@ -309,24 +311,6 @@ function goToExercises() {
   window.location = 'clinician/patientexercises/' + patientId;
 }
 
-window.onbeforeunload = (e) => {
-
-  if (actionBtn) {
-    return;
-  }
-
-  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
-    return;
-  }
-  else {
-    // electron treats any return value that is not 'null' as intent to stay on the page
-    return false;
-  }
-};
-
-$('.actionBtn').click(function() {
-  actionBtn = true;
-});
 
 (function ()
 {
@@ -650,9 +634,12 @@ $('.actionBtn').click(function() {
 
   /*
    * diff_level = {(easy:0.5), (normal:0.75), (hard:0.9)}
-   * base_thresh = 0.25
+   * base_thresh = 0.1
+   *
+   * returns [reps, direction_flag]
+   * reps is either 0 or 1
    */
-  function countReps(body, threshold_flag, diff_level, base_thresh) {
+  function countReps(body, threshold_flag, diff_level, base_thresh, numReps) {
 
     let reps = 0;
     let norm, ref_norm; // the position of the joint-for-norm
@@ -693,23 +680,34 @@ $('.actionBtn').click(function() {
     }
     console.log("top_thresh: " + top_thresh);
     console.log("bottom_thresh: " + bottom_thresh);
-    // direction group: (down, right), (up, left)
-    if ((threshold_flag === 'up') && (currR < top_thresh)) {
-      // goes up and pass the top_thresh
-      // only increase reps when moving in the same direction as defined in the exercise:
-      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-        reps++;
+
+    let n = parseInt(document.getElementById("cntReps").innerHTML);
+    if (n < numReps) {
+      // direction group: (down, right), (up, left)
+      if ((threshold_flag === 'up') && (currR < top_thresh)) {
+        // goes up and pass the top_thresh
+        // only increase reps when moving in the same direction as defined in the exercise:
+        if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+          reps++;
+        }
+        return [reps, 'down'];
+      } else if ((threshold_flag === 'down') && (currR > bottom_thresh)) {
+        // goes down and pass the bottom_thresh
+        // only increase reps when moving in the same direction as defined in the exercise:
+        if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
+          reps++;
+        }
+        return [reps, 'up'];
+      } else {
+        // console.log("No flip");
+        return [reps, threshold_flag];
       }
-      return [reps, 'down'];
-    } else if ((threshold_flag === 'down') && (currR > bottom_thresh)) {
-      // goes down and pass the bottom_thresh
-      // only increase reps when moving in the same direction as defined in the exercise:
-      if (threshold_flag === direction && isBodyInPlane(nz_1stFrame, body.joints[2].cameraZ)) {
-        reps++;
+    } else if (n === numReps && threshold_flag !== direction) {
+      // goes back to the resting position
+      if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
+        setTimeout(action('stop', 'practice'), 2000);
+        // action('stop', 'practice');
       }
-      return [reps, 'up'];
-    } else {
-      // console.log("No flip");
       return [reps, threshold_flag];
     }
   }
@@ -795,7 +793,9 @@ $('.actionBtn').click(function() {
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
             console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
-            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
+
+            let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.1, dataForCntReps.numReps);
+            // let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
             let n = parseInt(document.getElementById("cntReps").innerHTML) + parseInt(tempCnt[0]);
