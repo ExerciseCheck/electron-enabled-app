@@ -2,3 +2,5 @@
 *.iml
 data/
 *.js.orig
+anchor/excheck.log
+anchor/echeck-err.log
