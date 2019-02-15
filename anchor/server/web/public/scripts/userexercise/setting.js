@@ -154,6 +154,9 @@ function createRef() {
   const redirectToUrl = 'userexercise/session/start/reference/' +
                             getExerciseId() + '/' + getPatientId();
 
+  const numSets = $("#numSets").val();
+  const numReps = $("#numReps").val();
+  const diffLevel = $("#diffLevel").val();
   $.get(url, function(data){
 
     if ( data.settingIsUpdated ) {
@@ -161,7 +164,7 @@ function createRef() {
     }
 
     else {
-      initialSetting(1, 1, 0.75, getExerciseId(), getPatientId(), redirectToUrl);
+      initialSetting(numSets, numReps, diffLevel, getExerciseId(), getPatientId(), redirectToUrl);
     }
   });
 }
