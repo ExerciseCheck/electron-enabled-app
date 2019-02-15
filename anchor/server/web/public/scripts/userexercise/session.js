@@ -19,15 +19,14 @@ window.onbeforeunload = (e) => {
   if (window.actionBtn) {
     return;
   }
-  //TODO: test
-  if (parseInt(document.getElementById("cntReps").innerHTML) !== dataForCntReps.numReps) {
-    if (confirm('Are you sure you want to quit? Incomplete session data will be lost. Hahahah')) {
-      return;
-    }
-    else {
-      return false;
-    }
+
+  if (confirm('Are you sure you want to quit? Incomplete session data will be lost. Hahahah')) {
+    return;
   }
+  else {
+    return false;
+  }
+
 }
 
 $('.actionBtn').click(function() {
