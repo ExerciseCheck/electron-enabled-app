@@ -12,6 +12,7 @@ let refJointColor = "#FF6786";
 let MAX_BODYFRAMES_STORED = 4400;
 let framesExceededLimit = false;
 let threshold_flag, direction;
+let angle = 0;
 
 window.actionBtn = false;
 
@@ -548,6 +549,35 @@ $('.actionBtn').click(function() {
 
   }
 
+  function drawStop(parameters, ctx) {
+    let x = parameters.x;
+    let y = parameters.y;
+    let rot = parameters.rotation;
+    let cor = parameters.corners;
+    let hand_x = parameters.hx;
+    let hand_y = parameters.hy;
+    let r = parameters.radius;
+    ctx.beginPath();
+    ctx.strokeStyle = "#ff0000";
+    ctx.fillStyle = "#ff0000";
+    ctx.lineWidth = 2;
+    for (var i = 0; i <= rot; i++) {
+        var angle = i * 2 * Math.PI / cor - Math.PI / 2 + rot;
+        ctx.lineTo(x + r * Math.cos(angle), y + r * Math.sin(angle));
+    }
+    ctx.stroke();
+    ctx.fill();
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("STOP", canvas.width/4 * 3, canvas.height/11 * 3.001);
+    ctx.closePath();
+    let dist = Math.sqrt(Math.pow((hand_x - x),2) + Math.pow((hand_y - y), 2))
+    
+    if(dist <= r){
+      //When person's hand enters stop, the practice session will stop
+      action('stop', 'practice');
+    }
+}
 
   function startTimer() {
     let start = Date.now();
@@ -673,17 +703,17 @@ $('.actionBtn').click(function() {
     }
 
     let currR = ref_d / d * (body.joints[dataForCntReps.joint][dataForCntReps.axis] - norm) + ref_norm;
-    console.log("ref_d: " + ref_d);
-    console.log("ref_norm: " + ref_norm);
-    console.log("d: " + d);
-    console.log("norm: " + norm);
-    console.log("currR: " + currR);
+    // console.log("ref_d: " + ref_d);
+    // console.log("ref_norm: " + ref_norm);
+    // console.log("d: " + d);
+    // console.log("norm: " + norm);
+    // console.log("currR: " + currR);
 
     let ref_min = dataForCntReps.refMin; //upper
     let ref_max = dataForCntReps.refMax; //lower
     let range = ref_max - ref_min;
     let top_thresh, bottom_thresh;
-    console.log("ref_min, ref_max: " + ref_min + "\t" + ref_max);
+    // console.log("ref_min, ref_max: " + ref_min + "\t" + ref_max);
     if (direction === 'up') {
       top_thresh = ref_min + range * (1-diff_level);
       bottom_thresh = ref_max - range * base_thresh;
@@ -691,8 +721,8 @@ $('.actionBtn').click(function() {
       top_thresh = ref_min + range * base_thresh;
       bottom_thresh = ref_max - range * (1-diff_level);
     }
-    console.log("top_thresh: " + top_thresh);
-    console.log("bottom_thresh: " + bottom_thresh);
+    // console.log("top_thresh: " + top_thresh);
+    // console.log("bottom_thresh: " + bottom_thresh);
     // direction group: (down, right), (up, left)
     if ((threshold_flag === 'up') && (currR < top_thresh)) {
       // goes up and pass the top_thresh
@@ -725,7 +755,7 @@ $('.actionBtn').click(function() {
   //only start drawing with a body frame is detected
   //even though
 
-
+  let x = 1
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
@@ -769,6 +799,11 @@ $('.actionBtn').click(function() {
         //draw the body skeleton in live canvas
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
+        //set up the stop button. x is for rotation, just for fun. maybe we can add some animations to the stop button
+        x = x + 0.1
+        drawStop({x: canvas.width/4 * 3, y: canvas.height/4, corners: 8, radius: 50, rotation: x, 
+                  hx: body.joints[11].depthX * width, hy: body.joints[11].depthY * height}, ctx);
+
         document.addEventListener('timer-done', function(evt){
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
@@ -794,7 +829,7 @@ $('.actionBtn').click(function() {
           }
           if ((parsedURL.type === 'practice') && (parsedURL.mode === 'play')) {
             // countReps and timing
-            console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
+            // console.log("Here: " + dataForCntReps.diffLevel + "\t" + threshold_flag);
             let tempCnt = countReps(body, threshold_flag, dataForCntReps.diffLevel, 0.25);
 
             threshold_flag = tempCnt[1];
