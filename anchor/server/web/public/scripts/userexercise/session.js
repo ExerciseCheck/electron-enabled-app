@@ -20,7 +20,7 @@ window.onbeforeunload = (e) => {
     return;
   }
 
-  if (confirm('Are you sure you want to quit? Incomplete session data will be lost. Hahahah')) {
+  if (confirm('Are you sure you want to quit? Incomplete session data will be lost. ^-^ ')) {
     return;
   }
   else {
@@ -704,6 +704,7 @@ function goToExercises() {
     } else if (n === numReps && threshold_flag !== direction) {
       // goes back to the resting position
       if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
+        window.actionBtn = true;
         setTimeout(action('stop', 'practice'), 2000);
         // action('stop', 'practice');
       }
