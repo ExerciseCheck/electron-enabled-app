@@ -572,9 +572,11 @@ $('.actionBtn').click(function() {
     ctx.fillText("STOP", canvas.width/4 * 3, canvas.height/11 * 3.001);
     ctx.closePath();
     let dist = Math.sqrt(Math.pow((hand_x - x),2) + Math.pow((hand_y - y), 2))
-    
+
+
     if(dist <= r){
       //When person's hand enters stop, the practice session will stop
+      window.actionBtn = true;
       action('stop', 'practice');
     }
 }
