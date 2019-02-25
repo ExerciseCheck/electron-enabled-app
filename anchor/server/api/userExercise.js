@@ -869,12 +869,13 @@ internals.applyRoutes = function (server, next) {
           // For normalization:
           // console.log("requestPayload=", requestPayload.bodyFrames);
           let bodyFrames_decompressed = JSON.parse(Pako.inflate(requestPayload.bodyFrames, { to: 'string' }));
-         // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
+          // console.log("bodyFrames_decompressed", bodyFrames_decompressed);
           let prac_shoulderL2R = bodyFrames_decompressed[0].joints[8]["depthX"] - bodyFrames_decompressed[0].joints[4]["depthX"];
           let prac_neck2base = bodyFrames_decompressed[0].joints[0]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"];
           //let prac_depth = ??
 
-          for (let i=0; i<bodyFrames_decompressed.length; ++i) {
+          //for (let i=0; i<bodyFrames_decompressed.length; ++i) {
+          for (let i=0; i<bodyFrames_decompressed.length-30*2; ++i) {  //remove the last 2 seconds in the practice
             prac_impt_joint_X.push((bodyFrames_decompressed[i].joints[theJoint]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
             prac_impt_joint_Y.push((bodyFrames_decompressed[i].joints[theJoint]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
             prac_impt_joint_Z.push(bodyFrames_decompressed[i].joints[theJoint]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
