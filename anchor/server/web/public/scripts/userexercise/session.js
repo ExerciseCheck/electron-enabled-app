@@ -250,6 +250,9 @@ function showFeedback(accuracy, speed, exerciseId, patientId, isComplete) {
 
   document.getElementById("acc").innerHTML = acc_words;
   document.getElementById("spd").innerHTML = spd_words;
+  // document.getElementById("acc").innerHTML = accuracy;
+  // document.getElementById("spd").innerHTML = speed;
+
 
   // Get the modal
   let modal = document.getElementById('fdbkModal');
@@ -560,11 +563,11 @@ $('.actionBtn').click(function() {
     let r = parameters.radius;
     let type = parameters.parsedURL.type;
     let mode = parameters.parsedURL.mode;
-    let alpha = 0.5;
+    let alpha = 0.3;
     ctx.beginPath();
     ctx.strokeStyle = "#ff0000";
     // Make the stop sign solid when it is below the stop threshold
-    if(hand_z < 1.4){
+    if(hand_z < 2.4){
       alpha = 1;
     }
     ctx.fillStyle = "rgba(255, 0, 0, " + alpha + ")";
@@ -584,7 +587,7 @@ $('.actionBtn').click(function() {
     
     // Stop button only works when the exercise has started i.e. mode == play
     // hand_z decreases as you get closer to the Kinect. Value 1.4 is about 3 steps away from the Kinect
-    if(dist <= r && mode == 'play' && hand_z < 1.4){
+    if(dist <= r && mode == 'play' && hand_z < 2.4){
       //When person's hand enters stop, the practice session will stop
       window.actionBtn = true;
       action('stop', type);

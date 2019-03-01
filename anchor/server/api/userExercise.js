@@ -875,7 +875,7 @@ internals.applyRoutes = function (server, next) {
           //let prac_depth = ??
 
           //for (let i=0; i<bodyFrames_decompressed.length; ++i) {
-          for (let i=0; i<bodyFrames_decompressed.length-30*2; ++i) {  //remove the last 2 seconds in the practice
+          for (let i=0; i<bodyFrames_decompressed.length-30; ++i) {  //remove the last 1 seconds in the practice
             prac_impt_joint_X.push((bodyFrames_decompressed[i].joints[theJoint]["depthX"] - bodyFrames_decompressed[0].joints[2]["depthX"]) / prac_shoulderL2R);
             prac_impt_joint_Y.push((bodyFrames_decompressed[i].joints[theJoint]["depthY"] - bodyFrames_decompressed[0].joints[2]["depthY"]) / prac_neck2base);
             prac_impt_joint_Z.push(bodyFrames_decompressed[i].joints[theJoint]["cameraZ"] - bodyFrames_decompressed[0].joints[2]["cameraZ"]);
@@ -901,7 +901,8 @@ internals.applyRoutes = function (server, next) {
           let ref_neck2base = refBodyframes[0].joints[0]["depthY"] - refBodyframes[0].joints[2]["depthY"];
           //let ref_depth = ??
 
-          for (let i=0; i<refBodyframes.length; ++i) {
+          //for (let i=0; i<refBodyframes.length; ++i) {
+          for (let i=0; i<refBodyframes.length - 30; ++i) {  // remove the last 1 seconds in reference as well
             ref_impt_joint_X.push(
               (refBodyframes[i].joints[theJoint]["depthX"] - refJointNeck["depthX"]) / ref_shoulderL2R);
             ref_impt_joint_Y.push(
