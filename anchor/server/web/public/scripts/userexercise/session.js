@@ -560,9 +560,14 @@ $('.actionBtn').click(function() {
     let r = parameters.radius;
     let type = parameters.parsedURL.type;
     let mode = parameters.parsedURL.mode;
+    let alpha = 0.5;
     ctx.beginPath();
     ctx.strokeStyle = "#ff0000";
-    ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+    // Make the stop sign solid when it is below the stop threshold
+    if(hand_z < 1.4){
+      alpha = 1;
+    }
+    ctx.fillStyle = "rgba(255, 0, 0, " + alpha + ")";
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
     ctx.lineWidth = 10;
     for (var i = 0; i <= rot; i++) {
@@ -578,8 +583,8 @@ $('.actionBtn').click(function() {
     let dist = Math.sqrt(Math.pow((hand_x - x),2) + Math.pow((hand_y - y), 2))
     
     // Stop button only works when the exercise has started i.e. mode == play
-    // hand_z decreases as you get closer to the Kinect. Value 1.2 is about 2.5 steps away from the Kinect
-    if(dist <= r && mode == 'play' && hand_z < 1.2){
+    // hand_z decreases as you get closer to the Kinect. Value 1.4 is about 3 steps away from the Kinect
+    if(dist <= r && mode == 'play' && hand_z < 1.4){
       //When person's hand enters stop, the practice session will stop
       window.actionBtn = true;
       action('stop', type);
