@@ -313,24 +313,6 @@ function goToExercises() {
   window.location = 'clinician/patientexercises/' + patientId;
 }
 
-window.onbeforeunload = (e) => {
-
-  if (actionBtn) {
-    return;
-  }
-
-  if(confirm('Are you sure you want to quit? Incomplete session data will be lost.')) {
-    return;
-  }
-  else {
-    // electron treats any return value that is not 'null' as intent to stay on the page
-    return false;
-  }
-};
-
-$('.actionBtn').click(function() {
-  actionBtn = true;
-});
 
 (function ()
 {
