@@ -705,8 +705,9 @@ function goToExercises() {
       // goes back to the resting position
       if ((threshold_flag === 'up') && (currR < top_thresh) || (threshold_flag === 'down') && (currR > bottom_thresh)) {
         window.actionBtn = true;
-        setTimeout(action('stop', 'practice'), 2000);
-        // action('stop', 'practice');
+        //setTimeout(action('stop', 'practice'), 2000);
+        setTimeout(successAlert( numReps + ' repetitions completed. Stop recording now.'), 2500);
+        action('stop', 'practice');
       }
       return [reps, threshold_flag];
     }
