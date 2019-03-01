@@ -556,28 +556,33 @@ $('.actionBtn').click(function() {
     let cor = parameters.corners;
     let hand_x = parameters.hx;
     let hand_y = parameters.hy;
+    let hand_z = parameters.hz;
     let r = parameters.radius;
+    let type = parameters.parsedURL.type;
+    let mode = parameters.parsedURL.mode;
     ctx.beginPath();
     ctx.strokeStyle = "#ff0000";
-    ctx.fillStyle = "#ff0000";
-    ctx.lineWidth = 2;
+    ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.lineWidth = 10;
     for (var i = 0; i <= rot; i++) {
         var angle = i * 2 * Math.PI / cor - Math.PI / 2 + rot;
         ctx.lineTo(x + r * Math.cos(angle), y + r * Math.sin(angle));
     }
     ctx.stroke();
     ctx.fill();
-    ctx.font = "24px Arial";
+    ctx.font = "20px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.fillText("STOP", canvas.width/4 * 3, canvas.height/11 * 3.001);
     ctx.closePath();
     let dist = Math.sqrt(Math.pow((hand_x - x),2) + Math.pow((hand_y - y), 2))
-
-
-    if(dist <= r){
+    
+    // Stop button only works when the exercise has started i.e. mode == play
+    // hand_z decreases as you get closer to the Kinect. Value 1.2 is about 2.5 steps away from the Kinect
+    if(dist <= r && mode == 'play' && hand_z < 1.2){
       //When person's hand enters stop, the practice session will stop
       window.actionBtn = true;
-      action('stop', 'practice');
+      action('stop', type);
     }
 }
 
@@ -802,9 +807,11 @@ $('.actionBtn').click(function() {
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
         //set up the stop button. x is for rotation, just for fun. maybe we can add some animations to the stop button
+        // body.joints[11] is for the right hand.
         x = x + 0.1
-        drawStop({x: canvas.width/4 * 3, y: canvas.height/4, corners: 8, radius: 50, rotation: x, 
-                  hx: body.joints[11].depthX * width, hy: body.joints[11].depthY * height}, ctx);
+        drawStop({x: canvas.width/4 * 3, y: canvas.height/4, corners: 8, radius: 44, rotation: x, 
+                  hx: body.joints[11].depthX * width, hy: body.joints[11].depthY * height, hz: body.joints[11].cameraZ, 
+                  parsedURL: parsedURL}, ctx);
 
         document.addEventListener('timer-done', function(evt){
           nx_1stFrame = neck_x;
