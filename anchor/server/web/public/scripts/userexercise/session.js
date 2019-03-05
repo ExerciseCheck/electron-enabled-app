@@ -537,9 +537,9 @@ function goToExercises() {
   function drawStop(parameters, ctx) {
     let x = parameters.x;
     let y = parameters.y;
-    let hand_x = parameters.hx;
-    let hand_y = parameters.hy;
-    let hand_z = parameters.hz;
+    let wrist_x = parameters.wx;
+    let wrist_y = parameters.wy;
+    let wrist_z = parameters.wz;
     let r = parameters.radius;
     let type = parameters.parsedURL.type;
     let mode = parameters.parsedURL.mode;
@@ -547,7 +547,7 @@ function goToExercises() {
     ctx.beginPath();
     ctx.strokeStyle = "#ff0000";
     // Make the stop sign solid when it is below the stop threshold
-    if(hand_z < 2.4){
+    if(wrist_z < 2.4){
       alpha = 1;
     }
     ctx.arc(x, y, r, 0, 2 * Math.PI, false);
@@ -560,14 +560,13 @@ function goToExercises() {
     ctx.fillStyle = "#ffffff";
     ctx.fillText("STOP", canvas.width/4 * 3, canvas.height/11 * 3.001);
     ctx.closePath();
-    let dist = Math.sqrt(Math.pow((Math.floor(hand_x) - x),2) + Math.pow((Math.floor(hand_y) - y), 2))
+    let dist = Math.sqrt(Math.pow((Math.floor(wrist_x) - x),2) + Math.pow((Math.floor(wrist_y) - y), 2))
   
     // Stop button only works when the exercise has started i.e. mode == play
-    // had to offset r by 18 pixels due to the errors in the hand x,y values
-    if(dist <= r-18 && mode == 'play' && hand_z < 2.4){
-      //When person's hand enters stop, the practice session will stop
+    if(dist <= r && mode == 'play' && wrist_z < 2.4){
+      //When person's wrist enters stop, the practice session will stop
       window.actionBtn = true;
-      console.log('Stop button hit!', hand_x, hand_y, r-18, dist, mode);
+      // console.log('Stop button hit!', wrist_x, wrist_y, r, dist, mode);
       action('stop', type);
       // return 'done' so that multiple action() calls are not made as it takes a few seconds for the mode to change
       // from 'play' to 'stop'
@@ -613,13 +612,12 @@ function goToExercises() {
     //connect all the joints with the order defined in jointType
 
     ctx.beginPath();
-    ctx.moveTo(body.joints[7].depthX * width, body.joints[7].depthY * height);
+    ctx.moveTo(body.joints[6].depthX * width, body.joints[6].depthY * height);
     jointType.forEach(function(jointType){
       ctx.lineTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
       ctx.moveTo(body.joints[jointType].depthX * width, body.joints[jointType].depthY * height);
-
     });
-
+    
     ctx.lineWidth=8;
     ctx.strokeStyle=color;
     ctx.stroke();
@@ -797,12 +795,12 @@ function goToExercises() {
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
         //set up the stop button. Maybe we can add some animations to the stop button
-        //body.joints[11] is for the right hand.
+        //body.joints[10] is for the right wrist.
         //drawStopStatus changes to 'done' as soon as action('stop', ...) is called by drawStop()
         if (parsedURL.mode == 'play' && drawStopStatus == 'do')
         {
-          drawStopStatus = drawStop({x: canvas.width/4 * 3, y: canvas.height/4, radius: 44, hx: body.joints[11].depthX * width,
-                           hy: body.joints[11].depthY * height, hz: body.joints[11].cameraZ, parsedURL: parsedURL}, ctx);
+          drawStopStatus = drawStop({x: canvas.width/4 * 3, y: canvas.height/4, radius: 44, wx: body.joints[10].depthX * width,
+                           wy: body.joints[10].depthY * height, wz: body.joints[10].cameraZ, parsedURL: parsedURL}, ctx);
         }
         
         document.addEventListener('timer-done', function(evt){
