@@ -537,8 +537,6 @@ function goToExercises() {
   function drawStop(parameters, ctx) {
     let x = parameters.x;
     let y = parameters.y;
-    let rot = parameters.rotation;
-    let cor = parameters.corners;
     let hand_x = parameters.hx;
     let hand_y = parameters.hy;
     let hand_z = parameters.hz;
@@ -552,28 +550,30 @@ function goToExercises() {
     if(hand_z < 2.4){
       alpha = 1;
     }
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
     ctx.fillStyle = "rgba(255, 0, 0, " + alpha + ")";
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.lineWidth = 10;
-    for (var i = 0; i <= rot; i++) {
-        var angle = i * 2 * Math.PI / cor - Math.PI / 2 + rot;
-        ctx.lineTo(x + r * Math.cos(angle), y + r * Math.sin(angle));
-    }
-    ctx.stroke();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.fill();
     ctx.font = "20px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.fillText("STOP", canvas.width/4 * 3, canvas.height/11 * 3.001);
     ctx.closePath();
-    let dist = Math.sqrt(Math.pow((hand_x - x),2) + Math.pow((hand_y - y), 2))
-    
+    let dist = Math.sqrt(Math.pow((Math.floor(hand_x) - x),2) + Math.pow((Math.floor(hand_y) - y), 2))
+  
     // Stop button only works when the exercise has started i.e. mode == play
-    // hand_z decreases as you get closer to the Kinect. Value 1.4 is about 3 steps away from the Kinect
-    if(dist <= r && mode == 'play' && hand_z < 2.4){
+    // had to offset r by 18 pixels due to the errors in the hand x,y values
+    if(dist <= r-18 && mode == 'play' && hand_z < 2.4){
       //When person's hand enters stop, the practice session will stop
       window.actionBtn = true;
+      console.log('Stop button hit!', hand_x, hand_y, r-18, dist, mode);
       action('stop', type);
+      // return 'done' so that multiple action() calls are not made as it takes a few seconds for the mode to change
+      // from 'play' to 'stop'
+      return "done";
     }
+    return 'do';
 }
 
   function startTimer() {
@@ -751,8 +751,8 @@ function goToExercises() {
 
   //only start drawing with a body frame is detected
   //even though
-
-  let x = 1
+  // Stop status is required to prevent multiple calls to action() when stopping exercise
+  let drawStopStatus = 'do';
   window.Bridge.aOnBodyFrame = (bodyFrame) =>
   {
     const parsedURL = parseURL(window.location.pathname);
@@ -796,13 +796,15 @@ function goToExercises() {
         //draw the body skeleton in live canvas
         drawBody(body,ctx, liveBodyColor, commonBlue);
 
-        //set up the stop button. x is for rotation, just for fun. maybe we can add some animations to the stop button
-        // body.joints[11] is for the right hand.
-        x = x + 0.1
-        drawStop({x: canvas.width/4 * 3, y: canvas.height/4, corners: 8, radius: 44, rotation: x, 
-                  hx: body.joints[11].depthX * width, hy: body.joints[11].depthY * height, hz: body.joints[11].cameraZ, 
-                  parsedURL: parsedURL}, ctx);
-
+        //set up the stop button. Maybe we can add some animations to the stop button
+        //body.joints[11] is for the right hand.
+        //drawStopStatus changes to 'done' as soon as action('stop', ...) is called by drawStop()
+        if (parsedURL.mode == 'play' && drawStopStatus == 'do')
+        {
+          drawStopStatus = drawStop({x: canvas.width/4 * 3, y: canvas.height/4, radius: 44, hx: body.joints[11].depthX * width,
+                           hy: body.joints[11].depthY * height, hz: body.joints[11].cameraZ, parsedURL: parsedURL}, ctx);
+        }
+        
         document.addEventListener('timer-done', function(evt){
           nx_1stFrame = neck_x;
           ny_1stFrame = neck_y;
