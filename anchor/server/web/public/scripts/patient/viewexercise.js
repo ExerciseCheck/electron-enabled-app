@@ -53,7 +53,7 @@ $(".listButtons a").click(function() {
   event.preventDefault();
   const addressValue = $(this).attr("href");
   const addressToArray = addressValue.split('/');
-  const exerciseId = addressToArray[5];
+  const exerciseId = addressToArray[4];
   const checkPrac = 'api/userexercise/practice/' + exerciseId + '/';
 
   $.get(checkPrac, function(data) {
