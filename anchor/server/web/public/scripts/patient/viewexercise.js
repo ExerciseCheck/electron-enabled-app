@@ -17,10 +17,12 @@ function filter() {
   })
 }
 
+
 function initializePractice(exerciseId, addressValue) {
 
   const values = {};
   const url = 'api/userexercise/loadreference/' + exerciseId + '/';
+  console.log("exeID: " + exerciseId);
   values.exerciseId = exerciseId;
   values.weekStart = new Date().getWeekNumber();
 
@@ -53,7 +55,8 @@ $(".listButtons a").click(function() {
   event.preventDefault();
   const addressValue = $(this).attr("href");
   const addressToArray = addressValue.split('/');
-  const exerciseId = addressToArray[5];
+  const exerciseId = addressToArray[4];
+  console.log(exerciseId);
   const checkPrac = 'api/userexercise/practice/' + exerciseId + '/';
 
   $.get(checkPrac, function(data) {
