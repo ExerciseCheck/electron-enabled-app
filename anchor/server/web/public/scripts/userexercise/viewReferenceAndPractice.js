@@ -136,7 +136,7 @@ function downloadDataForPractice(userAndExerciseIds, id) {
 
   $.ajax({
     type: 'GET',
-    url: '/api/practice/' + id,
+    url: 'api/practice/' + id,
     success: function (result) {
 
       for ( var i=0; i<result.sets.length; i++ )
@@ -165,7 +165,7 @@ function downloadDataForReference(userAndExerciseIds, id) {
 
   $.ajax({
     type: 'GET',
-    url: '/api/reference/' + id,
+    url: 'api/reference/' + id,
     success: function (result) {
       result.bodyFrames = JSON.parse(pako.inflate(result.bodyFrames, { to: 'string' }));
 

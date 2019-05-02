@@ -12,11 +12,11 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Record Id</th>
-                                <th>exerciseName</th>
+                                <th>ExerciseName</th>
                                 <th>UserId</th>
                                 <th>Name</th>
                                 <th>ExerciseId</th>
-                                <th>createdAt</th>
+                                <th>CreatedAt</th>
                               {{#role user 'admin'}}
                                   <th>Edit</th>
                                   <th>Delete</th>
@@ -59,8 +59,9 @@
                   render: function (data, type, row) {
 
                     recordId =  row._id;
-                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName.split(/[\s,]+/).join("_"), row.name.split(/[\s,]+/).join("_")];
-                    return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForPractice(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
+                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName? row.exerciseName.split(/[\s,]+/).join("_"): "", row.name ? row.name.split(/[\s,]+/).join("_"): ""];
+
+                      return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForPractice(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
                   }
 
                 },
