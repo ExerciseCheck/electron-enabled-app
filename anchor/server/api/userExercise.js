@@ -7,16 +7,20 @@ const Smoothing = require('../web/helpers/smoothingMethod');
 const getSpeed = require('../web/helpers/getSpeed');
 const Pako = require('pako');
 const ObjectID = require('mongodb').ObjectID;
+const PracticeExercise = require('../models/practiceExercise');
+const ReferenceExercise = require('../models/referenceExercise');
+const Exercise = require('../models/exercise');
+const User = require('../models/user');
 
 const internals = {};
 
 
 internals.applyRoutes = function (server, next) {
 
-  const PracticeExercise = server.plugins['hicsail-hapi-mongo-models'].PracticeExercise;
-  const ReferenceExercise = server.plugins['hicsail-hapi-mongo-models'].ReferenceExercise;
-  const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
-  const User = server.plugins['hicsail-hapi-mongo-models'].User;
+  // const PracticeExercise = server.plugins['hicsail-hapi-mongo-models'].PracticeExercise;
+  // const ReferenceExercise = server.plugins['hicsail-hapi-mongo-models'].ReferenceExercise;
+  // const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
+  // const User = server.plugins['hicsail-hapi-mongo-models'].User;
 
 //Will eventually get rid of because no longer need user exercises page but this should now load REF EX
   server.route({
@@ -32,20 +36,40 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
+      const sortOrder = request.query['order[0][dir]'] === 'desc' ? '' : '-';
       const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
 
-      ReferenceExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+      console.log("\n\n" + sort + "\n" + limit + "\n" + page + "\n");
+      // console.log("\n\n" + fields);
+      let fieldlist = fields.split(' ');
+      // console.log(fieldlist);
+      let fields_obj = {};
+      fieldlist.slice(1).forEach(function(f){
+        fields_obj[f] = 1
+      });
+      // console.log(fields_obj);
 
-        var referenceExercises = [];
+      const filter = {};
 
-        Async.each(results.data,
+      const pipeLine = [
+        { '$match': filter },
+        { '$sort': { createdAt: -1 } },
+        // { '$project': {'bodyFrames':0, }  }
+        { '$project': fields_obj}
+      ];
 
+      // ReferenceExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+      ReferenceExercise.aggregate(pipeLine, (err, results) => {
+        let referenceExercises = [];
+
+        // Async.each(results.data,
+        Async.each(results,
           (referenceExercise, done) => {
 
+          // console.log("\n\nHERE", referenceExercise);
           User.findById(referenceExercise.userId, (err, user) => {
 
             if (err) {
@@ -62,6 +86,7 @@ internals.applyRoutes = function (server, next) {
                 //need this check because they might have been deleted
                 if (exercise) {
                   referenceExercise.exerciseName = exercise.exerciseName;
+                  // referenceExercises.push(referenceExercise);
                 }
                 referenceExercises.push(referenceExercise);
                 done();
@@ -69,6 +94,7 @@ internals.applyRoutes = function (server, next) {
 
             }
           });
+
         },
 
           function(err){
@@ -76,10 +102,13 @@ internals.applyRoutes = function (server, next) {
             return reply(err);
           }
 
+          // console.log(referenceExercises[0]);
           reply({
             draw: request.query.draw,
-            recordsTotal: results.data.length,
-            recordsFiltered: results.items.total,
+            // recordsTotal: results.data.length,
+            // recordsFiltered: results.items.total,
+            // recordsFiltered: 10,
+            recordsTotal: referenceExercises.length,
             data: referenceExercises,
             error: err
           });
@@ -109,32 +138,35 @@ internals.applyRoutes = function (server, next) {
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
 
-      PracticeExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+      console.log("\n\nRequest: \n" );
+      console.log(request)
+      PracticeExercise.pagedFind({}, fields, sort, 9, page, (err, results) => {
 
-        var referenceExercises = [];
+        let practiceExercises = [];
 
         Async.each(results.data,
 
-          (referenceExercise, done) => {
+          (practiceExercise, done) => {
 
-          User.findById(referenceExercise.userId, (err, user) => {
+          User.findById(practiceExercise.userId, (err, user) => {
 
             if (err) {
               done(err);
             }
             //need this check because they might have been deleted
             if (user) {
-              referenceExercise.name = user.name;
-              Exercise.findById(referenceExercise.exerciseId, (err, exercise) => {
+              practiceExercise.name = user.name;
+              Exercise.findById(practiceExercise.exerciseId, (err, exercise) => {
 
                 if (err) {
                   done(err);
                 }
                 //need this check because they might have been deleted
                 if (exercise) {
-                  referenceExercise.exerciseName = exercise.exerciseName;
+                  practiceExercise.exerciseName = exercise.exerciseName;
+                  // practiceExercises.push(practiceExercise);
                 }
-                referenceExercises.push(referenceExercise);
+                practiceExercises.push(practiceExercise);
                 done();
               });
 
@@ -151,7 +183,7 @@ internals.applyRoutes = function (server, next) {
             draw: request.query.draw,
             recordsTotal: results.data.length,
             recordsFiltered: results.items.total,
-            data: referenceExercises,
+            data: practiceExercises,
             error: err
           });
 
@@ -1060,9 +1092,10 @@ internals.applyRoutes = function (server, next) {
     }
   });
 
+
   server.route({
     method: 'DELETE',
-    path: '/userexercise/{id}',
+    path: '/userexercise/ref/{id}',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session'],
@@ -1072,6 +1105,33 @@ internals.applyRoutes = function (server, next) {
     handler: function (request, reply) {
 
       ReferenceExercise.findByIdAndDelete(request.params.id, (err, document) => {
+
+        if (err) {
+          return reply(err);
+        }
+
+        if (!document) {
+          return reply(Boom.notFound('Document not found.'));
+        }
+
+        reply({ message: 'Success.' });
+      });
+    }
+  });
+
+
+  server.route({
+    method: 'DELETE',
+    path: '/userexercise/prac/{id}',
+    config: {
+      auth: {
+        strategies: ['simple', 'jwt', 'session'],
+        scope: ['root','admin','clinician']
+      }
+    },
+    handler: function (request, reply) {
+
+      PracticeExercise.findByIdAndDelete(request.params.id, (err, document) => {
 
         if (err) {
           return reply(err);

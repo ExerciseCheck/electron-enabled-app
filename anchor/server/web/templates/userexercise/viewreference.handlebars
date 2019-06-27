@@ -39,6 +39,7 @@
       table = $('#userTable').DataTable({
             processing: true,
             serverSide: true,
+        paging: true,
             scrollX: true,
             scrollY: '500px',
             scrollCollapse: true,
@@ -59,9 +60,9 @@
                       data: "createdAt",
                       render: function (data, type, row) {
                         recordId =  row._id;
-                       userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName? row.exerciseName.split(/[\s,]+/).join("_"): "", row.name ? row.name.split(/[\s,]+/).join("_"): ""];
+                        userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName? row.exerciseName.split(/[\s,]+/).join("_"): "", row.name? row.name.split(/[\s,]+/).join("_"): "", row.createdAt];
 
-                        return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
+                        return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(\'' + userAndExerciseIds + '\', \'' + recordId + '\')">Download</button>';
 
                       }
 
@@ -99,19 +100,14 @@
                       data: "_id",
                       visible: false,
                       render: function (data, type, row) {
-                          if ( row.type === 'Reference' ) {
-                            return '<button class="btn btn-secondary" id="edit' + row._id + '" onclick="editDoc(\'' + row._id + '\')">Edit</button>';
-                          }
-                          else {
-                            return'';
-                          }
+                         return '<button class="btn btn-secondary" id="edit' + row._id + '" onclick="editDocRef(\'' + row._id + '\')">Edit</button>';
                       },
                   },
                   {
                       data: "_id",
                       visible: false,
                       render: function (data, type, row) {
-                          return '<button class="btn btn-danger" id="delete' + row._id + '" onclick="deleteDoc(\'' + row._id + '\')">Delete</button>';
+                          return '<button class="btn btn-danger" id="delete' + row._id + '" onclick="deleteDocRef(\'' + row._id + '\')">Delete</button>';
                       },
 
                   }
@@ -122,3 +118,5 @@
 </script>
 <script type="text/javascript" src="public/scripts/userexercise/viewReferenceAndPractice.js"></script>
 <link rel="stylesheet" href="public/css/styleSheet/genericStyles.css">
+
+

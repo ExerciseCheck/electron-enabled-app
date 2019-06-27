@@ -31,6 +31,9 @@
     </div>
 </div>
 <script>
+
+
+
     var table;
     $(document).ready(function () {
         var userAndExerciseIds = [];
@@ -38,6 +41,7 @@
         table = $('#userTable').DataTable({
             processing: true,
             serverSide: true,
+          paging: true,
             scrollX: true,
             scrollY: '500px',
             scrollCollapse: true,
@@ -50,7 +54,8 @@
                 url : "api/table/practiceExercise",
                 data: function (d) {
                     d.fields = "_id exerciseName userId exerciseId referenceId createdAt";
-                }
+                },
+                pages: 5
             },
             columns: [
                 {{#role user 'clinician'}}
@@ -58,19 +63,19 @@
                   data: "createdAt",
                   render: function (data, type, row) {
 
-                    recordId =  row._id;
-                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName? row.exerciseName.split(/[\s,]+/).join("_"): "", row.name ? row.name.split(/[\s,]+/).join("_"): ""];
+                    recordId = row._id;
+                    userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName? row.exerciseName.split(/[\s,]+/).join("_"): "", row.name? row.name.split(/[\s,]+/).join("_"): "", row.createdAt];
 
-                      return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForPractice(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
+                      return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForPractice(\'' + userAndExerciseIds + '\', \'' + recordId + '\')">Download</button>';
                   }
 
                 },
                 {{/role}}
-                 {
-                   data: "_id",
-                   defaultContent: ""
-                 },
-                 {
+                {
+                    data: "_id",
+                    defaultContent: ""
+                },
+                {
                     data: "exerciseName",
                     defaultContent: ""
                 },
@@ -84,7 +89,7 @@
                   visible: true,
                   defaultContent: ""
                 },
-              {
+                {
                     data: "exerciseId",
                     visible: false,
                     defaultContent: ""
@@ -92,7 +97,7 @@
                 {
                     data: "createdAt",
                     render: function (data, type, row) {
-                      var date = new Date(row.createdAt);
+                       var date = new Date(row.createdAt);
                        return date.toDateString() + ' ' + date.toLocaleTimeString('en-us');
                     }
                 },
@@ -101,19 +106,19 @@
                       data: "_id",
                       visible: false,
                       render: function (data, type, row) {
-                          if ( row.type === 'Reference' ) {
-                            return '<button class="btn btn-secondary" id="edit' + row._id + '" onclick="editDoc(\'' + row._id + '\')">Edit</button>';
-                          }
-                          else {
-                            return'';
-                          }
+                          // if ( row.type === 'Reference' ) {
+                            return '<button class="btn btn-secondary" id="edit' + row._id + '" onclick="editDocPrac(\'' + row._id + '\')">Edit</button>';
+                          // }
+                          // else {
+                          //   return'';
+                          // }
                       },
                   },
                   {
                       data: "_id",
                       visible: false,
                       render: function (data, type, row) {
-                          return '<button class="btn btn-danger" id="delete' + row._id + '" onclick="deleteDoc(\'' + row._id + '\')">Delete</button>';
+                          return '<button class="btn btn-danger" id="delete' + row._id + '" onclick="deleteDocPrac(\'' + row._id + '\')">Delete</button>';
                       },
 
                   }
