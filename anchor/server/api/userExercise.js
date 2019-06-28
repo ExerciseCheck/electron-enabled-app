@@ -63,6 +63,7 @@ internals.applyRoutes = function (server, next) {
       ];
 
       // ReferenceExercise.pagedFind({}, fields, sort, limit, page, (err, results) => {
+      //TODO: better use lookup??
       ReferenceExercise.aggregate(pipeLine, (err, results) => {
         let referenceExercises = [];
 
@@ -135,7 +136,7 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const sortOrder = request.query['order[0][dir]'] === 'asc' ? ' ' : '-';
+      const sortOrder = request.query['order[0][dir]'] === 'asc' ? '-' : ' '; //DESC
       const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
@@ -143,15 +144,25 @@ internals.applyRoutes = function (server, next) {
 
       // console.log("\n\nrequest.query: " );
       // console.log(request.query);
-      // console.log(request.query['search[value]']);
+
+      const search = (request.query['search[value]']);
+      console.log("\nSearch: ", search);
+      let filter = {
+        '$or': [
+          {'name': search},
+          {'exerciseName': search}
+        ]
+      };
+
       let practiceExercises = [];
+      let filtered_practiceExercises = [];
 
       Async.auto({
 
         findAllPractices: function (done) {
-            PracticeExercise.pagedFind({}, fields, sort, limit, page, done)
+            PracticeExercise.pagedFind( {}, fields, sort, limit, page, done)
         },
-        findExercise:['findAllPractices', function (results, done) {
+        joinNames:['findAllPractices', function (results, done) {
 
           let n = results.findAllPractices.data.length;
           console.log("\nLENGTH: ", n);
@@ -177,18 +188,37 @@ internals.applyRoutes = function (server, next) {
                         practiceExercise.exerciseName = exercise.exerciseName;
                         // practiceExercises.push(practiceExercise);
                       }
+
                       practiceExercises.push(practiceExercise);
-                      done();
+                      done()
                     });
                   }
 
               });
+
             });
-
-          done();
-
+          // done();
+          done(null, practiceExercises);
         }],
+        filterOnSearch: ['joinNames', function (results, done) {
+          if (search === '') {
+            filtered_practiceExercises = results.joinNames;
+            console.log(filtered_practiceExercises[0]);
+          } else {
+            results.joinNames.forEach(function(prac) {
+              if (prac.name === search || prac.exerciseName === search) {
+                filtered_practiceExercises.push(prac);
+                console.log(prac);
+              }
+            })
+          }
+          console.log(results.joinNames);
+          console.log(practiceExercises);
+
+          done(null, filtered_practiceExercises);
+        }]
       }, (err, results) => {
+        // console.log(results);
         if (err) {
           return reply(err);
         }
@@ -196,11 +226,13 @@ internals.applyRoutes = function (server, next) {
             draw: request.query.draw,
             recordsTotal: results.findAllPractices.items.total,
             recordsFiltered: results.findAllPractices.items.total,
-            data: practiceExercises,
+            data: results.filterOnSearch,
             error: err
         });
 
       });
+
+
     }
   });
 
