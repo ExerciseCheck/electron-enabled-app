@@ -22,10 +22,10 @@ internals.applyRoutes = function (server, next) {
   // const Exercise = server.plugins['hicsail-hapi-mongo-models'].Exercise;
   // const User = server.plugins['hicsail-hapi-mongo-models'].User;
 
-//Will eventually get rid of because no longer need user exercises page but this should now load REF EX
+  //serverSide: false
   server.route({
     method: 'GET',
-    path: '/table/refexercise',
+    path: '/table/referenceExercise',
     config: {
       auth: {
         strategies: ['simple', 'jwt', 'session']
@@ -36,13 +36,15 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const sortOrder = request.query['order[0][dir]'] === 'desc' ? '' : '-';
-      const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
-      const limit = Number(request.query.length);
-      const page = Math.ceil(Number(request.query.start) / limit) + 1;
+      // const sortOrder = request.query['order[0][dir]'] === 'desc' ? '' : '-';
+      // const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
+      // const limit = Number(request.query.length);
+      // const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
+      //
+      // console.log("\n\n" + sort + "\n" + limit + "\n" + page + "\n");
 
-      console.log("\n\n" + sort + "\n" + limit + "\n" + page + "\n");
+
       // console.log("\n\n" + fields);
       let fieldlist = fields.split(' ');
       // console.log(fieldlist);
@@ -56,8 +58,7 @@ internals.applyRoutes = function (server, next) {
 
       const pipeLine = [
         { '$match': filter },
-        { '$sort': { createdAt: -1 } },
-        // { '$project': {'bodyFrames':0, }  }
+        { '$sort': { "createdAt" : -1 } },
         { '$project': fields_obj}
       ];
 
@@ -102,15 +103,16 @@ internals.applyRoutes = function (server, next) {
             return reply(err);
           }
 
-          // console.log(referenceExercises[0]);
+          // console.log(referenceExercises);
+
           reply({
-            draw: request.query.draw,
+            draw: 1,
             // recordsTotal: results.data.length,
             // recordsFiltered: results.items.total,
-            // recordsFiltered: 10,
+            recordsFiltered: referenceExercises.length,
             recordsTotal: referenceExercises.length,
             data: referenceExercises,
-            error: err
+            // error: err
           });
 
         });
@@ -118,6 +120,7 @@ internals.applyRoutes = function (server, next) {
       });
     }
   });
+
 
   server.route({
     method: 'GET',
@@ -132,67 +135,74 @@ internals.applyRoutes = function (server, next) {
     },
     handler: function (request, reply) {
 
-      const sortOrder = request.query['order[0][dir]'] === 'asc' ? '' : '-';
+      const sortOrder = request.query['order[0][dir]'] === 'asc' ? ' ' : '-';
       const sort = sortOrder + request.query['columns[' + Number(request.query['order[0][column]']) + '][data]'];
       const limit = Number(request.query.length);
       const page = Math.ceil(Number(request.query.start) / limit) + 1;
       const fields = request.query.fields;
 
-      console.log("\n\nRequest: \n" );
-      console.log(request)
-      PracticeExercise.pagedFind({}, fields, sort, 9, page, (err, results) => {
+      // console.log("\n\nrequest.query: " );
+      // console.log(request.query);
+      // console.log(request.query['search[value]']);
+      let practiceExercises = [];
 
-        let practiceExercises = [];
+      Async.auto({
 
-        Async.each(results.data,
-
-          (practiceExercise, done) => {
-
-          User.findById(practiceExercise.userId, (err, user) => {
-
-            if (err) {
-              done(err);
-            }
-            //need this check because they might have been deleted
-            if (user) {
-              practiceExercise.name = user.name;
-              Exercise.findById(practiceExercise.exerciseId, (err, exercise) => {
-
-                if (err) {
-                  done(err);
-                }
-                //need this check because they might have been deleted
-                if (exercise) {
-                  practiceExercise.exerciseName = exercise.exerciseName;
-                  // practiceExercises.push(practiceExercise);
-                }
-                practiceExercises.push(practiceExercise);
-                done();
-              });
-
-            }
-          });
+        findAllPractices: function (done) {
+            PracticeExercise.pagedFind({}, fields, sort, limit, page, done)
         },
+        findExercise:['findAllPractices', function (results, done) {
 
-          function(err){
-          if (err) {
-            return reply(err);
-          }
+          let n = results.findAllPractices.data.length;
+          console.log("\nLENGTH: ", n);
 
-          reply({
+          Async.each(results.findAllPractices.data,
+            (practiceExercise, done) => {
+
+              User.findById(practiceExercise.userId, (err, user) => {
+
+                  if (err) {
+                    done(err);
+                  }
+                  //need this check because they might have been deleted
+                  if (user) {
+                    practiceExercise.name = user.name;
+                    Exercise.findById(practiceExercise.exerciseId, (err, exercise) => {
+
+                      if (err) {
+                        done(err);
+                      }
+                      //need this check because they might have been deleted
+                      if (exercise) {
+                        practiceExercise.exerciseName = exercise.exerciseName;
+                        // practiceExercises.push(practiceExercise);
+                      }
+                      practiceExercises.push(practiceExercise);
+                      done();
+                    });
+                  }
+
+              });
+            });
+
+          done();
+
+        }],
+      }, (err, results) => {
+        if (err) {
+          return reply(err);
+        }
+        reply({
             draw: request.query.draw,
-            recordsTotal: results.data.length,
-            recordsFiltered: results.items.total,
+            recordsTotal: results.findAllPractices.items.total,
+            recordsFiltered: results.findAllPractices.items.total,
             data: practiceExercises,
             error: err
-          });
-
         });
 
       });
     }
   });
-
 
 
   // this call does not seem to be used?

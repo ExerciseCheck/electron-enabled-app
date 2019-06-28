@@ -92,7 +92,8 @@ ReferenceExercise.activatePayload = Joi.object().keys({
 ReferenceExercise.indexes = [
   { key: { '_id': 1 } },
   { key: { userId: 1 } },
-  { key: { exerciseId: 1 } }
+  { key: { exerciseId: 1 } },
+  { key: { createdAt: 1 } }
 ];
 
 
