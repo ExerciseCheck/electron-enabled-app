@@ -52,7 +52,7 @@
     "joi": "10.x.x",
     "joi-password-complexity": "2.x.x",
     "jsonwebtoken": "8.x.x",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.19",
     "lout": "10.x.x",
     "mongo-models": "1.x.x",
     "mongodb": "2.x.x",
