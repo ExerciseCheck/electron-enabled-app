@@ -1,15 +1,18 @@
-version: '2'
+version: '3'
 services:
-  mongo:
-    image: mongo
+  mongo-exercisecheck:
+    image: mongo:3.4
     ports:
-    — "9000:9000"
-  anchor:
+      - 27018:27017
+    volumes:
+      - ./data/mongo:/data/db
+  exercisecheck:
     build: .
     restart: always
     depends_on:
-      - mongo
+      - mongo-exercisecheck
     ports:
-      - "9000:9000"
+      - 9000:9000
     environment:
-      - NODE_ENV='local'
+      - NODE_ENV='production'
+      - MONGO_URL='mongodb://mongo-exercisecheck:27017/exercisecheck'
