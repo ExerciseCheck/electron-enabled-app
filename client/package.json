@@ -5,13 +5,12 @@
   "main": "app/main.js",
   "scripts": {
     "start": "electron .",
-    "postinstall": "cd node_modules/kinect2/ && npm install async && npm run build:electron",
+    "postinstall": "electron-builder install-app-deps && cd node_modules/kinect2/ && npm install async && npm run build:electron",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
   "build": {
     "appId": "edu.bu.sail.exercisecheck",
-    "buildDependenciesFromSource": true,
     "win": {
       "target": "portable"
     }
@@ -20,11 +19,11 @@
   "author": "GitHub",
   "license": "MIT",
   "devDependencies": {
-    "electron": "~4.0.8",
-    "electron-builder": "^20.39.0"
+    "electron": "~1.8.3",
+    "electron-builder": "^20.28.4",
+    "electron-is-dev": "1.0.1"
   },
   "dependencies": {
-    "kinect2": "^0.1.6",
-    "electron-is-dev": "1.0.1"
+    "kinect2": "^0.1.5"
   }
 }

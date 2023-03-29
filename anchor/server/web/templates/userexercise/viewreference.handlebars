@@ -12,11 +12,11 @@
                             <tr>
                                 <th>Download</th>
                                 <th>Name</th>
-                                <th>exerciseName</th>
-                                <th>numSets</th>
-                                <th>numRepetition</th>
-                                <th>difficultyLevel</th>
-                                <th>createdAt</th>
+                                <th>ExerciseName</th>
+                                <th>NumSets</th>
+                                <th>NumRepetition</th>
+                                <th>DifficultyLevel</th>
+                                <th>CreatedAt</th>
                               {{#role user 'admin'}}
                                   <th>Edit</th>
                                   <th>Delete</th>
@@ -59,7 +59,8 @@
                       data: "createdAt",
                       render: function (data, type, row) {
                         recordId =  row._id;
-                        userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName.split(/[\s,]+/).join("_"), row.name.split(/[\s,]+/).join("_")];
+                       userAndExerciseIds = [row.userId, row.exerciseId, row.exerciseName? row.exerciseName.split(/[\s,]+/).join("_"): "", row.name ? row.name.split(/[\s,]+/).join("_"): ""];
+
                         return '<button class="btn btn-primary btm-sm" id="download'+row.exerciseId+'" href="#" value="Generate data" onclick="downloadDataForReference(\'' + userAndExerciseIds + '\'  ,\'' + recordId + '\')">Download</button>';
 
                       }
