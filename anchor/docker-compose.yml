@@ -1,6 +1,7 @@
 version: '3'
 services:
   mongo-exercisecheck:
+    restart: always
     image: mongo:3.4
     ports:
       - 27018:27017
@@ -14,5 +15,7 @@ services:
     ports:
       - 9000:9000
     environment:
-      - NODE_ENV='production'
-      - MONGO_URL='mongodb://mongo-exercisecheck:27017/exercisecheck'
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo-exercisecheck:27017/exercisecheck
+      - PROJECT_NAME=ExerciseCheck
+      - BASE_URL=https://sail3.bu.edu/exercisecheck
