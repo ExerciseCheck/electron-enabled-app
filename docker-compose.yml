@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  mongo-exercisecheck:
+    restart: always
+    image: mongo:3.4
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/mongo:/data/db
+  exercisecheck:
+    image: hicsail/exercise-check:latest
+    restart: always
+    depends_on:
+      - mongo-exercisecheck
+    ports:
+      - 9004:9000
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo-exercisecheck:27017/exercisecheck
+      - PROJECT_NAME=ExerciseCheck
+      - BASE_URL=https://sail3.bu.edu/exercisecheck
