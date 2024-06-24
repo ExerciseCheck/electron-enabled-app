@@ -7,14 +7,6 @@ const schema = Joi.object({
 
 joiToForm('formFields', schema);
 
-// $('#update').click((event) => {
-//   const exerciseId = window.location.pathname.split('/').pop();
-//   event.preventDefault();
-//   const values = {};
-//   $.each($('#form').serializeArray(), (i, field) => {
-//     values[field.name] = field.value;
-//   });
-
 $('#update').click((event) => {
   const exerciseId = window.location.pathname.split('/').pop();
   event.preventDefault();
@@ -37,5 +29,3 @@ $('#update').click((event) => {
     }
   });
 });
-
-

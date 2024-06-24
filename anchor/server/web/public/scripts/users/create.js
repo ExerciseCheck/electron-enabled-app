@@ -4,8 +4,8 @@ const schema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().lowercase().required(),
   username: Joi.string().token().lowercase().invalid('root').required(),
-  password: Joi.string().required().min(8).regex(/^[A-Z]+[a-z]+[0-9]+$/, '1 Uppercase, 1 lowercase, 1 number'),
-  confirmPassword: Joi.string().required().min(8).regex(/^[A-Z]+[a-z]+[0-9]+$/, '1 Uppercase, 1 lowercase, 1 number')
+  password: Joi.string().required(),
+  confirmPassword: Joi.string().required()
 });
 joiToForm('formFields',schema);
 

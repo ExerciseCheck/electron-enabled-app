@@ -75,7 +75,7 @@ internals.applyRoutes = function (server, next) {
           Joi.validate(request.payload.password, new PasswordComplexity(complexityOptions), (err, value) => {
 
             if (err) {
-              return reply(Boom.conflict('Password does not meet complexity standards'));
+              return reply(Boom.conflict('Your password must have at least 8 characters, 1 lowercase letter, 1 uppercase letter, 1 numeric character, and 1 symbol.'));
             }
             reply(true);
           });
